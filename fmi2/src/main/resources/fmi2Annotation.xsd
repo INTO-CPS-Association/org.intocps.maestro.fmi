@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="fmi2Annotation">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="Tool">
+				<xs:annotation>
+					<xs:documentation>Tool specific annotation (ignored by other tools).</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="name" type="xs:normalizedString" use="required">
+						<xs:annotation>
+							<xs:documentation>Name of tool that can interpret the annotation. "name" must be unique with respect to all other elements of the VendorAnnotation list.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

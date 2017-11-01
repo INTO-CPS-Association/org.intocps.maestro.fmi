@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:attributeGroup name="fmi2RealAttributes">
+		<xs:attribute name="quantity" type="xs:normalizedString"/>
+		<xs:attribute name="unit" type="xs:normalizedString"/>
+		<xs:attribute name="displayUnit" type="xs:normalizedString">
+			<xs:annotation>
+				<xs:documentation>Default display unit, provided the conversion of values in "unit" to values in "displayUnit" is defined in UnitDefinitions / Unit / DisplayUnit.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="relativeQuantity" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>If relativeQuantity=true, offset for displayUnit must be ignored.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="min" type="xs:double"/>
+		<xs:attribute name="max" type="xs:double">
+			<xs:annotation>
+				<xs:documentation>max >= min required</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="nominal" type="xs:double">
+			<xs:annotation>
+				<xs:documentation>nominal > 0.0 required</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="unbounded" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>Set to true, e.g., for crank angle. If true and variable is a state, relative tolerance should be zero on this variable.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="fmi2IntegerAttributes">
+		<xs:attribute name="quantity" type="xs:normalizedString"/>
+		<xs:attribute name="min" type="xs:int"/>
+		<xs:attribute name="max" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>max >= min required</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+</xs:schema>
