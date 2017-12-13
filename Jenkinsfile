@@ -140,7 +140,7 @@ node {
 		}
 	}
 		stage('Build COE') {
-			build '../maestro'
+			build '../maestro/development'
 		}
 }
 
