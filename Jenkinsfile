@@ -140,7 +140,7 @@ node {
 		}
 	}
 		stage('Build COE') {
-			build '../INTO-CPS-Association/maestro'
+			build '../maestro'
 		}
 }
 
