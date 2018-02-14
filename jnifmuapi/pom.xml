@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.intocps.fmi</groupId>
+		<groupId>org.into-cps.fmi</groupId>
 		<artifactId>root</artifactId>
 		<version>0.2.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
@@ -104,20 +104,7 @@
 		</pluginManagement>
 	</build>
 
-	<!-- In Project repository http://charlie.cu.cc/2012/06/how-add-external-libraries-maven/ -->
 
-
-	<repositories>
-
-		<repository>
-			<id>overture.au.dk</id>
-			<name>overture.au.dk-releases</name>
-			<url>http://overture.au.dk/artifactory/into-cps</url>
-		</repository>
-
-		<!-- repository> <id>mxtelecom</id> <name>mxtelecom.com</name> <url>http://opensource.mxtelecom.com/maven/repo</url> 
-			</repository -->
-	</repositories>
 	<dependencies>
 
 		<dependency>
@@ -150,7 +137,7 @@
 		<!-- dependency> <groupId>com.wapmx.native</groupId> <artifactId>mx-native-loader</artifactId> 
 			<version>1.0.3</version> </dependency -->
 		<dependency>
-			<groupId>org.intocps.fmi</groupId>
+			<groupId>org.into-cps.fmi</groupId>
 			<artifactId>fmi2</artifactId>
 			<version>0.2.5-SNAPSHOT</version>
 		</dependency>
