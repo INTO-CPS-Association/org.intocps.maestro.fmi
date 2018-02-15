@@ -155,9 +155,19 @@
             </activation>
 
 
-
             <build>
                 <plugins>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+
+                            <execution>
+                                <id>javah</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
 
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -168,12 +178,13 @@
                                     <tasks>
 
 
-                                        <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
-                                            <fileset dir="${fmi.native.lib}" includes="**/*">
+                                        <copy todir="${project.build.outputDirectory}/lib"
+                                              overwrite="true">
+                                            <fileset dir="${fmi.native.lib}"
+                                                     includes="**/*">
 
                                             </fileset>
                                         </copy>
-
 
 
                                     </tasks>
