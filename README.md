@@ -31,6 +31,11 @@ The project is released to:
 
 # Release Procedure
 
+**Since the binaries are not compilled locally, you have to download the ones from last snapshot before the release** 
+
+- 1. Download last `-SNAPSHOT` extract the `lib` folder and extract the `lib` folder
+- 2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted
+
 Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
 
 ```bash
@@ -61,8 +66,3 @@ git push --follow-tags
 mvn -Dmaven.repo.local=repository release:perform
 ```
 
-**Since the binaries are not compilled locally, you have to update artifactory manually after the release to include these**
-
-- 1. Download the released `jnifmuapi-X.X.X.jar` from artifactory
-- 2. Download last `-SNAPSHOT` extract the `lib` folder and add it to the released JAR
-- 3. Upload the file from step 1 to artifactory to override the released jar
