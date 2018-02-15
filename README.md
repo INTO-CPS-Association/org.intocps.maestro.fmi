@@ -31,6 +31,25 @@ The project is released to:
 
 # Release Procedure
 
+Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
+
+```bash
+-Dfmi.native.lib=/path/to/lib
+```
+or in your maven setting file
+
+```xml
+<profiles>
+  ...
+  <profile>
+    <properties>
+      <fmi.native.lib>/path/to/lib</fmi.native.lib>
+    </properties>
+  </profile>
+</profiles>
+```
+
+
 ```bash
 mvn -Dmaven.test.skip=true -Dmaven.repo.local=repository release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT -DpushChanges=false
 ```
