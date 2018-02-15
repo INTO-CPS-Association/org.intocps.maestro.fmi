@@ -75,28 +75,44 @@
                     </configuration>
                 </plugin>
 
-                <!-- Attatch sources to all installed jars -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.0</version>
-                    <configuration>
-                        <attach>false</attach>
-                        <skipSource>true</skipSource>
-                    </configuration>
-                </plugin>
 
-                <!-- Enable JavaDoc but dont fail on error. This must be disabled for
+ <!-- Attatch sources to all installed jars -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.0.0</version>
+          <!-- <executions> -->
+          <!--   <execution> -->
+          <!--     <id>attach-sources</id> -->
+          <!--     <goals> -->
+          <!--       <goal>jar</goal> -->
+          <!--     </goals> -->
+          <!--   </execution> -->
+          <!-- </executions> -->
+          <configuration>
+            <attach>true</attach>
+          </configuration>
+        </plugin>
+
+        <!-- Enable JavaDoc but dont fail on error. This must be disabled for
              the Eclipse project in the IDE -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.3</version>
-                    <configuration>
-                        <failOnError>false</failOnError>
-                        <quiet>true</quiet>
-                    </configuration>
-                </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.10.3</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <failOnError>false</failOnError>
+            <quiet>true</quiet>
+          </configuration>
+        </plugin>
 
 
                 <plugin>
@@ -203,10 +219,14 @@
                         <arguments>-Dmaven.test.skip=true</arguments>
                         <tagNameFormat>Release/@{project.version}
                         </tagNameFormat>
-                        <releaseProfiles>release</releaseProfiles>
+                        <releaseProfiles>release,codesigning</releaseProfiles>
                     </configuration>
                 </plugin>
-
+  <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jarsigner-plugin</artifactId>
+          <version>1.2</version>
+        </plugin>
 
                 <!-- Disable the maven enforcer warning in Eclipse -->
                 <plugin>
@@ -293,6 +313,41 @@
     </organization>
 
     <inceptionYear>2015</inceptionYear>
+
+
+ <profiles>
+<profile>
+      <id>codesigning</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jarsigner-plugin</artifactId>
+            <configuration>
+							
+							<!-- This is an attempt to disable the test error: java.lang.SecurityException: class ...'s signer information does not match signer information of other classes in the same package
+							-->
+							<removeExistingSignatures>true</removeExistingSignatures>
+              
+							<storetype>${keystore.type}</storetype>
+              <keystore>${keystore.path}</keystore>
+              <alias>${keystore.alias}</alias>
+              <storepass>${keystore.store.password}</storepass>
+              <keypass>${keystore.key.password}</keypass>
+            </configuration>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+ </profiles>
 
 </project>
 
