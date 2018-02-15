@@ -230,7 +230,7 @@
                         <arguments>-Dmaven.test.skip=true</arguments>
                         <tagNameFormat>Release/@{project.version}
                         </tagNameFormat>
-                        <releaseProfiles>release,codesigning</releaseProfiles>
+                        <releaseProfiles>release,release-sign-artifacts</releaseProfiles>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -328,28 +328,22 @@
 
     <profiles>
         <profile>
-            <id>codesigning</id>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jarsigner-plugin</artifactId>
-                        <configuration>
-
-                            <!-- This is an attempt to disable the test error: java.lang.SecurityException: class ...'s signer information does not match signer information of other classes in the same package
-                            -->
-                            <removeExistingSignatures>true
-                            </removeExistingSignatures>
-
-                            <storetype>${keystore.type}</storetype>
-                            <keystore>${keystore.path}</keystore>
-                            <alias>${keystore.alias}</alias>
-                            <storepass>${keystore.store.password}</storepass>
-                            <keypass>${keystore.key.password}</keypass>
-                        </configuration>
+                        <artifactId>maven-gpg-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>sign</id>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
@@ -359,6 +353,7 @@
                 </plugins>
             </build>
         </profile>
+
     </profiles>
 
 </project>
