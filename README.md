@@ -1,7 +1,10 @@
 # org.intocps.fmi
 Java FMI support
+##JNIFMUAPI project
 
-
+##FMI2 project
+This contains the JAVA types and interfaces representing the FMI standard.
+Furthermore, the project contains XSD files from the FMI standard that are used for verifying model description files.
 ## Environment
 
 * java 7 jdk
