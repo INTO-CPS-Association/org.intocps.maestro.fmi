@@ -1,160 +1,198 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.intocps.fmi</groupId>
-		<artifactId>root</artifactId>
-		<version>0.2.5-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-
-
-	<artifactId>jnifmuapi</artifactId>
-	<name>JNI interface for FMI</name>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-
-				<configuration>
-					<skipTests>false</skipTests>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-
-					<execution>
-						<id>javah</id>
-						<phase>process-classes</phase>
-						<configuration>
-							<tasks>
-
-								<exec dir="${project.basedir}/src/main/native/include" executable="javah" failonerror="true">
+    <parent>
+        <groupId>org.into-cps.fmi</groupId>
+        <artifactId>root</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
 
-									<arg value="-classpath" />
-									<arg value="../../../../target/classes" />
-									<arg value="org.intocps.fmi.jnifmuapi.NativeFmu" />
-									<arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent" />
+    <artifactId>jnifmuapi</artifactId>
+    <name>JNI interface for FMI</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+
+                <configuration>
+                    <skipTests>false</skipTests>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+
+                    <execution>
+                        <id>javah</id>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks>
+
+                                <exec dir="${project.basedir}/src/main/native/include" executable="javah" failonerror="true">
 
 
-									<redirector outputproperty="redirector.out" errorproperty="redirector.err">
-										<inputfilterchain>
-											<replacestring from="before" to="after" />
-										</inputfilterchain>
-										<outputmapper type="merge" to="target/redirector.out" />
-										<errormapper type="merge" to="target/redirector.err" />
-									</redirector>
-
-								</exec>
+                                    <arg value="-classpath" />
+                                    <arg value="../../../../target/classes" />
+                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmu" />
+                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent" />
 
 
+                                    <redirector outputproperty="redirector.out" errorproperty="redirector.err">
+                                        <inputfilterchain>
+                                            <replacestring from="before" to="after" />
+                                        </inputfilterchain>
+                                        <outputmapper type="merge" to="target/redirector.out" />
+                                        <errormapper type="merge" to="target/redirector.err" />
+                                    </redirector>
 
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-
-				</executions>
-			</plugin>
-		</plugins>
+                                </exec>
 
 
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-antrun-plugin
-										</artifactId>
-										<versionRange>
-											[1.8,)
-										</versionRange>
-										<goals>
-											<goal>run</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
 
-	<!-- In Project repository http://charlie.cu.cc/2012/06/how-add-external-libraries-maven/ -->
+                </executions>
+            </plugin>
+        </plugins>
 
 
-	<repositories>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-antrun-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.8,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-		<repository>
-			<id>overture.au.dk</id>
-			<name>overture.au.dk-releases</name>
-			<url>http://overture.au.dk/artifactory/into-cps</url>
-		</repository>
 
-		<!-- repository> <id>mxtelecom</id> <name>mxtelecom.com</name> <url>http://opensource.mxtelecom.com/maven/repo</url> 
-			</repository -->
-	</repositories>
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
 
-		</dependency>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>1.5</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.5</version>
+        </dependency>
 
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
-			<!-- scope>test</scope -->
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
 
-		<!-- dependency> <groupId>com.wapmx.native</groupId> <artifactId>mx-native-loader</artifactId> 
-			<version>1.0.3</version> </dependency -->
-		<dependency>
-			<groupId>org.intocps.fmi</groupId>
-			<artifactId>fmi2</artifactId>
-			<version>0.2.5-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.into-cps.fmi</groupId>
+            <artifactId>fmi2</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+
+                            <execution>
+                                <id>javah</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <tasks>
+
+
+                                        <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
+                                            <fileset dir="${fmi.native.lib}" includes="**/*">
+
+                                            </fileset>
+                                        </copy>
+
+
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+    </profiles>
+
 
 </project>
 

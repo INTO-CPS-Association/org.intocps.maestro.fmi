@@ -103,3 +103,4 @@ Makefile
 #Intellij files
 **/*.iml
 *.dylib
+.idea

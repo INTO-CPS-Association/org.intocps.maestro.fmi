@@ -139,9 +139,9 @@ node {
 			server.publishBuildInfo buildInfo
 		}
 	}
-		stage('Build COE') {
-			build '../maestro/development'
-		}
+//		stage('Build COE') {
+//			build '../maestro/development'
+//		}
 }
 
 
