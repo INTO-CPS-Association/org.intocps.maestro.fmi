@@ -40,6 +40,7 @@ import java.io.IOException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.intocps.fmi.FmuInvocationException;
+import org.intocps.fmi.FmuMissingLibraryException;
 import org.intocps.fmi.IFmiComponent;
 import org.intocps.fmi.jnifmuapi.Fmu;
 import org.junit.Assert;
@@ -50,8 +51,7 @@ public class LoadInstantiateFreeUnloadTest
 
 	@Test
 	public void test() throws FmuInvocationException, IOException,
-			XPathExpressionException
-	{
+			XPathExpressionException, FmuMissingLibraryException {
 		System.out.println("LoadInstantiateFreeUnloadTest.test");
 		Fmu fmu;
 		IFmiComponent comp;
