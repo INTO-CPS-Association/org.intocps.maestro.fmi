@@ -39,7 +39,7 @@ The project is released to:
 
 **Since the binaries are not compilled locally, you have to download the ones from last snapshot before the release** 
 
-- 1. Download last `-SNAPSHOT` extract the `lib` folder and extract the `lib` folder
+- 1. Download last `-SNAPSHOT` of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/) and extract the `lib` folder
 - 2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted
 
 Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
@@ -47,7 +47,7 @@ Make sure you have the pre-build natives e.g. from last snapshot and that these 
 ```bash
 -Dfmi.native.lib=/path/to/lib
 ```
-or in your maven setting file
+or in your local maven settings file
 
 ```xml
 <profiles>
