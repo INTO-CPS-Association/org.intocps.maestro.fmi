@@ -34,24 +34,17 @@
 
 package org.intocps.fmi.jnifmuapi;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.zip.ZipException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.intocps.fmi.*;
 
 import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.io.IOUtils;
-import org.intocps.fmi.Fmi2Status;
-import org.intocps.fmi.FmiInvalidNativeStateException;
-import org.intocps.fmi.FmuInvocationException;
-import org.intocps.fmi.IFmiComponent;
-import org.intocps.fmi.IFmu;
-import org.intocps.fmi.IFmuCallback;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.ZipException;
 
 class DirectoryFmu extends NativeFmu implements IFmu
 {
@@ -86,8 +79,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 	 * @see intocps.fmuapi.IFmu#load()
 	 */
 	@Override
-	public void load() throws FmuInvocationException
-	{
+	public void load() throws FmuInvocationException, FmuMissingLibraryException {
 		if (loaded)
 		{
 			return;
@@ -122,7 +114,6 @@ class DirectoryFmu extends NativeFmu implements IFmu
 			modelIdentifier = name;
 			libraryPath = generateLibraryFile(modelIdentifier);
 		}
-
 		internalLoad(libraryPath);
 	}
 
@@ -138,8 +129,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 	
 
 
-	public void internalLoad(File libraryPath) throws FmuInvocationException
-	{
+	public void internalLoad(File libraryPath) throws FmuInvocationException, FmuMissingLibraryException {
 		if (loaded)
 		{
 			return;
@@ -147,8 +137,11 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		if (libraryPath == null || !libraryPath.exists())
 		{
-			throw new FmuInvocationException("library does not exist: "
-					+ libraryPath);
+			List<String> pathSplit = Arrays.asList(libraryPath.getPath().split(File.separator));
+			String fmuLib = StringUtils.join(pathSplit.subList(pathSplit.size()-3,pathSplit.size()), File.separator);
+
+			throw new FmuMissingLibraryException("The library for the current OS and architecture does not exist within the FMU: " +
+					fmuLib);
 		}
 
 		logger.debug("Loading FMU library: {}", libraryPath);
@@ -160,7 +153,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		if (fmuPtr == 0)
 		{
-			throw new FmuInvocationException("Load faild");
+			throw new FmuInvocationException("Load failed");
 		}
 
 		loaded = true;

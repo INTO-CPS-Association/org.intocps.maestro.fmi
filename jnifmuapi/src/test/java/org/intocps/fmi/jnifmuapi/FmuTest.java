@@ -46,7 +46,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
+// Before running these tests extract the latest fmi.native lib. See https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi
 public class FmuTest
 {
 	Fmu fmu;

@@ -43,7 +43,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 public interface IFmu
 {
-	public abstract void load() throws FmuInvocationException;
+	public abstract void load() throws FmuInvocationException, FmuMissingLibraryException;
 
 	/**
 	 * Creates an instance of the FMU

@@ -40,12 +40,7 @@ import java.util.Vector;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FileUtils;
-import org.intocps.fmi.Fmi2Status;
-import org.intocps.fmi.FmiInvalidNativeStateException;
-import org.intocps.fmi.FmuInvocationException;
-import org.intocps.fmi.IFmiComponent;
-import org.intocps.fmi.IFmu;
-import org.intocps.fmi.IFmuCallback;
+import org.intocps.fmi.*;
 import org.intocps.fmi.jnifmuapi.Factory;
 
 public class Main
@@ -198,6 +193,9 @@ public class Main
 				} catch (IOException | FmuInvocationException e)
 				{
 					handleError(e);
+				}
+				catch (FmuMissingLibraryException e)
+				{	handleError(e);
 				} catch (XPathExpressionException e)
 				{
 					handleError(e);

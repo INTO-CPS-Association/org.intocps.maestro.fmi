@@ -46,6 +46,7 @@ import java.util.zip.ZipFile;
 import org.apache.commons.io.IOUtils;
 import org.intocps.fmi.FmiInvalidNativeStateException;
 import org.intocps.fmi.FmuInvocationException;
+import org.intocps.fmi.FmuMissingLibraryException;
 
 final class Fmu extends DirectoryFmu
 {
@@ -121,8 +122,7 @@ final class Fmu extends DirectoryFmu
 	 * @see intocps.fmuapi.IFmu#load()
 	 */
 	@Override
-	public void load() throws FmuInvocationException
-	{
+	public void load() throws FmuInvocationException, FmuMissingLibraryException {
 		logger.debug("Load FMU {}", path);
 		if (loaded)
 		{

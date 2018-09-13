@@ -42,6 +42,7 @@ import org.intocps.fmi.InvalidParameterException;
 import org.junit.Assert;
 import org.junit.Test;
 
+// Before running these tests extract the latest fmi.native lib and place the lib folder in resources. See https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi
 public class FmuComponentTest extends BaseFmuComponent
 {
 	@Test

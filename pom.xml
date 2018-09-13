@@ -12,7 +12,7 @@
 
     <groupId>org.into-cps.fmi</groupId>
     <artifactId>root</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <name>The FMI interface and implementations</name>
     <packaging>pom</packaging>
@@ -265,6 +265,12 @@
                     </configuration>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -286,7 +292,7 @@
         <developerConnection>
             scm:git:git@github.com:INTO-CPS-Association/org.intocps.maestro.fmi.git
         </developerConnection>
-        <tag>Release/1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
