@@ -72,3 +72,5 @@ git push --follow-tags
 mvn -Dmaven.repo.local=repository release:perform
 ```
 
+Afterwards, go to http://oss.sonatype.org -> staging repositories -> select the release.
+Then click `close`, and once available, `release`.
