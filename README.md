@@ -2,7 +2,17 @@
 Java FMI support
 
 ## JNIFMUAPI project
-TODO 
+### To build the JNIFMUAPI do the following:
+1. Get submodules: FIRST CHECKOUT: `git submodule update --init --recursive`
+   otherwise: `git submodule update --recursive`
+2. Navigate to org.intocps.maestro.fmi/jnifmuapi/src/main/native 
+3. run cmake .
+4. run make
+### To set up a dev environment use eclipse. 
+1. Perform submodule step from above
+2. Perform 2 from above
+3. Create a makefile project, i.e.: cmake . -G"Eclipse CDT4 - Unix Makefiles"
+
 
 ## FMI2 project
 This contains the JAVA types and interfaces representing the FMI standard.
