@@ -147,7 +147,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetReal(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Real, r, len);
 
@@ -157,7 +157,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetReal(
     copyNativeArrayToJniDouble(env, r, values, len);
   }
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(r);
 
   return status;
@@ -171,7 +170,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetInteger(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Integer, r, len);
 
@@ -181,7 +180,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetInteger(
     copyNativeArrayToJniInteger(env, r, values, len);
   }
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(r);
 
   return status;
@@ -195,8 +193,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetBoolean(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
-
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Boolean, b, len);
 
@@ -206,7 +203,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetBoolean(
     copyNativeArrayToJniBoolean(env, b, values, len);
   }
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(b);
 
   return status;
@@ -219,7 +215,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetString(
   fmi2Component c = getCompPtr(componentPtr);
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2String, returnStrings, len);
 
@@ -230,9 +226,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetString(
     copyNativeArrayToJniString(env, returnStrings, values, len);
   }
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(returnStrings);
-
 
   return status;
 }
@@ -245,7 +239,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetBoolean(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Boolean, b, len);
 
@@ -253,7 +247,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetBoolean(
 
   fmi2Status status = getFmuPtr(fmuPtr)->setBoolean(c, vr_arr, len, b);
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(b);
 
   return status;
@@ -267,14 +260,14 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetInteger(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Integer, b, len);
 
   copyJniArrayToNativeInteger(env, values, b, len);
 
   fmi2Status status = getFmuPtr(fmuPtr)->setInteger(c, vr_arr, len, b);
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
+
   free(b);
 
   return status;
@@ -288,7 +281,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetReal(
 
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2Real, r, len);
 
@@ -296,7 +289,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetReal(
 
   fmi2Status status = getFmuPtr(fmuPtr)->setReal(c, vr_arr, len, r);
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(r);
 
   return status;
@@ -310,7 +302,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetString(
   int i;
   jsize len = (*env)->GetArrayLength(env, vr);
 
-  fmi2ValueReference *vr_arr = (*env)->GetLongArrayElements(env, vr, 0);
+  fmi2ValueReference *vr_arr = createValueRefArray(env, vr, len);
 
   DECLARE_ARRAY(fmi2String, r, len);
 
@@ -322,7 +314,6 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetString(
     free((char *)r[i]);
   }
 
-  (*env)->ReleaseLongArrayElements(env, vr, vr_arr, 0);
   free(r);
 
   return status;
