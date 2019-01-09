@@ -104,3 +104,4 @@ Makefile
 **/*.iml
 *.dylib
 .idea
+.csettings/

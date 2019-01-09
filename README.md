@@ -2,17 +2,43 @@
 Java FMI support
 
 ## JNIFMUAPI project
+root is referring to org.intocps.fmi/jnifmuapi/src/main/native/
+
 ### To build the JNIFMUAPI do the following:
+To generate a shared library for the platform you are working on do the following:
 1. Get submodules: FIRST CHECKOUT: `git submodule update --init --recursive`
    otherwise: `git submodule update --recursive`
 2. Navigate to org.intocps.maestro.fmi/jnifmuapi/src/main/native 
 3. run cmake .
 4. run make
-### To set up a dev environment use eclipse. 
-1. Perform submodule step from above
-2. Perform 2 from above
-3. Create a makefile project, i.e.: cmake . -G"Eclipse CDT4 - Unix Makefiles"
+5. This generates libfmuapi.dylib (for mac), which can be placed within the lib/Mac-x86_64 directory of jnifmuapi-*.jar
 
+*OR:* Push the branch, run it at build.overture.au and download the jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/ 
+
+### To set up a dev environment use eclipse. 
+If your system variables are not detected in eclipse, then open it via the
+terminal. I.e. on mac: open /Applications/eclipse.app/contents/mac/eclipse and Not
+open /Applications/eclipse.app. See https://superuser.com/questions/28344/path-env-variable-on-mac-os-x-and-or-eclipse
+1. Perform submodule step from above
+2. Download the plugin cmake4eclipse
+   (https://github.com/15knots/cmake4eclipse#quick-start describes how to import
+   a cmake project)
+3. Follow this: https://stackoverflow.com/a/38716337/1308616
+   (https://github.com/15knots/cmake4eclipse#quick-start might describe how to
+   access more up-to-date instructions)
+ 4. It should now be possible to build.
+ 
+To get proper IDE features it might be necessary to add includes for both C and
+C++ at: project properties -> C/C++ General -> Preprocesser Include Paths,
+Macros etc -> CDT User Settings Entires -> Add -> ... The following might need
+to be added:
+- root/include
+- path to jdk include
+i.e.`/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include`
+check contains system headers
+- specific jni_md for the platform, i.e.
+`/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include/darwin`
+check contains system headers.
 
 ## FMI2 project
 This contains the JAVA types and interfaces representing the FMI standard.
