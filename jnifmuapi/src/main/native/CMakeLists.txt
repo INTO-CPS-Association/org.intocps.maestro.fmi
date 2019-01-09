@@ -5,6 +5,8 @@ include(clang-format.cmake)
 
 include(CheckCXXCompilerFlag)
 
+set(CMAKE_MACOSX_RPATH 1)
+
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
