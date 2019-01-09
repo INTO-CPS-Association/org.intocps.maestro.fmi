@@ -15,15 +15,13 @@ To generate a shared library for the platform you are working on do the followin
 
 *OR:* Push the branch, run it at build.overture.au and download the jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/ 
 
-### To set up a dev environment use eclipse. 
+### To set up a dev environment using eclipse. 
 If your system variables are not detected in eclipse, then open it via the
-terminal. I.e. on mac: open /Applications/eclipse.app/contents/mac/eclipse and Not
-open /Applications/eclipse.app. See https://superuser.com/questions/28344/path-env-variable-on-mac-os-x-and-or-eclipse
+terminal. I.e. on MAC: `open /Applications/eclipse.app/contents/mac/eclipse` and **not**
+`open /Applications/eclipse.app`. See https://superuser.com/questions/28344/path-env-variable-on-mac-os-x-and-or-eclipse
 1. Perform submodule step from above
 2. Download the plugin cmake4eclipse
-   (https://github.com/15knots/cmake4eclipse#quick-start describes how to import
-   a cmake project)
-3. Follow this: https://stackoverflow.com/a/38716337/1308616
+3. Follow this to import a cmake project: https://stackoverflow.com/a/38716337/1308616
    (https://github.com/15knots/cmake4eclipse#quick-start might describe how to
    access more up-to-date instructions)
  4. It should now be possible to build.
