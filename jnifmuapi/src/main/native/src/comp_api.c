@@ -158,6 +158,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetReal(
   }
 
   free(r);
+  free(vr_arr);
 
   return status;
 }
@@ -181,6 +182,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetInteger(
   }
 
   free(r);
+  free(vr_arr);
 
   return status;
 }
@@ -204,6 +206,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetBoolean(
   }
 
   free(b);
+  free(vr_arr);
 
   return status;
 }
@@ -227,6 +230,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetString(
   }
 
   free(returnStrings);
+  free(vr_arr);
 
   return status;
 }
@@ -248,6 +252,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetBoolean(
   fmi2Status status = getFmuPtr(fmuPtr)->setBoolean(c, vr_arr, len, b);
 
   free(b);
+  free(vr_arr);
 
   return status;
 }
@@ -269,6 +274,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetInteger(
   fmi2Status status = getFmuPtr(fmuPtr)->setInteger(c, vr_arr, len, b);
 
   free(b);
+  free(vr_arr);
 
   return status;
 }
@@ -290,6 +296,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetReal(
   fmi2Status status = getFmuPtr(fmuPtr)->setReal(c, vr_arr, len, r);
 
   free(r);
+  free(vr_arr);
 
   return status;
 }
@@ -315,6 +322,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetString(
   }
 
   free(r);
+  free(vr_arr);
 
   return status;
 }
@@ -433,6 +441,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSetRealInputDerivatives(
 
   free(r);
   free(orderArr);
+  free(vr_arr);
 
   return status;
 }
@@ -459,6 +468,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetRealOutputDerivatives(
   copyNativeArrayToJniDouble(env, r, values, len);
 
   free(r);
+  free(vr_arr);
 
   return status;
 }
@@ -491,6 +501,8 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetDirectionalDerivative(
 
   free(r);
   free(dvKnownRef);
+  free(vUnknown_ref);
+  free(vKnown_ref);
 
   return status;
 }
