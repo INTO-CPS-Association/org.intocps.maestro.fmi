@@ -17,8 +17,8 @@ To generate a shared library for the platform you are working on do the followin
 
 ### To Use this library do the following:
 
-1. Download the latest SNAPSHOT jar of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
-1. Download the `fmi2.jar`
+1. Download the jar of [`jnifmuapi`](https://mvnrepository.com/artifact/org.into-cps.fmi/jnifmuapi/1.0.2) or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
+1. Download [`fmi2.jar`](https://mvnrepository.com/artifact/org.into-cps.fmi/fmi2/1.0.2) or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/fmi2/)
 1. Add both previous jars to your project.
 1. Extract the `lib` folder that is locate inside the jar obtained in step 1. Place that folder somewhere in your java library path, so that, for example, the entry `lib/Windows-amd64/fmuapi.dll` will be found in one of the folders in the java library path.
 1. Test the link by running 
