@@ -15,6 +15,15 @@ To generate a shared library for the platform you are working on do the followin
 
 *OR:* Push the branch, run it at build.overture.au and download the jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/ 
 
+### To Use this library do the following:
+
+1. Download the latest SNAPSHOT jar of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
+1. Download the `fmi2.jar`
+1. Add both previous jars to your project.
+1. Extract the `lib` folder that is locate inside the jar obtained in step 1. Place that folder somewhere in your java library path, so that, for example, the entry `lib/Windows-amd64/fmuapi.dll` will be found in one of the folders in the java library path.
+1. Test the link by running 
+`org.intocps.fmi.jnifmuapi.Factory.checkApi()`
+
 ### To set up a dev environment using eclipse. 
 If your system variables are not detected in eclipse, then open it via the
 terminal. I.e. on MAC: `open /Applications/eclipse.app/contents/mac/eclipse` and **not**
