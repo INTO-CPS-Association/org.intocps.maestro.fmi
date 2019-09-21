@@ -391,7 +391,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetIntegerStatus(
 }
 
 JNIEXPORT jbyte JNICALL
-Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_fmi2GetBooleanStatus(
+Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetBooleanStatus(
     JNIEnv *env, jobject obj, jlong fmuPtr, jlong componentPtr, jbyte kind,
     jbooleanArray value) {
   fmi2Component comp = getCompPtr(componentPtr);
