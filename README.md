@@ -103,6 +103,8 @@ or in your local maven settings file
 </profiles>
 ```
 
+Run from Development branch:
+
 
 ```bash
 mvn -Dmaven.test.skip=true -Dmaven.repo.local=repository release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT -DpushChanges=false
