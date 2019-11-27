@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.into-cps.fmi</groupId>
         <artifactId>root</artifactId>
-        <version>0.0.7-SNAPSHOT</version>
+        <version>1.0.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -140,7 +140,7 @@
         <dependency>
             <groupId>org.into-cps.fmi</groupId>
             <artifactId>fmi2</artifactId>
-            <version>0.0.7-SNAPSHOT</version>
+            <version>1.0.6</version>
         </dependency>
     </dependencies>
 
