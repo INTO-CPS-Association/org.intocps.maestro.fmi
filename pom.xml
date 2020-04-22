@@ -12,7 +12,7 @@
 
     <groupId>org.into-cps.fmi</groupId>
     <artifactId>root</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
 
     <name>The FMI interface and implementations</name>
     <packaging>pom</packaging>

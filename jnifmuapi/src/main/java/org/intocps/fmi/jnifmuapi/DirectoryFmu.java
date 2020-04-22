@@ -42,8 +42,11 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
 class DirectoryFmu extends NativeFmu implements IFmu
@@ -137,11 +140,12 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		if (libraryPath == null || !libraryPath.exists())
 		{
-			List<String> pathSplit = Arrays.asList(libraryPath.getPath().split(File.separator));
-			String fmuLib = StringUtils.join(pathSplit.subList(pathSplit.size()-3,pathSplit.size()), File.separator);
+			Path p = libraryPath.toPath();
+			int pLength = p.getNameCount();
+			String desiredPath = p.subpath(pLength-3, pLength).toString();
 
 			throw new FmuMissingLibraryException("The library for the current OS and architecture does not exist within the FMU: " +
-					fmuLib);
+					desiredPath);
 		}
 
 		logger.debug("Loading FMU library: {}", libraryPath);
