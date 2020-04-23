@@ -84,40 +84,41 @@ The project is released to:
 
 **Since the binaries are not compilled locally, you have to download the ones from last snapshot before the release** 
 
-- 1. Download last `-SNAPSHOT` of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/) and extract the `lib` folder
-- 2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted
+1. Download last `-SNAPSHOT` of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/) and extract the `lib` folder
+2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted. Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
 
-Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
+    ```bash
+    -Dfmi.native.lib=/path/to/lib
+    ```
+    or in your local maven settings file
 
-```bash
--Dfmi.native.lib=/path/to/lib
-```
-or in your local maven settings file
+    ```xml
+    <profiles>
+      ...
+      <profile>
+        <properties>
+          <fmi.native.lib>/path/to/lib</fmi.native.lib>
+        </properties>
+      </profile>
+    </profiles>
+    ```
 
-```xml
-<profiles>
-  ...
-  <profile>
-    <properties>
-      <fmi.native.lib>/path/to/lib</fmi.native.lib>
-    </properties>
-  </profile>
-</profiles>
-```
+3. Run from Development branch with adjusted release and development version:
 
-Run from Development branch:
+    ```bash
+    mvn -Dmaven.test.skip=true -Dmaven.repo.local=repository release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT -DpushChanges=false
+    ```
 
+1. If all is ok then push and release
 
-```bash
-mvn -Dmaven.test.skip=true -Dmaven.repo.local=repository release:prepare -DreleaseVersion=0.0.4 -DdevelopmentVersion=0.0.5-SNAPSHOT -DpushChanges=false
-```
+    ```bash
+    git push --follow-tags
+    mvn -Dmaven.repo.local=repository release:perform
+    ```
 
-if all is ok then push and release
-
-```bash
-git push --follow-tags
-mvn -Dmaven.repo.local=repository release:perform
-```
-
-Afterwards, go to http://oss.sonatype.org -> staging repositories -> select the release.
+1. Afterwards, go to http://oss.sonatype.org -> staging repositories -> select the release.
 Then click `close`, and once available, `release`.
+
+1. Go to master branch and merge with the newly created tag. 
+
+1. **Remember to switch back to the development branch!!!**
