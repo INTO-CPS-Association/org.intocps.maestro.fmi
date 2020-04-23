@@ -80,6 +80,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 	/*
 	 * (non-Javadoc)
 	 * @see intocps.fmuapi.IFmu#load()
+	 * The reason for the recovering behaviour is based on several FMUs having a wrong modelIdentifier attribute in the modelDescription.xml.
 	 */
 	@Override
 	public void load() throws FmuInvocationException, FmuMissingLibraryException {
@@ -90,7 +91,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		String modelIdentifier = null;
 		final String errorMsg = "Fmu do not conform to the standard. Unable to obtain modelIndentifier '%s' for co-simulation, defaulting to archieve name '%s'";
-		final String recovery_log_message= "Attempting to recover loading of the library by setting modelIndentifier='%s'";
+		final String recovery_log_message= "Attempting to recover loading of the library by setting modelIdentifier to '%s'";
 		try
 		{
 			modelIdentifier = FmiUtil.getModelIdentifier(getModelDescription());
@@ -112,7 +113,7 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		if (!libraryPath.exists())
 		{
-			logger.error(String.format(errorMsg, modelIdentifier, name));
+			logger.error(String.format("The library corresponding to the modelIdentifier '%s' could not be found at: '%s", modelIdentifier, logMessageLibraryPath(libraryPath)));
 			logger.warn(String.format(recovery_log_message,name));
 			modelIdentifier = name;
 			libraryPath = generateLibraryFile(modelIdentifier);
@@ -130,7 +131,12 @@ class DirectoryFmu extends NativeFmu implements IFmu
 		return FmiUtil.generateLibraryFileFromPlatform(osName,arch,modelIdentifier,dir);
 	}
 	
-
+	public static String logMessageLibraryPath(File libraryPath){
+		Path p = libraryPath.toPath();
+		int pLength = p.getNameCount();
+		String desiredPath = p.subpath(pLength-3, pLength).toString();
+		return desiredPath;
+	}
 
 	public void internalLoad(File libraryPath) throws FmuInvocationException, FmuMissingLibraryException {
 		if (loaded)
@@ -140,12 +146,8 @@ class DirectoryFmu extends NativeFmu implements IFmu
 
 		if (libraryPath == null || !libraryPath.exists())
 		{
-			Path p = libraryPath.toPath();
-			int pLength = p.getNameCount();
-			String desiredPath = p.subpath(pLength-3, pLength).toString();
-
-			throw new FmuMissingLibraryException("The library for the current OS and architecture does not exist within the FMU: " +
-					desiredPath);
+			String errorMsg = logMessageLibraryPath(libraryPath);
+			throw new FmuMissingLibraryException("The library for the architecture and OS does not exist within the FMU at: " + errorMsg);
 		}
 
 		logger.debug("Loading FMU library: {}", libraryPath);
