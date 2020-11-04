@@ -52,8 +52,12 @@ abstract class NativeFmu
 
 	static private boolean isLoaded;
 
-	static
+	public static void loadNativeApi()
 	{
+		if(isLoaded)
+		{
+			return;
+		}
 		String libPath = NativeFmuApi.getPlatformSpecificLibaryPath("fmuapi");
 		logger.debug("Loading library: " + libPath);
 		File lib;
@@ -64,9 +68,9 @@ abstract class NativeFmu
 			isLoaded = true;
 		} catch (Exception e)
 		{
-			logger.error("Faild to load native Library file: " + libPath, e);
-			// throw new RuntimeException( "Unable to load native library fmuapi",e);
+			logger.error("Failed to load native Library file: " + libPath, e);
 			isLoaded = false;
+			throw new RuntimeException("Failed to load native Library file: " + libPath, e);
 		}
 
 	}
