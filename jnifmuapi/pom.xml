@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -33,21 +34,22 @@
                         <configuration>
                             <tasks>
 
-                                <exec dir="${project.basedir}/src/main/native/include" executable="javah" failonerror="true">
+                                <exec dir="${project.basedir}/src/main/native/include" executable="javah"
+                                      failonerror="true">
 
 
-                                    <arg value="-classpath" />
-                                    <arg value="../../../../target/classes" />
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmu" />
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent" />
+                                    <arg value="-classpath"/>
+                                    <arg value="../../../../target/classes"/>
+                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmu"/>
+                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent"/>
 
 
                                     <redirector outputproperty="redirector.out" errorproperty="redirector.err">
                                         <inputfilterchain>
-                                            <replacestring from="before" to="after" />
+                                            <replacestring from="before" to="after"/>
                                         </inputfilterchain>
-                                        <outputmapper type="merge" to="target/redirector.out" />
-                                        <errormapper type="merge" to="target/redirector.err" />
+                                        <outputmapper type="merge" to="target/redirector.out"/>
+                                        <errormapper type="merge" to="target/redirector.err"/>
                                     </redirector>
 
                                 </exec>
@@ -92,7 +94,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -152,37 +154,23 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
 
-
             <build>
                 <plugins>
-
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-
                             <execution>
                                 <id>javah</id>
                                 <phase>none</phase>
                             </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
                             <execution>
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <tasks>
-
-
                                         <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
                                             <fileset dir="${fmi.native.lib}" includes="**/*">
-
                                             </fileset>
                                         </copy>
-
-
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -194,10 +182,6 @@
                 </plugins>
             </build>
         </profile>
-
-
     </profiles>
-
-
 </project>
 
