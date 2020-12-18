@@ -64,12 +64,6 @@ class DirectoryFmu extends NativeFmu implements IFmu
 	{
 		this.dir = path;
 		this.name = name;
-
-//		if (!NativeFmu.isNativeApiLoaded())
-//		{
-//			throw new FmuInvocationException("Native fmuapi library not loaded. Check log for more information.");
-//		}
-
 	}
 
 	long getFmuPtr()

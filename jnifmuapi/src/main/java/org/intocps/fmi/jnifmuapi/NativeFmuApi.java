@@ -39,7 +39,7 @@ class NativeFmuApi
 
 	final static String LIB_BASE = "lib";
 
-	public static String getPlatformSpecificLibaryPath(String name)
+	public static String getPlatformSpecificLibraryPath(String name)
 	{
 		String osName = System.getProperty("os.name");
 

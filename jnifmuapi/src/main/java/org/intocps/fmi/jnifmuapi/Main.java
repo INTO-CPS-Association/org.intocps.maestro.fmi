@@ -57,7 +57,7 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 
-		String libPath = NativeFmuApi.getPlatformSpecificLibaryPath("fmuapi");
+		String libPath = NativeFmuApi.getPlatformSpecificLibraryPath("fmuapi");
 		System.out.println("Loading library: " + libPath);
 		File lib = new NativeLibraryLoader().loadLibrary(libPath);
 		System.out.println("Loaded Library file: " + lib);

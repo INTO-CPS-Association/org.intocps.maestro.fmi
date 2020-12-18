@@ -1,5 +1,11 @@
-cmake_minimum_required (VERSION 2.8.5)
-project (fmuapi C CXX)
+cmake_minimum_required (VERSION 3.1.3)
+project (fmuapi
+		VERSION 2.0.0
+		LANGUAGES C CXX
+		)
+
+configure_file(src/config.h.in config.h )
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include(clang-format.cmake)
 
@@ -39,14 +45,17 @@ if (UNIX)
 endif()
 
 #include_directories(${libshmfmi_SOURCE_DIR})
-include_directories(include src/external/shared src/external/shared/fmi/include )
+include_directories(include src/fmi3 src/external/shared src/external/shared/fmi2/headers src/external/shared/fmi3/headers )
 
 #add_library(${PROJECT_NAME} SHARED src/main/native/sharedmemory.cpp ${PROTO_SRCS} ${PROTO_HDRS})
 
 file(GLOB C_FILES src/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES src/*.cpp)
 
-add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES})
+file(GLOB C_FILES_3 src/fmi3/*.c) # ../includes/templates/*.c)
+file(GLOB CPP_FILES_3 src/fmi3/*.cpp)
+
+add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
 
 add_definitions(-DSTANDALONE_XML_PARSER -DLIBXML_STATIC -DFMI_COSIMULATION)
 
@@ -78,3 +87,12 @@ if (WIN32)
 	SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 endif() 
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/Mac-x86_64/"
+		BYPRODUCTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/Mac-x86_64"
+		)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/Mac-x86_64/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
+		BYPRODUCTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/Mac-x86_64/libfmuapi.dylib"
+		)

@@ -33,20 +33,22 @@
  *		Kenneth Lausdahl
  */
 
-#include "fmi2.h"
-#include "fmu_api.h"
-#include "jni_util.h"
-#include "org_intocps_fmi_jnifmuapi_NativeFmu.h"
+#include "fmi3.h"
+#define BUFSIZE 4096
 
-JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_callbackTest(
-    JNIEnv *env, jobject obj, jlong fmuPtr, jstring name) {
-  const char *instanceName = GetString(env, name);
-  fmuLoggerCache((FMU *)fmuPtr, instanceName, fmi2Warning, NULL, NULL);
-  (*env)->ReleaseStringUTFChars(env, name, instanceName);
-}
+void fmu3Logger(fmi3InstanceEnvironment instanceEnvironment,
+                fmi3String instanceName, fmi3Status status, fmi3String category,
+                fmi3String message, ...);
+void fmu3CallbackIntermediateUpdate(
+    fmi3InstanceEnvironment instanceEnvironment,
+    fmi3Float64 intermediateUpdateTime, fmi3Boolean clocksTicked,
+    fmi3Boolean intermediateVariableSetRequested,
+    fmi3Boolean intermediateVariableGetAllowed,
+    fmi3Boolean intermediateStepFinished, fmi3Boolean canReturnEarly,
+    fmi3Boolean *earlyReturnRequested, fmi3Float64 *earlyReturnTime);
 
-JNIEXPORT void JNICALL
-Java_org_intocps_fmi_jnifmuapi_NativeFmu_throwExceptionTest(JNIEnv *env,
-                                                            jobject obj) {
-  throwException(env, "this is a test exception throw");
-}
+void fmu3CallbackLockPreemption();
+void fmu3CallbackUnlockPreemption();
+
+int loadDll3(const char *dllPath, FMU3 *fmu);
+int error3(const char *message);
