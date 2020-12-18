@@ -92,7 +92,7 @@ public class FmuTest {
     @Test
     public void testNativeVersion() {
 
-        Assert.assertEquals("2.0.0", Fmu.getJniApiVersion());
+        Assert.assertEquals("2.0.0", fmu.getJniApiVersion());
 
     }
 
