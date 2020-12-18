@@ -63,7 +63,7 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nUnLoad(
     throwException(env, "Unsupported platform");
 #endif
 #elif __linux
-    dlclose(ptr->dllHandle);
+    dlclose(ptr->fmu.dllHandle);
 #endif
 
     delete(ptr);
