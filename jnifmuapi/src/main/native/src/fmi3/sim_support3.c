@@ -41,7 +41,7 @@
 #include <string.h>
 
 #include "fmi3.h"
-#include "src/sim_support.h"
+#include "sim_support3.h"
 
 static void *getAdrOptional(int *success, HMODULE dllHandle,
                             const char *functionName, bool optional) {
