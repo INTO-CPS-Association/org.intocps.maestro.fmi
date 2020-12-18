@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nUnLoad(
         JNIEnv *env, jobject obj, jlong fmuptr) {
     Fmi3Node *ptr = getFmuPtr(fmuptr);
 #ifdef _WIN32
-    FreeLibrary(ptr->dllHandle);
+    FreeLibrary(ptr->fmu.dllHandle);
 #elif __APPLE__
 //extern "C"
 //{
