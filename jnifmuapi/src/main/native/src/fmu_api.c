@@ -38,7 +38,7 @@
 #include "config.h"
 
 JNIEXPORT jstring JNICALL
-Java_org_intocps_fmi_jnifmuapi_NativeFmu_getJniApiVersion(JNIEnv *env,
+Java_org_intocps_fmi_jnifmuapi_NativeFmu_nGetJniApiVersion(JNIEnv *env,
                                                           jclass cl) {
       jstring result = (*env)->NewStringUTF(env, PROJECT_VER);
     return result;

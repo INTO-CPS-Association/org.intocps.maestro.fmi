@@ -65,10 +65,10 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_throwExceptionTe
 
 /*
  * Class:     org_intocps_fmi_jnifmuapi_NativeFmu
- * Method:    getJniApiVersion
+ * Method:    nGetJniApiVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_getJniApiVersion
+JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nGetJniApiVersion
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus

@@ -105,5 +105,7 @@ abstract class NativeFmu {
 
     protected native void throwExceptionTest() throws Exception;
 
-    public static native String getJniApiVersion();
+    protected static native String nGetJniApiVersion();
+
+
 }
