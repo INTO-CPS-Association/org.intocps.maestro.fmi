@@ -54,6 +54,7 @@ stage('Compile native code X') {
 		}
 	},linux64: {
 		node('Xcompile') {
+		    cleanWs()
 			checkout scm
 			sh 'git submodule update --init'
 			sh "SHM_DEPENDENCIES_ROOT=/home/privatejenkins/shm-dependencies ./xcompile.sh -linux64"
