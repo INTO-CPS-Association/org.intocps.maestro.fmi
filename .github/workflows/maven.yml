@@ -33,6 +33,8 @@ jobs:
         run: grep -r "nGetJniApiVersion" .
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
+      - name: find
+        run: find . -name "*.so"
       - name: artifact
         uses: actions/upload-artifact@v2
         with:
