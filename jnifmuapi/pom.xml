@@ -173,7 +173,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.into-cps.fmi</groupId>
+            <groupId>org.intocps.fmi</groupId>
             <artifactId>fmi2</artifactId>
             <version>1.0.11-SNAPSHOT</version>
         </dependency>

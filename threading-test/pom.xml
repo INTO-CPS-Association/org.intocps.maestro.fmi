@@ -21,7 +21,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.into-cps.fmi</groupId>
+            <groupId>org.intocps.fmi</groupId>
             <artifactId>jnifmuapi</artifactId>
             <version>${project.version}</version>
         </dependency>
