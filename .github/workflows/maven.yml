@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        platform: [x32, x64]
+        os: [ubuntu-latest]#, windows-latest, macos-latest]
+#        platform: [x32, x64]
     steps:
       - uses: actions/checkout@v2
         with: 
@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Maven download
-        run: mvn dependency:resolve dependency:resolve-plugins -B --quiet -DexcludeGroupIds=org.intocps
+        run: mvn dependency:resolve dependency:resolve-plugins -B --quiet -DexcludeGroupIds=org.intocps.fmi
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
       - name: Maven Test
