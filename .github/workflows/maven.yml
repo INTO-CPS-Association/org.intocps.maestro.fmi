@@ -29,6 +29,8 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet  #dependency:resolve dependency:resolve-plugins -B --quiet -DexcludeGroupIds=org.intocps.fmi -DincludeParents=true
+      - name: grep
+        run: grep -r "nGetJniApiVersion" .
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
       - name: Maven Test
