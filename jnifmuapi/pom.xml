@@ -235,6 +235,11 @@
                                     <tasks>
                                         <exec dir="${project.basedir}/src/main/native/" executable="cmake"
                                               failonerror="true">
+                                            <arg value="--version"/>
+
+                                        </exec>
+                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+                                              failonerror="true">
                                             <arg value="."/>
 
                                         </exec>
