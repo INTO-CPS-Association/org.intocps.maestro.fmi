@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Maven download
-        run: mvn mvn dependency:resolve dependency:resolve-plugins -B --quiet
+        run: mvn dependency:resolve dependency:resolve-plugins -B --quiet
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
       - name: Maven Test
