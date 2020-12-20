@@ -33,5 +33,10 @@ jobs:
         run: grep -r "nGetJniApiVersion" .
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
+      - name: artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nativelib
+          path: jnifmuapi/target/classes/lib/Linux-x86_64/libfmuapi.so
       - name: Maven Test
         run: mvn test
