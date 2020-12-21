@@ -7,6 +7,6 @@ public class StaticTest {
     @Test
     public void StaticTest() {
 
-        NativeFmu.class.getf Assert.assertEquals("2.0.0", Fmu.getJniApiVersion());
+        Assert.assertEquals("2.0.0", Fmu.getJniApiVersion());
     }
 }
