@@ -239,7 +239,7 @@
                                         </exec>
                                         <exec dir="${project.basedir}/src/main/native/" executable="cmake"
                                               failonerror="true">
-                                            <arg value="-G MinGW Makefiles"/>
+                                            <arg value="-G &quot;Unix Makefiles&quot;"/>
                                             <arg value="."/>
 
                                         </exec>
