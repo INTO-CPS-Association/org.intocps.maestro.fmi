@@ -68,7 +68,7 @@ jobs:
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet
       - name: Maven Build Final
-        run: mvn -B package --file pom.xml
+        run: mvn -B package --file pom.xml -Dmaven.test.skip=true
       - name: upload jnifmuapi
         uses: actions/upload-artifact@v2
         with:
