@@ -23,7 +23,7 @@ jobs:
           - {
             name: "Windows Latest MinGW", artifact: "Windows-MinGW.tar.xz",
             os: windows-latest,
-            build_type: "Release", cc: "gcc", cxx: "g++"
+            build_type: "Release", cc: "mingw32-gcc.exe", cxx: "mingw32-c++.exe"
           }
     steps:
       - uses: actions/checkout@v2
