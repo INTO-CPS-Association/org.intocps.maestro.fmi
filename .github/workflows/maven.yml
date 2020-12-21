@@ -19,13 +19,13 @@ jobs:
       matrix:
         os: [ windows-latest ] # ubuntu-latest, , macos-latest
         platform: [ x32, x64 ]
-        config:
-          - {
-            name: "Windows Latest MinGW", artifact: "Windows-MinGW.tar.xz",
-            os: windows-latest,
-            build_type: "Release", cc: "mingw32-gcc.exe", cxx: "mingw32-c++.exe",
-            generators: "Unix Makefiles"
-          }
+    #        config:
+    #          - {
+    #            name: "Windows Latest MinGW", artifact: "Windows-MinGW.tar.xz",
+    #            os: windows-latest,
+    #            build_type: "Release", cc: "mingw32-gcc.exe", cxx: "mingw32-c++.exe",
+    #            generators: "Unix Makefiles"
+    #          }
     steps:
       - uses: actions/checkout@v2
         with:
@@ -36,8 +36,8 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet
-      - name: Alter path
-        run: echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
+      #      - name: Alter path
+      #        run: echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
       - name: Maven Build
         run: mvn -B package --file pom.xml -DskipTests -Pmake
       - name: artifact
