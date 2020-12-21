@@ -17,7 +17,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>copy-resources-fmi2-schema</id>
@@ -72,7 +71,7 @@
                         <id>javah</id>
                         <phase>process-classes</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <exec dir="${project.basedir}/src/main/native/include" executable="javah"
                                       failonerror="true">
                                     <arg value="-classpath"/>
@@ -89,7 +88,7 @@
                                         <errormapper type="merge" to="target/redirector.err"/>
                                     </redirector>
                                 </exec>
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -199,12 +198,12 @@
                             <execution>
                                 <phase>generate-resources</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
                                             <fileset dir="${fmi.native.lib}" includes="**/*">
                                             </fileset>
                                         </copy>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
@@ -232,7 +231,7 @@
                                 <id>cmake</id>
                                 <phase>process-classes</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <exec dir="${project.basedir}/src/main/native/" executable="cmake"
                                               failonerror="true">
                                             <arg value="--version"/>
@@ -251,7 +250,7 @@
                                             <arg value="--always-make"/>
 
                                         </exec>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
