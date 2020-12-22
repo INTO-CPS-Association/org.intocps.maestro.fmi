@@ -242,7 +242,54 @@
                                             <arg value="-G"/>
                                             <arg value="Unix Makefiles"/>
                                             <arg value="."/>
+                                        </exec>
 
+                                        <exec dir="${project.basedir}/src/main/native/" executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+
+                                            <arg value="--always-make"/>
+
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>make32</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+
+                            <execution>
+                                <id>cmake</id>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+                                              failonerror="true">
+                                            <arg value="--version"/>
+
+                                        </exec>
+                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-DCMAKE_GENERATOR_PLATFORM=x86"/>
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="."/>
                                         </exec>
 
                                         <exec dir="${project.basedir}/src/main/native/" executable="make"

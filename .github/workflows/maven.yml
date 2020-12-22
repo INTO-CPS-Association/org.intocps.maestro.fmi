@@ -18,7 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ] # ubuntu-latest, , macos-latest
-    #       platform: [ x32, x64 ]
+        platform: [ x32, x64 ]
+        exclude:
+          - os: macos-latest
+            platform: x32
     #        config:
     #          - {
     #            name: "Windows Latest MinGW", artifact: "Windows-MinGW.tar.xz",
@@ -38,8 +41,12 @@ jobs:
         run: mvn validate dependency:resolve-plugins -B --quiet
       #      - name: Alter path
       #        run: echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
-      - name: Maven Build
+      - name: Maven Build x32
+        run: mvn -B package --file pom.xml -DskipTests -Pmake32
+        if: "${{ matrix.platform }}" == "x32"
+      - name: Maven Build x64
         run: mvn -B package --file pom.xml -DskipTests -Pmake
+        if: "${{ matrix.platform }}" == "x64"
       - name: artifact
         uses: actions/upload-artifact@v2
         with:
