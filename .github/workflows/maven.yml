@@ -70,7 +70,7 @@ jobs:
 
   pack:
     runs-on: ubuntu-latest
-    if: matrix.platform == 'x64'
+
     needs: build
     steps:
       - uses: actions/checkout@v2
