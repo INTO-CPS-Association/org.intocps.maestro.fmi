@@ -42,11 +42,11 @@ jobs:
       #      - name: Alter path
       #        run: echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
       - name: Maven Build x32
-        run: mvn -B package --file pom.xml -DskipTests -Pmake32
-        if: "${{ matrix.platform }}" == "x32"
+        run: mvn -B package --file pom.xml -Pmake32
+        if: ${{ matrix.platform == "x32" }}
       - name: Maven Build x64
-        run: mvn -B package --file pom.xml -DskipTests -Pmake
-        if: "${{ matrix.platform }}" == "x64"
+        run: mvn -B package --file pom.xml -Pmake
+        if: ${{ matrix.platform == "x64" }}
       - name: artifact
         uses: actions/upload-artifact@v2
         with:
