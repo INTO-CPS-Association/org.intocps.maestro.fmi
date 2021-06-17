@@ -16,6 +16,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-h</arg>
+                        <arg>${project.basedir}/src/main/native/include</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
@@ -61,40 +71,6 @@
                 <configuration>
                     <skipTests>false</skipTests>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-
-                    <execution>
-                        <id>javah</id>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <target>
-                                <exec dir="${project.basedir}/src/main/native/include" executable="javah"
-                                      failonerror="true">
-                                    <arg value="-classpath"/>
-                                    <arg value="../../../../target/classes"/>
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmu"/>
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent"/>
-                                    <arg value="org.intocps.fmi3.jnifmuapi.NativeFmu3"/>
-                                    <arg value="org.intocps.fmi3.jnifmuapi.NativeFmuInstance3"/>
-                                    <redirector outputproperty="redirector.out" errorproperty="redirector.err">
-                                        <inputfilterchain>
-                                            <replacestring from="before" to="after"/>
-                                        </inputfilterchain>
-                                        <outputmapper type="merge" to="target/redirector.out"/>
-                                        <errormapper type="merge" to="target/redirector.err"/>
-                                    </redirector>
-                                </exec>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 
@@ -192,7 +168,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>javah</id>
+                                <id>javac</id>
                                 <phase>none</phase>
                             </execution>
                             <execution>
