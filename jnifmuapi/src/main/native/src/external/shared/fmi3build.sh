@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+# TURN Find all lines with TYPE -> turn Const char into char -> remove * -> Remove space -> take until (
 types=$(grep "TYPE" fmi3/headers/fmi3FunctionTypes.h | sed 's/const char/constchar/g'| sed 's/  */ /g' |cut -d ' ' -f3 | cut -d '(' -f1)
 
 
