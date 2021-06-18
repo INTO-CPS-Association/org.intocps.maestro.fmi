@@ -103,6 +103,7 @@ GET_TEMPLATE(Boolean,Boolean,jboolean)
 //GET_TEMPLATE(Binary,Long,jlong)
 
 
+// The functions below are all implemented via the templated version above.
 
 //JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetFloat32
 //        (JNIEnv *, jobject, jlong, jlongArray, jint, jdoubleArray, jint);
@@ -150,9 +151,11 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 
 /**************************************************************
  *
- *          GET
+ *          SET
  *
  **************************************************************/
+
+// The commented functions below are implemented via the templated function
 
 //JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetFloat32
 //        (JNIEnv *, jobject, jlong, jlongArray, jint, jdoubleArray, jint);
