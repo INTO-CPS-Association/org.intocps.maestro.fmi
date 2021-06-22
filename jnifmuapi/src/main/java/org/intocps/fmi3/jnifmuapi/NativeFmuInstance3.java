@@ -31,19 +31,19 @@ public class NativeFmuInstance3 {
     /* end::EnterInitializationMode[] */
 
     /* tag::ExitInitializationMode[] */
-    native Fmi2Status nExitInitializationMode(long instance);
+    native Fmi2Status nExitInitializationMode(long fmu, long instance);
     /* end::ExitInitializationMode[] */
 
     /* tag::EnterEventMode[] */
-    native Fmi2Status nEnterEventMode(long instance, boolean stepEvent, int rootsFound[], int nEventIndicators, boolean timeEvent);
+    native Fmi2Status nEnterEventMode(long fmu, long instance, boolean stepEvent, int rootsFound[], int nEventIndicators, boolean timeEvent);
     /* end::EnterEventMode[] */
 
     /* tag::Terminate[] */
-    native Fmi2Status nTerminate(long instance);
+    native Fmi2Status nTerminate(long fmu, long instance);
     /* end::Terminate[] */
 
     /* tag::Reset[] */
-    native Fmi2Status nReset(long instance);
+    native Fmi2Status nReset(long fmu, long instance);
     /* end::Reset[] */
 
     /* Getting and setting variable values */

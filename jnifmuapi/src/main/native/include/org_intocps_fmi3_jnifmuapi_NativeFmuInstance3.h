@@ -34,34 +34,34 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nExitInitializationMode
- * Signature: (J)Lorg/intocps/fmi/Fmi2Status;
+ * Signature: (JJ)Lorg/intocps/fmi/Fmi2Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitInitializationMode
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nEnterEventMode
- * Signature: (JZ[IIZ)Lorg/intocps/fmi/Fmi2Status;
+ * Signature: (JJZ[IIZ)Lorg/intocps/fmi/Fmi2Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
-  (JNIEnv *, jobject, jlong, jboolean, jintArray, jint, jboolean);
+  (JNIEnv *, jobject, jlong, jlong, jboolean, jintArray, jint, jboolean);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nTerminate
- * Signature: (J)Lorg/intocps/fmi/Fmi2Status;
+ * Signature: (JJ)Lorg/intocps/fmi/Fmi2Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nTerminate
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nReset
- * Signature: (J)Lorg/intocps/fmi/Fmi2Status;
+ * Signature: (JJ)Lorg/intocps/fmi/Fmi2Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nReset
-  (JNIEnv *, jobject, jlong);
+  (JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
