@@ -175,6 +175,8 @@ CallbackJniInfo createBasicCallback(JNIEnv *env, jobject obj, const char *method
 
     cb.env = env;
     env->GetJavaVM(&cb.g_vm);
+
+    return cb;
 }
 /********************************************************
  * FMU

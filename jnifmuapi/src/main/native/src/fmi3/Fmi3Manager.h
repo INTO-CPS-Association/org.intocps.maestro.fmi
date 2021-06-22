@@ -53,7 +53,9 @@ public:
     CallbackJniInfo callback_lockPreemption;
     CallbackJniInfo callback_unlockPreemption;
     Fmi3Node* owner;
-    ~Fmi3InstanceNode();
+    ~Fmi3InstanceNode() {
+
+    }
 };
 
 
