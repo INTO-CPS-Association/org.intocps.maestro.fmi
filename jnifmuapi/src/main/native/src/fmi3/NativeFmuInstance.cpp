@@ -3,13 +3,32 @@
 //
 #include "org_intocps_fmi3_jnifmuapi_NativeFmuInstance3.h"
 #include "Fmi3Manager.h"
+#include "../shared/utilities.h"
+
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nSetDebugLogging
  * Signature: (JZI[Ljava/lang/String;)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetDebugLogging
-        (JNIEnv *, jobject, jlong, jboolean, jint, jobjectArray) { return nullptr; }
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetDebugLogging
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jboolean loggingOn, jobjectArray categories) {
+
+    size_t size = env->GetArrayLength(categories);
+
+    DECLARE_ARRAY(fmi2String, strings, size);
+    copyJniArrayToNativeString(env, categories, strings, size);
+
+    fmi3Status status = getFmuPtr(fmuPtr)->fmi3SetDebugLogging(
+            getInstancePtr(instancePtr), loggingOn, size, strings);
+
+    int i;
+
+    for (i = 0; i < size; i++) {
+        free((char *) strings[i]);
+    }
+    free(strings);
+    return status;
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -17,31 +36,57 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFreeInstance
-        (JNIEnv *, jobject, jlong) {}
+        (JNIEnv *, jobject, jlong fmuPtr, jlong instancePtr) {
+    fmi3Instance instance = getInstancePtr(instancePtr);
+    getFmuPtr(fmuPtr)->fmi3FreeInstance(instance);
+    Fmi3Manager::getInstance()->freeInstance(instance);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nEnterInitializationMode
  * Signature: (JZDDZD)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterInitializationMode
-        (JNIEnv *, jobject, jlong, jboolean, jdouble, jdouble, jboolean, jdouble) { return nullptr; }
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterInitializationMode
+        (JNIEnv *, jobject, jlong fmuPtr, jlong instancePtr,
+         jboolean toleranceDefined, jdouble tolerance, jdouble startTime,
+         jboolean stopTimeDefined, jdouble stopTime) {
+    fmi3Instance instance = getInstancePtr(instancePtr);
+    return getFmuPtr(fmuPtr)->fmi3EnterInitializationMode(instance, toleranceDefined, tolerance, startTime, stopTimeDefined,
+                                                          stopTime);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nExitInitializationMode
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitInitializationMode
-        (JNIEnv *, jobject, jlong) { return nullptr; }
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitInitializationMode
+        (JNIEnv *, jobject, jlong fmuPtr, jlong instancePtr) {
+    fmi3Instance instance = getInstancePtr(instancePtr);
+    return getFmuPtr(fmuPtr)->fmi3ExitInitializationMode(instance);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nEnterEventMode
  * Signature: (JZ[IIZ)Lorg/intocps/fmi3/Fmi3Status;
+ * fmi3Instance instance,
+                                          fmi3Boolean stepEvent,
+                                          const fmi3Int32 rootsFound[],
+                                          size_t nEventIndicators,
+                                          fmi3Boolean timeEvent
  */
-JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
-        (JNIEnv *, jobject, jlong, jboolean, jintArray, jint, jboolean) { return nullptr; }
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
+        (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr, jboolean stepEvent, jintArray rootsFound, jint nEventIndicators, jboolean timeEvent) {
+    fmi3Instance instance = getInstancePtr(instancePtr);
+    fmi3Int32 rootsFound_[nEventIndicators];
+    fmi3Status status = getFmuPtr(fmuPtr)->fmi3EnterEventMode(instance, stepEvent, rootsFound_, nEventIndicators, timeEvent);
+    if (status == fmi3OK || status == fmi3Warning)
+        copyArray_fmi3Int32_to_jint(env, rootsFound_, rootsFound, nEventIndicators);
+
+    return status;
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -66,7 +111,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nRe
  *
  **************************************************************/
 
-#define GET_TEMPLATE(fmiType,api,jniType) JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGet##fmiType\
+#define GET_TEMPLATE(fmiType, api, jniType) JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGet##fmiType\
         (JNIEnv *env, jobject obj, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,\
          jniType##Array values, jint nValues) {\
 \
@@ -89,17 +134,28 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nRe
     return convertStatus(env, status);\
 }                                                                                                              \
 
-GET_TEMPLATE(Float32,Float,jfloat)
-GET_TEMPLATE(Float64,Double,jdouble)
-GET_TEMPLATE(Int8,Int,jint)
-GET_TEMPLATE(UInt8,Int,jint)
-GET_TEMPLATE(Int16,Int,jint)
-GET_TEMPLATE(UInt16,Int,jint)
-GET_TEMPLATE(Int32,Int,jint)
-GET_TEMPLATE(UInt32,Int,jint)
-GET_TEMPLATE(Int64,Long,jlong)
-GET_TEMPLATE(UInt64,Long,jlong)
-GET_TEMPLATE(Boolean,Boolean,jboolean)
+
+GET_TEMPLATE(Float32, Float, jfloat)
+
+GET_TEMPLATE(Float64, Double, jdouble)
+
+GET_TEMPLATE(Int8, Int, jint)
+
+GET_TEMPLATE(UInt8, Int, jint)
+
+GET_TEMPLATE(Int16, Int, jint)
+
+GET_TEMPLATE(UInt16, Int, jint)
+
+GET_TEMPLATE(Int32, Int, jint)
+
+GET_TEMPLATE(UInt32, Int, jint)
+
+GET_TEMPLATE(Int64, Long, jlong)
+
+GET_TEMPLATE(UInt64, Long, jlong)
+
+GET_TEMPLATE(Boolean, Boolean, jboolean)
 //GET_TEMPLATE(Binary,Long,jlong)
 
 
@@ -194,7 +250,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
         (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jbooleanArray, jint);
 
 
-#define SET_TEMPLATE(fmiType,api,jniType) JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSet##fmiType\
+#define SET_TEMPLATE(fmiType, api, jniType) JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSet##fmiType\
 (JNIEnv *env, jobject obj, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,\
          jniType##Array values, jint nValues)\
 {\
@@ -214,17 +270,27 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
     return convertStatus(env, status);\
 }
 
-SET_TEMPLATE(Float32,Float,jfloat)
-SET_TEMPLATE(Float64,Double,jdouble)
-SET_TEMPLATE(Int8,Int,jint)
-SET_TEMPLATE(UInt8,Int,jint)
-SET_TEMPLATE(Int16,Int,jint)
-SET_TEMPLATE(UInt16,Int,jint)
-SET_TEMPLATE(Int32,Int,jint)
-SET_TEMPLATE(UInt32,Int,jint)
-SET_TEMPLATE(Int64,Long,jlong)
-SET_TEMPLATE(UInt64,Long,jlong)
-SET_TEMPLATE(Boolean,Boolean,jboolean)
+SET_TEMPLATE(Float32, Float, jfloat)
+
+SET_TEMPLATE(Float64, Double, jdouble)
+
+SET_TEMPLATE(Int8, Int, jint)
+
+SET_TEMPLATE(UInt8, Int, jint)
+
+SET_TEMPLATE(Int16, Int, jint)
+
+SET_TEMPLATE(UInt16, Int, jint)
+
+SET_TEMPLATE(Int32, Int, jint)
+
+SET_TEMPLATE(UInt32, Int, jint)
+
+SET_TEMPLATE(Int64, Long, jlong)
+
+SET_TEMPLATE(UInt64, Long, jlong)
+
+SET_TEMPLATE(Boolean, Boolean, jboolean)
 
 
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetString

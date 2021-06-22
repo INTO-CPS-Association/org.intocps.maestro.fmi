@@ -8,6 +8,21 @@ Fmi3Manager* Fmi3Manager::instance;
 
 Fmi3Manager::Fmi3Manager(){}
 
+void Fmi3Manager::store(fmi3Instance instance, Fmi3InstanceNode* node) {
+    this->instanceToInstanceNode[instance] = node;
+}
+
+void Fmi3Manager::freeInstance(fmi3Instance instance){
+    auto instanceNode = this->getInstanceNode(instance);
+    delete(instanceNode);
+    this->instanceToInstanceNode.erase(instance);
+
+}
+
+Fmi3InstanceNode* Fmi3Manager::Fmi3Manager::getInstanceNode(fmi3Instance instance) {
+    return this->instanceToInstanceNode[instance];
+}
+
 
 void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
                                   fmi2String *target, jsize len) {
@@ -87,3 +102,8 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 
     return eval;
 }
+
+FMU3 *getFmuPtr(jlong fmuPtr) { return (FMU3 *) fmuPtr; }
+
+fmi3Instance getInstancePtr(jlong compPtr){return (fmi3Instance) compPtr;}
+

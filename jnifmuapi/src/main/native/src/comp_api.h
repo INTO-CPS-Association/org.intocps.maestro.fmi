@@ -38,6 +38,7 @@
 
 #include "fmu_api.h"
 #include "org_intocps_fmi_jnifmuapi_NativeFmuComponent.h"
+#include "shared/utilities.h"
 
 fmi2Component getCompPtr(jlong componentPtr);
 

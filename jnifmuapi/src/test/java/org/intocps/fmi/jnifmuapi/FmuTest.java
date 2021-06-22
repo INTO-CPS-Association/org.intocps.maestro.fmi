@@ -45,7 +45,8 @@ import org.junit.Test;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 
-// Before running these tests extract the latest fmi.native lib. See https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi
+// Before running these tests extract the latest fmi.native lib. Place it in jnifmuapi/src/test/resources/lib/<PLATFORM>/
+// See https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi
 public class FmuTest {
     Fmu fmu;
 

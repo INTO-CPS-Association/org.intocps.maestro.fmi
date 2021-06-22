@@ -58,12 +58,6 @@ fmi2ValueReference *createValueRefArray(JNIEnv *env, jlongArray vr, jsize len) {
   return vr_arr;
 }
 
-#define DECLARE_ARRAY(type, name, length)             \
-  type *name = (type *)malloc(sizeof(type) * length); \
-  if (name == NULL) {                                 \
-    throwException(env, "malloc r failed");           \
-  }
-
 /********************************************************
  * FMU Component
  ********************************************************/

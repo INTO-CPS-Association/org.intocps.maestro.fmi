@@ -53,13 +53,13 @@ public:
     CallbackJniInfo callback_lockPreemption;
     CallbackJniInfo callback_unlockPreemption;
     Fmi3Node* owner;
+    ~Fmi3InstanceNode();
 };
 
 
 class Fmi3Manager {
     static Fmi3Manager *instance;
-//    map<Fmi3Node *, Fmi3Node> fmuNodes;
-//    map<Fmi3InstanceNode *, Fmi3InstanceNode> instances;
+    map<fmi3Instance, Fmi3InstanceNode*> instanceToInstanceNode;
 
 private:
     Fmi3Manager();
@@ -72,10 +72,14 @@ public:
         return instance;
     };
 
-     void store(Fmi3InstanceNode* node){}
-
-
+    void store(fmi3Instance instance, Fmi3InstanceNode* node);
+    Fmi3InstanceNode* getInstanceNode(fmi3Instance);
+    void freeInstance(fmi3Instance instance);
 };
+
+FMU3 *getFmuPtr(jlong fmuPtr);
+
+fmi3Instance getInstancePtr(jlong compPtr);
 
 jobject convertStatus(JNIEnv *env, fmi3Status status);
 
