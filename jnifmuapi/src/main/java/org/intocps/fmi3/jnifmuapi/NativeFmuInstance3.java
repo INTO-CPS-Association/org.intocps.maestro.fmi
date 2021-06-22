@@ -1,6 +1,8 @@
 package org.intocps.fmi3.jnifmuapi;
 
 
+import org.intocps.fmi.Fmi2Status;
+
 public class NativeFmuInstance3 {
 
     final long fmuPtr;
@@ -16,7 +18,7 @@ public class NativeFmuInstance3 {
      * @param categories
      * @return
      */
-    native byte nSetDebugLogging(long fmu, long instance, boolean loggingOn, String categories[]);
+    native Fmi2Status nSetDebugLogging(long fmu, long instance, boolean loggingOn, String categories[]);
 
     /* tag::FreeInstance[] */
     native void nFreeInstance(long fmu, long instance);
@@ -24,119 +26,119 @@ public class NativeFmuInstance3 {
 
     /* Enter and exit initialization mode, enter event mode, terminate and reset */
     /* tag::EnterInitializationMode[] */
-    native byte nEnterInitializationMode(long fmu, long instance, boolean toleranceDefined, double tolerance, double startTime, boolean stopTimeDefined,
-            double stopTime);
+    native Fmi2Status nEnterInitializationMode(long fmu, long instance, boolean toleranceDefined, double tolerance, double startTime, boolean stopTimeDefined,
+                                               double stopTime);
     /* end::EnterInitializationMode[] */
 
     /* tag::ExitInitializationMode[] */
-    native byte nExitInitializationMode(long instance);
+    native Fmi2Status nExitInitializationMode(long instance);
     /* end::ExitInitializationMode[] */
 
     /* tag::EnterEventMode[] */
-    native byte nEnterEventMode(long instance, boolean stepEvent, int rootsFound[], int nEventIndicators, boolean timeEvent);
+    native Fmi2Status nEnterEventMode(long instance, boolean stepEvent, int rootsFound[], int nEventIndicators, boolean timeEvent);
     /* end::EnterEventMode[] */
 
     /* tag::Terminate[] */
-    native byte nTerminate(long instance);
+    native Fmi2Status nTerminate(long instance);
     /* end::Terminate[] */
 
     /* tag::Reset[] */
-    native byte nReset(long instance);
+    native Fmi2Status nReset(long instance);
     /* end::Reset[] */
 
     /* Getting and setting variable values */
     /* tag::Getters[] */
-    native byte nGetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi2Status nGetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native byte nGetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi2Status nGetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native byte nGetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nGetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
+    native Fmi2Status nGetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 
-    native byte nGetBoolean(long instance, long valueReferences[], int nValueReferences, boolean values[], int nValues);
+    native Fmi2Status nGetBoolean(long instance, long valueReferences[], int nValueReferences, boolean values[], int nValues);
 
-    native byte nGetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
+    native Fmi2Status nGetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
 
-    native byte nGetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], long values[], int nValues);
+    native Fmi2Status nGetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], long values[], int nValues);
     /* end::Getters[] */
 
     /* tag::Setters[] */
-    native byte nSetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi2Status nSetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native byte nSetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi2Status nSetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native byte nSetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nSetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native byte nSetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
+    native Fmi2Status nSetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 
-    native byte nSetBoolean(long instance, long valueReferences[], int nValueReferences, boolean values[], int nValues);
+    native Fmi2Status nSetBoolean(long instance, long valueReferences[], int nValueReferences, boolean values[], int nValues);
 
-    native byte nSetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
+    native Fmi2Status nSetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
 
-    native byte nSetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], long values[], int nValues);
+    native Fmi2Status nSetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], long values[], int nValues);
     /* end::Setters[] */
 
     /* Getting Variable Dependency Information */
     /* tag::GetNumberOfVariableDependencies[] */
-    native byte nGetNumberOfVariableDependencies(long instance, long valueReference, int[] nDependencies);
+    native Fmi2Status nGetNumberOfVariableDependencies(long instance, long valueReference, int[] nDependencies);
     /* end::GetNumberOfVariableDependencies[] */
 
     /* tag::GetVariableDependencies[] */
-    native byte nGetVariableDependencies(long instance, long dependent, int elementIndicesOfDependent[], long independents[],
+    native Fmi2Status nGetVariableDependencies(long instance, long dependent, int elementIndicesOfDependent[], long independents[],
             int elementIndicesOfIndependents[], int dependencyKinds[], int nDependencies);
     /* end::GetVariableDependencies[] */
 
     /* Getting and setting the internal FMU state */
     /* tag::GetFMUState[] */
-    native byte nGetFMUState(long instance, long[] FMUState);
+    native Fmi2Status nGetFMUState(long instance, long[] FMUState);
     /* end::GetFMUState[] */
 
     /* tag::SetFMUState[] */
-    native byte nSetFMUState(long instance, long FMUState);
+    native Fmi2Status nSetFMUState(long instance, long FMUState);
     /* end::SetFMUState[] */
 
     /* tag::FreeFMUState[] */
-    native byte nFreeFMUState(long instance, long FMUState);
+    native Fmi2Status nFreeFMUState(long instance, long FMUState);
     /* end::FreeFMUState[] */
 
     /* tag::SerializedFMUStateSize[] */
-    native byte nSerializedFMUStateSize(long instance, long FMUState, int[] size);
+    native Fmi2Status nSerializedFMUStateSize(long instance, long FMUState, int[] size);
     /* end::SerializedFMUStateSize[] */
 
     //    /* tag::SerializeFMUState[] */
-    //    native byte nSerializeFMUState     (long instance,
+    //    native Fmi2Status nSerializeFMUState     (long instance,
     //            fmi3FMUState  FMUState,
     //            fmi3Byte serializedState[],
     //            int size);
     //    /* end::SerializeFMUState[] */
     //
     //    /* tag::DeSerializeFMUState[] */
-    //    native byte nDeSerializeFMUState   (long instance,
+    //    native Fmi2Status nDeSerializeFMUState   (long instance,
     //            fmi3Byte serializedState[],
     //            int size,
     //            fmi3FMUState* FMUState);
@@ -144,54 +146,54 @@ public class NativeFmuInstance3 {
 
     /* Getting partial derivatives */
     /* tag::GetDirectionalDerivative[] */
-    native byte nGetDirectionalDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
+    native Fmi2Status nGetDirectionalDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
             double sensitivity[], int nSensitivity);
     /* end::GetDirectionalDerivative[] */
 
     /* tag::GetAdjointDerivative[] */
-    native byte nGetAdjointDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
+    native Fmi2Status nGetAdjointDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
             double sensitivity[], int nSensitivity);
     /* end::GetAdjointDerivative[] */
 
 
     /* Entering and exiting the Configuration or Reconfiguration Mode */
     /* tag::EnterConfigurationMode[] */
-    native byte nEnterConfigurationMode(long instance);
+    native Fmi2Status nEnterConfigurationMode(long instance);
     /* end::EnterConfigurationMode[] */
 
     /* tag::ExitConfigurationMode[] */
-    native byte nExitConfigurationMode(long instance);
+    native Fmi2Status nExitConfigurationMode(long instance);
     /* end::ExitConfigurationMode[] */
 
     /* Clock related functions */
     /* tag::GetClock[] */
-    native byte nGetClock(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi2Status nGetClock(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
     /* end::GetClock[] */
 
     /* tag::SetClock[] */
-    native byte nSetClock(long instance, long valueReferences[], int nValueReferences, int values[], boolean subactive[], int nValues);
+    native Fmi2Status nSetClock(long instance, long valueReferences[], int nValueReferences, int values[], boolean subactive[], int nValues);
     /* end::SetClock[] */
 
     /* tag::GetIntervalDecimal[] */
-    native byte nGetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double interval[], int nValues);
+    native Fmi2Status nGetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double interval[], int nValues);
     /* end::GetIntervalDecimal[] */
 
     /* tag::GetIntervalFraction[] */
-    native byte nGetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[],
+    native Fmi2Status nGetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[],
             int nValues);
     /* end::GetIntervalFraction[] */
 
     /* tag::SetIntervalDecimal[] */
-    native byte nSetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double interval[], int nValues);
+    native Fmi2Status nSetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double interval[], int nValues);
     /* end::SetIntervalDecimal[] */
 
     /* tag::SetIntervalFraction[] */
-    native byte nSetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[],
+    native Fmi2Status nSetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[],
             int nValues);
     /* end::SetIntervalFraction[] */
 
     /* tag::UpdateDiscreteStates[] */
-    native byte nUpdateDiscreteStates(long instance, boolean[] discreteStatesNeedUpdate, boolean[] terminateSimulation,
+    native Fmi2Status nUpdateDiscreteStates(long instance, boolean[] discreteStatesNeedUpdate, boolean[] terminateSimulation,
             boolean[] nominalsOfContinuousStatesChanged, boolean[] valuesOfContinuousStatesChanged, boolean[] nextEventTimeDefined,
             double[] nextEventTime);
     /* end::UpdateDiscreteStates[] */
@@ -201,46 +203,46 @@ public class NativeFmuInstance3 {
      ****************************************************/
 
     /* tag::EnterContinuousTimeMode[] */
-    native byte nEnterContinuousTimeMode(long instance);
+    native Fmi2Status nEnterContinuousTimeMode(long instance);
     /* end::EnterContinuousTimeMode[] */
 
     /* tag::CompletedIntegratorStep[] */
-    native byte nCompletedIntegratorStep(long instance, boolean noSetFMUStatePriorToCurrentPoint, boolean[] enterEventMode,
+    native Fmi2Status nCompletedIntegratorStep(long instance, boolean noSetFMUStatePriorToCurrentPoint, boolean[] enterEventMode,
             boolean[] terminateSimulation);
     /* end::CompletedIntegratorStep[] */
 
     /* Providing independent variables and re-initialization of caching */
     /* tag::SetTime[] */
-    native byte nSetTime(long instance, double time);
+    native Fmi2Status nSetTime(long instance, double time);
     /* end::SetTime[] */
 
     /* tag::SetContinuousStates[] */
-    native byte nSetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
+    native Fmi2Status nSetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
     /* end::SetContinuousStates[] */
 
     /* Evaluation of the model equations */
     /* tag::GetDerivatives[] */
-    native byte nGetDerivatives(long instance, double derivatives[], int nContinuousStates);
+    native Fmi2Status nGetDerivatives(long instance, double derivatives[], int nContinuousStates);
     /* end::GetDerivatives[] */
 
     /* tag::GetEventIndicators[] */
-    native byte nGetEventIndicators(long instance, double eventIndicators[], int nEventIndicators);
+    native Fmi2Status nGetEventIndicators(long instance, double eventIndicators[], int nEventIndicators);
     /* end::GetEventIndicators[] */
 
     /* tag::GetContinuousStates[] */
-    native byte nGetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
+    native Fmi2Status nGetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
     /* end::GetContinuousStates[] */
 
     /* tag::GetNominalsOfContinuousStates[] */
-    native byte nGetNominalsOfContinuousStates(long instance, double nominals[], int nContinuousStates);
+    native Fmi2Status nGetNominalsOfContinuousStates(long instance, double nominals[], int nContinuousStates);
     /* end::GetNominalsOfContinuousStates[] */
 
     /* tag::GetNumberOfEventIndicators[] */
-    native byte nGetNumberOfEventIndicators(long instance, int[] nEventIndicators);
+    native Fmi2Status nGetNumberOfEventIndicators(long instance, int[] nEventIndicators);
     /* end::GetNumberOfEventIndicators[] */
 
     /* tag::GetNumberOfContinuousStates[] */
-    native byte nGetNumberOfContinuousStates(long instance, int[] nContinuousStates);
+    native Fmi2Status nGetNumberOfContinuousStates(long instance, int[] nContinuousStates);
     /* end::GetNumberOfContinuousStates[] */
 
     /***************************************************
@@ -250,19 +252,19 @@ public class NativeFmuInstance3 {
     /* Simulating the FMU */
 
     /* tag::EnterStepMode[] */
-    native byte nEnterStepMode(long instance);
+    native Fmi2Status nEnterStepMode(long instance);
     /* end::EnterStepMode[] */
 
     /* tag::GetOutputDerivatives[] */
-    native byte nGetOutputDerivatives(long instance, long valueReferences[], int nValueReferences, int orders[], double values[], int nValues);
+    native Fmi2Status nGetOutputDerivatives(long instance, long valueReferences[], int nValueReferences, int orders[], double values[], int nValues);
     /* end::GetOutputDerivatives[] */
 
     /* tag::DoStep[] */
-    native byte nDoStep(long instance, double currentCommunicationPoint, double communicationStepSize, boolean noSetFMUStatePriorToCurrentPoint,
+    native Fmi2Status nDoStep(long instance, double currentCommunicationPoint, double communicationStepSize, boolean noSetFMUStatePriorToCurrentPoint,
             boolean[] eventEncountered, boolean[] clocksAboutToTick, boolean[] terminate, boolean[] earlyReturn, double[] lastSuccessfulTime);
     /* end::DoStep[] */
 
     /* tag::ActivateModelPartition[] */
-    native byte nActivateModelPartition(long instance, long clockReference, int clockElementIndex, double activationTime);
+    native Fmi2Status nActivateModelPartition(long instance, long clockReference, int clockElementIndex, double activationTime);
 
 }

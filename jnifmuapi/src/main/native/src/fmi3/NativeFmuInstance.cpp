@@ -10,7 +10,7 @@
  * Method:    nSetDebugLogging
  * Signature: (JZI[Ljava/lang/String;)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetDebugLogging
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetDebugLogging
         (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jboolean loggingOn, jobjectArray categories) {
 
     size_t size = env->GetArrayLength(categories);
@@ -27,7 +27,7 @@ JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetD
         free((char *) strings[i]);
     }
     free(strings);
-    return status;
+    return convertStatus(env, status);
 }
 
 /*
@@ -47,13 +47,13 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFreeI
  * Method:    nEnterInitializationMode
  * Signature: (JZDDZD)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterInitializationMode
-        (JNIEnv *, jobject, jlong fmuPtr, jlong instancePtr,
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterInitializationMode
+        (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr,
          jboolean toleranceDefined, jdouble tolerance, jdouble startTime,
          jboolean stopTimeDefined, jdouble stopTime) {
     fmi3Instance instance = getInstancePtr(instancePtr);
-    return getFmuPtr(fmuPtr)->fmi3EnterInitializationMode(instance, toleranceDefined, tolerance, startTime, stopTimeDefined,
-                                                          stopTime);
+    return convertStatus(env, getFmuPtr(fmuPtr)->fmi3EnterInitializationMode(instance, toleranceDefined, tolerance, startTime, stopTimeDefined,
+                                                          stopTime));
 }
 
 /*
@@ -61,10 +61,10 @@ JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnte
  * Method:    nExitInitializationMode
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
-JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitInitializationMode
-        (JNIEnv *, jobject, jlong fmuPtr, jlong instancePtr) {
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitInitializationMode
+        (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr) {
     fmi3Instance instance = getInstancePtr(instancePtr);
-    return getFmuPtr(fmuPtr)->fmi3ExitInitializationMode(instance);
+    return convertStatus(env, getFmuPtr(fmuPtr)->fmi3ExitInitializationMode(instance));
 }
 
 /*
@@ -77,7 +77,7 @@ JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExit
                                           size_t nEventIndicators,
                                           fmi3Boolean timeEvent
  */
-JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
         (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr, jboolean stepEvent, jintArray rootsFound, jint nEventIndicators, jboolean timeEvent) {
     fmi3Instance instance = getInstancePtr(instancePtr);
     fmi3Int32 rootsFound_[nEventIndicators];
@@ -85,7 +85,7 @@ JNIEXPORT jbyte JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnte
     if (status == fmi3OK || status == fmi3Warning)
         copyArray_fmi3Int32_to_jint(env, rootsFound_, rootsFound, nEventIndicators);
 
-    return status;
+    return convertStatus(env, status);
 }
 
 /*
