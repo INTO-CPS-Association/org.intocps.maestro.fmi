@@ -84,6 +84,7 @@ FMU3 *getFmuPtr(jlong fmuPtr);
 fmi3Instance getInstancePtr(jlong compPtr);
 
 jobject convertStatus(JNIEnv *env, fmi3Status status);
+void copy_native_fmi3IntervalQualifiers_to_java(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len);
 
 typedef unsigned int uint;
 #define COPY_ARRAY_TEMPLATE(fromType,apiName,toType)inline toType *createArray_##toType##_from_## fromType(JNIEnv *env, fromType##Array vr, jsize len) { \
@@ -113,7 +114,7 @@ COPY_ARRAY_TEMPLATE(jdouble,Double,long)
 COPY_ARRAY_TEMPLATE(jfloat,Float,float)
 //COPY_ARRAY_TEMPLATE(jlong,Long,long)
 void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
-                                  fmi2String *target, jsize len);
+                                  fmi3String *target, jsize len);
 
 
 #define COPY_TO_JNI_ARRAY(fromType,apiName,toType)inline void copyArray_## fromType##_to_##toType(JNIEnv *env,const fromType *source,\
@@ -148,6 +149,7 @@ COPY_TO_JNI_ARRAY(fmi3UInt32,Int,jint)
 COPY_TO_JNI_ARRAY(fmi3Int64,Long,jlong)
 COPY_TO_JNI_ARRAY(fmi3UInt64,Long,jlong)
 COPY_TO_JNI_ARRAY(fmi3Boolean,Boolean,jboolean)
+COPY_TO_JNI_ARRAY(fmi3Clock,Boolean,jboolean)
 COPY_TO_JNI_ARRAY(fmi3Char,Int,jint)
 COPY_TO_JNI_ARRAY(fmi3Byte,Int,jint)
 COPY_TO_JNI_ARRAY(fmi3Binary,Long,jlong)
@@ -173,6 +175,7 @@ COPY_FROM_JNI_ARRAY(fmi3UInt32,Int,jint)
 COPY_FROM_JNI_ARRAY(fmi3Int64,Long,jlong)
 COPY_FROM_JNI_ARRAY(fmi3UInt64,Long,jlong)
 COPY_FROM_JNI_ARRAY(fmi3Boolean,Boolean,jboolean)
+COPY_FROM_JNI_ARRAY(fmi3Clock,Boolean,jboolean)
 COPY_FROM_JNI_ARRAY(fmi3Char,Int,jint)
 COPY_FROM_JNI_ARRAY(fmi3Byte,Int,jint)
 

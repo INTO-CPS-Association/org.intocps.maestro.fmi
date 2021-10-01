@@ -15,7 +15,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
 
     size_t size = env->GetArrayLength(categories);
 
-    DECLARE_ARRAY(fmi2String, strings, size);
+    DECLARE_ARRAY(fmi3String, strings, size);
     copyJniArrayToNativeString(env, categories, strings, size);
 
     fmi3Status status = getFmuPtr(fmuPtr)->fmi3SetDebugLogging(
@@ -52,8 +52,9 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
          jboolean toleranceDefined, jdouble tolerance, jdouble startTime,
          jboolean stopTimeDefined, jdouble stopTime) {
     fmi3Instance instance = getInstancePtr(instancePtr);
-    return convertStatus(env, getFmuPtr(fmuPtr)->fmi3EnterInitializationMode(instance, toleranceDefined, tolerance, startTime, stopTimeDefined,
-                                                          stopTime));
+    return convertStatus(env, getFmuPtr(fmuPtr)->fmi3EnterInitializationMode(instance, toleranceDefined, tolerance,
+                                                                             startTime, stopTimeDefined,
+                                                                             stopTime));
 }
 
 /*
@@ -78,10 +79,12 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEx
                                           fmi3Boolean timeEvent
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
-        (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr, jboolean stepEvent, jintArray rootsFound, jint nEventIndicators, jboolean timeEvent) {
+        (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr, jboolean stepEvent, jintArray rootsFound,
+         jint nEventIndicators, jboolean timeEvent) {
     fmi3Instance instance = getInstancePtr(instancePtr);
     fmi3Int32 rootsFound_[nEventIndicators];
-    fmi3Status status = getFmuPtr(fmuPtr)->fmi3EnterEventMode(instance, stepEvent, rootsFound_, nEventIndicators, timeEvent);
+    fmi3Status status = getFmuPtr(fmuPtr)->fmi3EnterEventMode(instance, stepEvent, rootsFound_, nEventIndicators,
+                                                              timeEvent);
     if (status == fmi3OK || status == fmi3Warning)
         copyArray_fmi3Int32_to_jint(env, rootsFound_, rootsFound, nEventIndicators);
 
@@ -96,7 +99,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nTerminate
         (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr) {
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
-    FMU3* fmu = getFmuPtr(fmuPtr);
+    FMU3 *fmu = getFmuPtr(fmuPtr);
     return convertStatus(env, fmu->fmi3Terminate(instancePtr_));
 }
 
@@ -108,7 +111,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nTe
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nReset
         (JNIEnv *env, jobject, jlong fmuPtr, jlong instancePtr) {
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
-    FMU3* fmu = getFmuPtr(fmuPtr);
+    FMU3 *fmu = getFmuPtr(fmuPtr);
     return convertStatus(env, fmu->fmi3Reset(instancePtr_));
 }
 
@@ -164,8 +167,6 @@ GET_TEMPLATE(Int64, Long, jlong)
 GET_TEMPLATE(UInt64, Long, jlong)
 
 GET_TEMPLATE(Boolean, Boolean, jboolean)
-//GET_TEMPLATE(Binary,Long,jlong)
-
 
 // The functions below are all implemented via the templated version above.
 
@@ -202,8 +203,31 @@ GET_TEMPLATE(Boolean, Boolean, jboolean)
 //JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetBoolean
 //        (JNIEnv *, jobject, jlong, jlongArray, jint, jbooleanArray, jint);
 //
-//JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetBinary
-//        (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jbooleanArray, jint);
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetBinary
+        (JNIEnv *env, jobject obj, jlong instanceNodePtr, jlongArray valueReferences, jint nValueReferences,
+         jintArray valueSizes, jobjectArray values, jint nValues) {
+    Fmi3InstanceNode *instanceNode = (Fmi3InstanceNode *) instanceNodePtr;
+
+    DECLARE_ARRAY(fmi3Binary, nativeByteValues, nValues);
+    fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+    DECLARE_ARRAY(int, nativeValueSizes, nValues);
+
+    fmi3Status status = instanceNode->owner->fmu.fmi3GetBinary(instanceNode, nativeValueReferences, nValueReferences,
+                                                               nativeValueSizes, nativeByteValues, nValues);
+
+    for (int i = 0; i < nValues; i++) {
+        const jbyte *bytesPtr = nativeByteValues[i];
+        jbyteArray row = (jbyteArray) env->GetObjectArrayElement(values, i);
+        env->SetByteArrayRegion(row, 0, nativeValueSizes[i], bytesPtr);
+        env->DeleteLocalRef(row);
+    }
+    copyArray_int_to_jint(env, nativeValueSizes, valueSizes, nValues);
+
+    free(nativeValueReferences);
+    free(nativeValueSizes);
+    free(nativeByteValues);
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -211,7 +235,26 @@ GET_TEMPLATE(Boolean, Boolean, jboolean)
  * Signature: (J[JI[Ljava/lang/String;I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetString
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jobjectArray, jint);
+        (JNIEnv *env, jobject obj, jlong instanceNodePtr, jlongArray valueReferences, jint nValueReferences,
+         jobjectArray values, jint nValues) {
+    Fmi3InstanceNode *instanceNode = (Fmi3InstanceNode *) instanceNodePtr;
+
+    DECLARE_ARRAY(fmi3String, nativeStrings, nValues);
+    fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    fmi3Status status = instanceNode->owner->fmu.fmi3SetString(instanceNode, nativeValueReferences, nValueReferences,
+                                                               nativeStrings, nValues);
+
+    for (int i = 0; i < nValues; i++) {
+        jstring jstrBuf = env->NewStringUTF(nativeStrings[i]);
+        env->SetObjectArrayElement(values, i, jstrBuf);
+        env->DeleteLocalRef(jstrBuf);
+    }
+
+    free(nativeStrings);
+    free(nativeValueReferences);
+    return convertStatus(env, status);
+}
 
 /**************************************************************
  *
@@ -253,10 +296,6 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 //
 //JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetBoolean
 //        (JNIEnv *, jobject, jlong, jlongArray, jint, jbooleanArray, jint);
-
-JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetBinary
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jbooleanArray, jint);
-
 
 #define SET_TEMPLATE(fmiType, api, jniType) JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSet##fmiType\
 (JNIEnv *env, jobject obj, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,\
@@ -300,9 +339,66 @@ SET_TEMPLATE(UInt64, Long, jlong)
 
 SET_TEMPLATE(Boolean, Boolean, jboolean)
 
+JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetBinary
+        (JNIEnv *env, jobject obj, jlong instanceNodePtr, jlongArray valueReferences, jint nValueReferences,
+         jintArray valueSizes, jobjectArray values, jint nValues) {
+    Fmi3InstanceNode *instanceNode = (Fmi3InstanceNode *) instanceNodePtr;
+
+    const fmi3Binary nativeByteValues[nValues];
+    std::map<jbyteArray, jbyte *> reservedByteValues;
+    fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    DECLARE_ARRAY(fmi3UInt32, nativeValueSizes, nValues);
+    copyArray_jint_to_fmi3UInt32(valueSizes, nativeValueSizes);
+
+    for (int i = 0; i < nValues; i++) {
+        jbyteArray row = (jbyteArray) env->GetObjectArrayElement(values, i);
+        jbyte *bytesPtr = env->GetByteArrayElements(row, NULL);
+        reservedByteValues.insert(pair<jbyteArray, jbyte *>(row, bytesPtr));
+        nativeByteValues[i] = (fmi3Binary) bytesPtr;
+        env->DeleteLocalRef(row);
+    }
+
+    fmi3Status status = instanceNode->owner->fmu.fmi3SetBinaryType(instanceNode, nativeValueReferences,
+                                                                   nValueReferences, nativeValueSizes, nativeByteValues,
+                                                                   nValues);
+
+    for (auto const &entry: reservedByteValues) {
+        env->ReleaseByteArrayElements(entry.first, entry.second, 0);
+    }
+
+    free(nativeValueReferences);
+    free(nativeValueSizes);
+    return convertStatus(env, status);
+}
+
 
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetString
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jobjectArray, jint);
+        (JNIEnv *env, jobject obj, jlong instanceNodePtr, jlongArray valueReferences, jint nValueReferences,
+         jobjectArray values, jint nValues) {
+    Fmi3InstanceNode *instanceNode = (Fmi3InstanceNode *) instanceNodePtr;
+
+    const fmi3String nativeStrings[nValues];
+    jstring reservedStrings[nValues];
+    fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    for (int i = 0; i < nValues; i++) {
+        jstring value = (jstring) (env->GetObjectArrayElement(values, i));
+        reservedStrings[i] = value;
+        nativeStrings[i] = env->GetStringUTFChars(value, NULL);
+        env->DeleteLocalRef(value);
+    }
+
+    fmi3Status status = instanceNode->owner->fmu.fmi3SetString(instanceNode, nativeValueReferences, nValueReferences,
+                                                               nativeStrings, nValues);
+
+    for (int i = 0; i < nValues; i++) {
+        env->ReleaseStringUTFChars(reservedStrings[i], nativeStrings[i]);
+    }
+
+    free(nativeValueReferences);
+    return convertStatus(env, status);
+}
 
 
 /*
@@ -311,7 +407,21 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfVariableDependencies
-        (JNIEnv *, jobject, jlong, jlong, jintArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong valueReference,
+         jintArray nDependenciesArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference nativeValueReference = (fmi3ValueReference) nativeValueReference;
+    int nDependencies;
+    fmi3Status status = fmuPtr_->fmi3GetNumberOfVariableDependencies(instancePtr_, nativeValueReference, &nDependencies);
+
+    jint *nDependenciesElem = env->GetIntArrayElements(nDependenciesArrPtr, NULL);
+    nDependenciesElem[0] = (jint) nDependencies;
+    env->ReleaseIntArrayElements(nDependenciesArrPtr, nDependenciesElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -319,7 +429,34 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JJ[I[J[I[II)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetVariableDependencies
-        (JNIEnv *, jobject, jlong, jlong, jintArray, jlongArray, jintArray, jintArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong dependent,
+         jintArray elementIndicesOfDependent, jlongArray independents, jintArray elementIndicesOfIndependents,
+         jobjectArray dependencyKinds, jint nDependencies) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference nativeDependent = (fmi3ValueReference) dependent;
+    DECLARE_ARRAY(fmi3ValueReference, nativeIndependents, nDependencies);
+    DECLARE_ARRAY(int, nativeElementIndicesOfDependent, nDependencies);
+    DECLARE_ARRAY(int, nativeElementIndicesOfIndependents, nDependencies);
+    DECLARE_ARRAY(fmi3DependencyKind, nativeDependencyKinds, nDependencies);
+
+    fmi3Status status = fmuPtr_->fmi3GetVariableDependencies(instancePtr_, nativeDependent,
+                                                             nativeElementIndicesOfDependent, nativeIndependents,
+                                                             nativeElementIndicesOfinDependents, nativeDependencyKinds,
+                                                             nDependencies);
+    copyArray_fmi3DependencyKind_to_javaEnum(env, nativeDependencyKinds, dependencyKinds, nDependencies);
+    copyArray_fmi3UInt64_to_jlong(env, nativeIndependents, independents);
+    copyArray_int_to_jint(env, nativeElementIndicesOfDependent, elementIndicesOfDependent, nDependencies);
+    copyArray_int_to_jint(env, nativeElementIndicesOfIndependents, elementIndicesOfIndependents, nDependencies);
+
+    free(nativeDependencyKinds);
+    free(nativeIndependents);
+    free(nativeElementIndicesOfDependent);
+    free(nativeElementIndicesOfIndependents);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -327,7 +464,21 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetFMUState
-        (JNIEnv *, jobject, jlong, jlongArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray statePtrArr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3FMUstate state;
+    state = NULL;
+    fmi3Status status = fmuPtr_->fmi3GetFMUState(instancePtr_, &state);
+
+    jlong *vbody = env->GetLongArrayElements(statePtrArr, NULL);
+    vbody[0] = (jlong) (state);
+
+    env->ReleaseLongArrayElements(statePtrArr, vbody, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -335,7 +486,15 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JJ)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetFMUState
-        (JNIEnv *, jobject, jlong, jlong);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong statePtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+    fmi3Status status = fmuPtr_->fmi3SetFMUState(instancePtr_, state);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -343,7 +502,16 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (JJ)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFreeFMUState
-        (JNIEnv *, jobject, jlong, jlong);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong statePtr) {
+
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+    fmi2Status status = fmuPtr_->fmi3FreeFMUState(instancePtr_, &state);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -351,7 +519,23 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFr
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSerializedFMUStateSize
-        (JNIEnv *, jobject, jlong, jlong, jintArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong statePtrArr, jintArray sizeArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+
+    jsize len = env->GetArrayLength(sizeArrPtr);
+
+    int size;
+    fmi2Status status = fmuPtr_->fmi3SerializedFMUStateSize(instancePtr_, state, &size);
+
+    jint *sizeElem = env->GetIntArrayElements(sizeArrPtr, NULL);
+    sizeElem[0] = (jint) size;
+    env->ReleaseIntArrayElements(sizeArrPtr, sizeElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -359,7 +543,31 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[JI[JI[DI[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetDirectionalDerivative
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jint, jdoubleArray, jint, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray unknowns, jint nUnknows,
+         jlongArray knowns, jint nKnowns, jdoubleArray seed, jint nSeed, jdoubleArray sensitivity, jint nSensitivity) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *unknowns_refs = createArray_uint_from_jlong(env, unknowns, nUnknows);
+    fmi3ValueReference *knowns_refs = createArray_uint_from_jlong(env, knowns, nKnowns);
+
+    DECLARE_ARRAY(fmi3Float64, nativeSeed, nSeed);
+    copyArray_jdouble_to_fmi3Float64(env, seed, nativeSeed, nSeed);
+
+    DECLARE_ARRAY(fmi3Float64, nativeSensitivity, nSensitivity);
+
+    fmi3Status status = fmuPtr_->fmi3GetDirectionalDerivative(
+            instancePtr_, unknowns_refs, nUnknows, knowns_refs, nKnowns, nativeSeed, nSeed, nativeSensitivity, nSensitivity);
+
+    copyArray_fmi3Float64_to_jdouble(env, nativeSensitivity, sensitivity, nSensitivity);
+
+    free(unknowns_refs);
+    free(knowns_refs);
+    free(nativeSeed);
+    free(nativeSensitivity);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -367,7 +575,31 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[JI[JI[DI[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetAdjointDerivative
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jint, jdoubleArray, jint, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray unknowns, jint nUnknows,
+         jlongArray knowns, jint nKnowns, jdoubleArray seed, jint nSeed, jdoubleArray sensitivity, jint nSensitivity) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *unknowns_refs = createArray_uint_from_jlong(env, unknowns, nUnknows);
+    fmi3ValueReference *knowns_refs = createArray_uint_from_jlong(env, knowns, nKnowns);
+
+    DECLARE_ARRAY(fmi3Float64, nativeSeed, nSeed);
+    copyArray_jdouble_to_fmi3Float64(env, seed, nativeSeed, nSeed);
+
+    DECLARE_ARRAY(fmi3Float64, nativeSensitivity, nSensitivity);
+
+    fmi3Status status = fmuPtr_->fmi3GetAdjointDerivative(
+            instancePtr_, unknowns_refs, nUnknows, knowns_refs, nKnowns, nativeSeed, nSeed, nativeSensitivity, nSensitivity);
+
+    copyArray_fmi3Float64_to_jdouble(env, nativeSensitivity, sensitivity, nSensitivity);
+
+    free(unknowns_refs);
+    free(knowns_refs);
+    free(nativeSeed);
+    free(nativeSensitivity);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -375,7 +607,14 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterConfigurationMode
-        (JNIEnv *, jobject, jlong);
+        (JNIEnv *env, jobject obj, jlong instancePtr, jlong fmuPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3EnterConfigurationMode(instancePtr_);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -383,7 +622,14 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nExitConfigurationMode
-        (JNIEnv *, jobject, jlong);
+        (JNIEnv *env, jobject obj, jlong instancePtr, jlong fmuPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3ExitConfigurationMode(instancePtr_);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -391,7 +637,23 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEx
  * Signature: (J[JI[II)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetClock
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jbooleanArray values, jint nValues) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+    DECLARE_ARRAY(fmi3Clock, nativeClocks, nValues);
+
+    fmi3Status status = fmuPtr_->fmi3GetClock(instancePtr_, value_refs, nativeClocks, nValues);
+
+    copyArray_fmi3Clock_to_jboolean(env, nativeClocks, values, nValues);
+
+    free(value_refs);
+    free(nativeClocks);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -399,7 +661,22 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[JI[I[ZI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetClock
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jbooleanArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jbooleanArray values, jint nValues) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+    DECLARE_ARRAY(fmi3Clock, nativeClocks, nValues);
+    copyArray_jboolean_to_fmi3Clock(env, values, nativeClocks, nValues);
+
+    fmi3Status status = fmuPtr_->fmi3GetClock(instancePtr_, value_refs, nativeClocks, nValues);
+
+    free(value_refs);
+    free(nativeClocks)
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -407,7 +684,26 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[JI[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetIntervalDecimal
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jdoubleArray intervals, jobjectArray qualifiers, jint nIntervals) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    DECLARE_ARRAY(fmi3IntervalQualifier, nativeQualifiers, nIntervals);
+    DECLARE_ARRAY(fmi3Float64, nativeIntervals, nIntervals);
+
+    fmi3Status status = fmuPtr_->fmi3GetIntervalDecimal(instancePtr_, value_refs, nValueReferences, nativeIntervals,
+                                                        nativeQualifiers, nIntervals);
+    copyArray_fmi3IntervalQualifiers_to_javaEnum(env, nativeQualifiers, qualifiers, nIntervals);
+    copyArray_fmi3Float64_to_jdouble(env, nativeIntervals, intervals, nIntervals);
+
+    free(value_refs);
+    free(nativeQualifiers);
+    free(nativeIntervals);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -415,7 +711,33 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[JI[J[JI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetIntervalFraction
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jlongArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jlongArray intervalCounters, jlongArray resolutions, jobjectArray qualifiers, jint nIntervals) {
+    //intervalCounters length == resolutions length == nIntervals
+
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    DECLARE_ARRAY(fmi3IntervalQualifier, nativeQualifiers, nIntervals);
+    DECLARE_ARRAY(fmi3UInt64, nativeIntervalCounters, nIntervals);
+    DECLARE_ARRAY(fmi3UInt64, nativeResolutions, nIntervals);
+
+
+    fmi3Status status = fmuPtr_->fmi3GetIntervalDecimal(instancePtr_, value_refs, nValueReferences,
+                                                        nativeIntervalCounters, nativeResolutions, nativeQualifiers,
+                                                        nIntervals);
+    copy_native_fmi3IntervalQualifiers_to_java(env, nativeQualifiers, qualifiers, nIntervals);
+    copyArray_fmi3UInt64_to_jlong(env, nativeIntervalCounters, intervalCounters, nIntervals);
+    copyArray_fmi3UInt64_to_jlong(env, nativeResolutions, resolutions, nIntervals);
+
+    free(value_refs);
+    free(nativeQualifiers);
+    free(nativeIntervalCounters);
+    free(nativeResolutions);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -423,7 +745,22 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[JI[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetIntervalDecimal
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jdoubleArray intervals, jint nIntervals) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+    DECLARE_ARRAY(fmi3Float64, intervalArr, nIntervals);
+    copyArray_jdouble_to_fmi3Float64(env, intervals, intervalArr, nIntervals);
+
+    fmi3Status status = fmuPtr_->fmi3SetIntervalDecimal(instancePtr_, value_refs, intervalArr, nIntervals);
+
+    free(value_refs);
+    free(intervalArr);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -431,7 +768,26 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[JI[J[JI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetIntervalFraction
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jlongArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jlongArray intervalCounters, jlongArray resolutions, jint nIntervals) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+    DECLARE_ARRAY(fmi3UInt64, nativeIntervalCounters, nIntervals);
+    DECLARE_ARRAY(fmi3UInt64, nativeResolutions, nIntervals);
+    copyArray_jlong_to_fmi3UInt64(env, intervalCounters, nativeIntervalCounters, nIntervals);
+    copyArray_jlong_to_fmi3UInt64(env, resolutions, nativeResolutions, nIntervals);
+
+    fmi3Status status = fmuPtr_->fmi3SetIntervalDecimal(instancePtr_, value_refs, nativeIntervalCounters,
+                                                        nativeResolutions, nIntervals);
+
+    free(value_refs);
+    free(nativeIntervalCounters);
+    free(nativeResolutions);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -439,8 +795,50 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[Z[Z[Z[Z[Z[D)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nUpdateDiscreteStates
-        (JNIEnv *, jobject, jlong, jbooleanArray, jbooleanArray, jbooleanArray, jbooleanArray, jbooleanArray,
-         jdoubleArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jbooleanArray discreteStatesNeedUpdateArrPtr,
+         jbooleanArray terminateSimulationArrPtr, jbooleanArray nominalsOfContinuousStatesChangedArrPtr,
+         jbooleanArray valuesOfContinuousStatesChangedArrPtr, jbooleanArray nextEventTimeDefinedArrPtr,
+         jdoubleArray nextEventTimeArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Boolean discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged, valuesOfContinuousStatesChanged, nextEventTimeDefined;
+    fmi3Float64 nextEventTime;
+
+    fmi3Status status = fmuPtr_->fmi3UpdateDiscreteStates(instancePtr_, &discreteStatesNeedUpdate, &terminateSimulation,
+                                                          &nominalsOfContinuousStatesChanged,
+                                                          &valuesOfContinuousStatesChanged, &nextEventTimeDefined,
+                                                          &nextEventTime);
+
+    jboolean *discreteStatesNeedUpdateElem = env->GetBooleanArrayElements(discreteStatesNeedUpdateArrPtr, NULL);
+    discreteStatesNeedUpdateElem[0] = (jboolean) discreteStatesNeedUpdate;
+    env->ReleaseBooleanArrayElements(discreteStatesNeedUpdateArrPtr, discreteStatesNeedUpdateElem, 0);
+
+    jboolean *terminateSimulationArrElem = env->GetBooleanArrayElements(terminateSimulationArrPtr, NULL);
+    terminateSimulationArrElem[0] = (jboolean) terminateSimulation;
+    env->ReleaseBooleanArrayElements(terminateSimulationArrPtr, terminateSimulationArrElem, 0);
+
+    jboolean *nominalsOfContinuousStatesChangedArrElem = env->GetBooleanArrayElements(
+            nominalsOfContinuousStatesChangedArrPtr, NULL);
+    nominalsOfContinuousStatesChangedArrElem[0] = (jboolean) nominalsOfContinuousStatesChanged;
+    env->ReleaseBooleanArrayElements(nominalsOfContinuousStatesChangedArrPtr, nominalsOfContinuousStatesChangedArrElem,
+                                     0);
+
+    jboolean *valuesOfContinuousStatesChangedArrElem = env->GetBooleanArrayElements(
+            valuesOfContinuousStatesChangedArrPtr, NULL);
+    valuesOfContinuousStatesChangedArrElem[0] = (jboolean) valuesOfContinuousStatesChanged;
+    env->ReleaseBooleanArrayElements(valuesOfContinuousStatesChangedArrPtr, valuesOfContinuousStatesChangedArrElem, 0);
+
+    jboolean *nextEventTimeDefinedArrElem = env->GetBooleanArrayElements(nextEventTimeDefinedArrPtr, NULL);
+    nextEventTimeDefinedArrElem[0] = (jboolean) nextEventTimeDefined;
+    env->ReleaseBooleanArrayElements(nextEventTimeDefinedArrPtr, nextEventTimeDefinedArrElem, 0);
+
+    jdouble *nextEventTimeArrElem = env->GetDoubleArrayElements(nextEventTimeArrPtr, 0);
+    nextEventTimeArrElem[0] = (jboolean) nextEventTime;
+    env->ReleaseDoubleArrayElements(nextEventTimeArrPtr, nextEventTimeArrElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -448,7 +846,14 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nUp
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterContinuousTimeMode
-        (JNIEnv *, jobject, jlong);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3EnterContinuousTimeMode(instancePtr_);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -456,7 +861,27 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
  * Signature: (JZ[Z[Z)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nCompletedIntegratorStep
-        (JNIEnv *, jobject, jlong, jboolean, jbooleanArray, jbooleanArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jboolean noSetFMUStatePriorToCurrentPoint,
+         jbooleanArray enterEventModeArrPtr, jbooleanArray terminateSimulationArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Boolean enterEventMode, terminateSimulation;
+    fmi3Boolean nativeNoSetFMUStatePriorToCurrentPoint = (fmi3Boolean)(noSetFMUStatePriorToCurrentPoint != JNI_FALSE);
+
+    fmi3Status status = fmuPtr_->fmi3CompletedIntegratorStep(instancePtr_, nativeNoSetFMUStatePriorToCurrentPoint,
+                                                             &enterEventMode, &terminateSimulation);
+
+    jboolean *enterEventModeArrElem = env->GetBooleanArrayElements(enterEventModeArrPtr, NULL);
+    enterEventModeArrElem[0] = (jboolean) enterEventMode;
+    env->ReleaseBooleanArrayElements(enterEventModeArrPtr, enterEventModeArrElem, 0);
+
+    jboolean *terminateSimulationArrElem = env->GetBooleanArrayElements(terminateSimulationArrPtr, NULL);
+    terminateSimulationArrElem[0] = (jboolean) terminateSimulation;
+    env->ReleaseBooleanArrayElements(terminateSimulationArrPtr, terminateSimulationArrElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -464,7 +889,14 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nCo
  * Signature: (JD)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetTime
-        (JNIEnv *, jobject, jlong, jdouble);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jdouble time) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3SetTime(instancePtr_, time);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -472,7 +904,18 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetContinuousStates
-        (JNIEnv *, jobject, jlong, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jdoubleArray continuousStates,
+         jint nContinuousStates) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    DECLARE_ARRAY(fmi3Float64, nativeContinuousStates, nContinuousStates);
+    copyArray_jdouble_to_fmi3Float64(env, continuousStates, nativeContinuousStates, nContinuousStates);
+    fmi3Status status = fmuPtr_->fmi3SetTime(instancePtr_, nativeContinuousStates, nContinuousStates);
+
+    free(nativeContinuousStates);
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -488,7 +931,18 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetEventIndicators
-        (JNIEnv *, jobject, jlong, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong fmuInstance, jdoubleArray eventIndicators,
+         jint nEventIndicators) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    DECLARE_ARRAY(fmi3Float64, nativeEventIndicators, nEventIndicators);
+    fmi3Status status = fmuPtr_->fmi3GetEventIndicators(instancePtr_, nativeEventIndicators, nEventIndicators);
+    copyArray_fmi3Float64_to_jdouble(env, nativeEventIndicators, eventIndicators);
+
+    free(nativeEventIndicators);
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -496,7 +950,18 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetContinuousStates
-        (JNIEnv *, jobject, jlong, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jdoubleArray continuousStates,
+         jint nContinuousStates) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    DECLARE_ARRAY(fmi3Float64, nativeContinuousStates, nContinuousStates);
+    fmi3Status status = fmuPtr_->fmi3SetTime(instancePtr_, nativeContinuousStates, nContinuousStates);
+    copyArray_fmi3Float64_to_jdouble(env, continuousStates, nativeContinuousStates, nContinuousStates);
+
+    free(nativeContinuousStates);
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -504,7 +969,17 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNominalsOfContinuousStates
-        (JNIEnv *, jobject, jlong, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jdoubleArray nominals, jint nContinuousStates) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    DECLARE_ARRAY(fmi3Float64, nativeNominals, nContinuousStates);
+    fmi3Status status = fmuPtr_->fmi3GetNominalsOfContinuousStates(instancePtr_, nativeNominals, nContinuousStates);
+    copyArray_fmi3Float64_to_jdouble(env, nominals, nativeNominals, nContinuousStates);
+
+    free(nativeNominals)
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -512,7 +987,22 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfEventIndicators
-        (JNIEnv *, jobject, jlong, jintArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jintArray nEventIndicatorsArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    jsize len = env->GetArrayLength(nEventIndicatorsArrPtr);
+
+    int nEventIndicators;
+
+    fmi3Status status = fmuPtr_->fmi3GetNumberOfEventIndicators(instancePtr_, &nEventIndicators);
+
+    jint *nEventIndicatorsElem = env->GetIntArrayElements(nEventIndicatorsArrPtr, NULL);
+    nEventIndicatorsElem[0] = (jint) nEventIndicators;
+    env->ReleaseIntArrayElements(nEventIndicatorsArrPtr, nEventIndicatorsElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -520,7 +1010,22 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfContinuousStates
-        (JNIEnv *, jobject, jlong, jintArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jintArray nContinuousStatesArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    jsize len = env->GetArrayLength(nContinuousStatesArrPtr);
+
+    int nContinuousStates;
+
+    fmi3Status status = fmuPtr_->fmi3GetNumberOfContinuousStates(instancePtr_, &nContinuousStates);
+
+    jint *nContinuousStatesElem = env->GetIntArrayElements(nContinuousStatesArrPtr, NULL);
+    nContinuousStatesElem[0] = (jint) nContinuousStates;
+    env->ReleaseIntArrayElements(nContinuousStatesArrPtr, nContinuousStatesElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -528,7 +1033,14 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterStepMode
-        (JNIEnv *, jobject, jlong);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3EnterStepMode(instancePtr_);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -536,7 +1048,27 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEn
  * Signature: (J[JI[I[DI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetOutputDerivatives
-        (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jdoubleArray, jint);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,
+         jintArray orders, jdoubleArray values, jint nValues) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3ValueReference *value_refs = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
+
+    jsize ordersLen = env->GetArrayLength(orders);
+
+    DECLARE_ARRAY(fmi3Int32, nativeOrders, ordersLen);
+    copyArray_jint_to_fmi3Int32(env, orders, nativeOrders);
+    DECLARE_ARRAY(fmi3Float64, nativeValues, nValues);
+
+    fmi3Status status = fmuPtr_->fmi3GetOutputDerivatives(instancePtr_, value_refs, nValueReferences, nativeOrders,
+                                                          nativeValues, nValues);
+    copyArray_fmi3Float64_to_jdouble(env, nativeValues, values);
+
+    free(value_refs);
+    free(nativeOrders);
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -544,8 +1076,42 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JDDZ[Z[Z[Z[Z[D)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nDoStep
-        (JNIEnv *, jobject, jlong, jdouble, jdouble, jboolean, jbooleanArray, jbooleanArray, jbooleanArray,
-         jbooleanArray, jdoubleArray);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jdouble currentCommunicationPoint,
+         jdouble communicationStepSize, jboolean noSetFMUStatePriorToCurrentPoint, jbooleanArray eventEncounteredArrPtr,
+         jbooleanArray terminateSimulationArrPtr, jbooleanArray earlyReturnArrPtr,
+         jdoubleArray lastSuccessfulTimeArrPtr) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Boolean eventEncountered, terminateSimulation, earlyReturn, lastSuccessfulTime;
+    fmi3Boolean nativeNoSetFMUStatePriorToCurrentPoint = (fmi3Boolean)(noSetFMUStatePriorToCurrentPoint != JNI_FALSE);
+
+
+    fmi3Status status = fmuPtr_->fmi3DoStep(instancePtr_, currentCommunicationPoint, communicationStepSize,
+                                            nativeNoSetFMUStatePriorToCurrentPoint, &eventEncountered,
+                                            &terminateSimulation, &earlyReturn, &lastSuccessfulTime);
+
+    jboolean *eventEncounteredElem = env->GetBooleanArrayElements(eventEncounteredArrPtr, NULL);
+    eventEncounteredElem[0] = (jboolean) eventEncountered;
+    env->ReleaseBooleanArrayElements(eventEncounteredArrPtr, eventEncounteredElem, 0);
+
+    jboolean *terminateSimulationArrElem = env->GetBooleanArrayElements(terminateSimulationArrPtr, NULL);
+    terminateSimulationArrElem[0] = (jboolean) terminateSimulation;
+    env->ReleaseBooleanArrayElements(terminateSimulationArrPtr, terminateSimulationArrElem, 0);
+
+    jboolean *earlyReturnArrElem = env->GetBooleanArrayElements(
+            earlyReturnArrPtr, NULL);
+    earlyReturnArrElem[0] = (jboolean) earlyReturn;
+    env->ReleaseBooleanArrayElements(earlyReturnArrPtr, earlyReturnArrElem,
+                                     0);
+
+    jdouble *lastSuccessfulTimeArrElem = env->GetDoubleArrayElements(
+            lastSuccessfulTimeArrPtr, NULL);
+    lastSuccessfulTimeArrElem[0] = (jboolean) lastSuccessfulTime;
+    env->ReleaseDoubleArrayElements(lastSuccessfulTimeArrPtr, lastSuccessfulTimeArrElem, 0);
+
+    return convertStatus(env, status);
+}
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -553,4 +1119,13 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nDo
  * Signature: (JJID)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nActivateModelPartition
-        (JNIEnv *, jobject, jlong, jlong, jint, jdouble);
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong clockReference, jint clockElementIndex,
+         jdouble activationTime) {
+    fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
+    FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
+
+    fmi3Status status = fmuPtr_->fmi3ActivateModelPartition(instancePtr_, clockReference, clockElementIndex,
+                                                            activationTime);
+
+    return convertStatus(env, status);
+}

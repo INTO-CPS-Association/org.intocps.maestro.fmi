@@ -8,6 +8,7 @@ package org.intocps.fmi3;
 //                fmi3Error,
 //                fmi3Fatal,
 //    } fmi3Status;
+/* end::Status[] */
 public enum Fmi3Status {
     fmi3OK,
     fmi3Warning,

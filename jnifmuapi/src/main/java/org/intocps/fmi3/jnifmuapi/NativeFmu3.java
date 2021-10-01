@@ -6,7 +6,7 @@ public class NativeFmu3 {
 
     /* Type definitions */
 
-    /* end::Status[] */
+
 
     /* tag::DependencyKind[] */
     //    typedef enum {

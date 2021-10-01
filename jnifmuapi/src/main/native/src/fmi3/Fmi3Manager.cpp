@@ -53,6 +53,97 @@ void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
     }
 }
 
+void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyKind *dependencyKinds, jobjectArray jDependencyKinds, jsize len) {
+    if(len < 1){
+        return;
+    }
+
+    jclass cls = NULL;
+    jfieldID enumField = NULL;
+    const char* signature = "Lorg/intocps/fmi3/Fmi3DependencyKind;";
+    
+    cls = env->FindClass("org/intocps/fmi3/Fmi3DependencyKind");
+    if (cls == NULL) {
+        return;
+    }
+
+    for(int i = 0; i < len; i++) {
+        switch (dependencyKinds[i]) {
+            case fmi3Independent:
+                enumField = env->GetStaticFieldID(cls , "fmi3Independent", signature);
+                break;
+            case fmi3Constant:
+                enumField = env->GetStaticFieldID(cls , "fmi3Constant", signature);
+                break;
+            case fmi3Fixed:
+                enumField = env->GetStaticFieldID(cls , "fmi3Fixed", signature);
+                break;
+            case fmi3Tunable:
+                enumField = env->GetStaticFieldID(cls , "fmi3Tunable", signature);
+                break;
+            case fmi3Discrete:
+                enumField = env->GetStaticFieldID(cls , "fmi3Discrete", signature);
+                break;
+            case fmi3Dependent:
+                enumField = env->GetStaticFieldID(cls , "fmi3Dependent", signature);
+                break;
+        }
+        if(enumField != NULL){
+            jobject enumVal = env->GetStaticObjectField(cls, enumField);
+            if(enumVal != NULL){
+                env->SetObjectArrayElement(jQualifiers, i, enumVal);
+                env->DeleteLocalRef(enumVal);
+            }
+        }
+    }
+
+    env->ExceptionClear();
+    if (cls != NULL){
+        env->DeleteLocalRef(cls);
+    }
+}
+
+void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len) {
+    if(len < 1){
+        return;
+    }
+
+    jclass cls = NULL;
+    jfieldID enumField = NULL;
+    const char* signature = "Lorg/intocps/fmi3/Fmi3IntervalQualifier;";
+
+    cls = env->FindClass("org/intocps/fmi3/Fmi3IntervalQualifier");
+    if (cls == NULL) {
+        return;
+    }
+
+    for(int i = 0; i < len; i++) {
+        switch (qualifiers[i]) {
+            case fmi3IntervalNotYetKnown:
+                enumField = env->GetStaticFieldID(cls , "fmi3IntervalNotYetKnown", signature);
+                break;
+            case fmi3IntervalUnchanged:
+                enumField = env->GetStaticFieldID(cls , "fmi3IntervalUnchanged", signature);
+                break;
+            case fmi3IntervalChanged:
+                enumField = env->GetStaticFieldID(cls , "fmi3IntervalChanged", signature);
+                break;
+        }
+        if(enumField != NULL){
+            jobject enumVal = env->GetStaticObjectField(cls, enumField);
+            if(enumVal != NULL){
+                env->SetObjectArrayElement(jQualifiers, i, enumVal);
+                env->DeleteLocalRef(enumVal);
+            }
+        }
+    }
+
+    env->ExceptionClear();
+    if (cls != NULL){
+        env->DeleteLocalRef(cls);
+    }
+}
+
 
 jobject convertStatus(JNIEnv *env, fmi3Status status) {
     jclass cls;
