@@ -208,20 +208,23 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
          jintArray valueSizes, jobjectArray values, jint nValues) {
     Fmi3InstanceNode *instanceNode = (Fmi3InstanceNode *) instanceNodePtr;
 
-    DECLARE_ARRAY(fmi3Binary, nativeByteValues, nValues);
+    DECLARE_ARRAY(signed char*, nativeByteValues, nValues);
     fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
-    DECLARE_ARRAY(int, nativeValueSizes, nValues);
+    DECLARE_ARRAY(long unsigned int, nativeValueSizes, nValues);
 
     fmi3Status status = instanceNode->owner->fmu.fmi3GetBinary(instanceNode, nativeValueReferences, nValueReferences,
                                                                nativeValueSizes, nativeByteValues, nValues);
 
+    jint *valueSizesElems = env->GetIntArrayElements(valueSizes, NULL);
     for (int i = 0; i < nValues; i++) {
         const jbyte *bytesPtr = nativeByteValues[i];
         jbyteArray row = (jbyteArray) env->GetObjectArrayElement(values, i);
         env->SetByteArrayRegion(row, 0, nativeValueSizes[i], bytesPtr);
         env->DeleteLocalRef(row);
+
+        valueSizesElems[i] =(jint) nativeValueSizes[i];
     }
-    copyArray_int_to_jint(env, nativeValueSizes, valueSizes, nValues);
+    env->ReleaseIntArrayElements( valueSizes, valueSizesElems, NULL);
 
     free(nativeValueReferences);
     free(nativeValueSizes);
