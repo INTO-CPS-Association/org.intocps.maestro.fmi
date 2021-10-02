@@ -84,7 +84,8 @@ FMU3 *getFmuPtr(jlong fmuPtr);
 fmi3Instance getInstancePtr(jlong compPtr);
 
 jobject convertStatus(JNIEnv *env, fmi3Status status);
-void copy_native_fmi3IntervalQualifiers_to_java(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len);
+void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len);
+void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyKind *dependencyKinds, jobjectArray jDependencyKinds, jsize len);
 
 typedef unsigned int uint;
 #define COPY_ARRAY_TEMPLATE(fromType,apiName,toType)inline toType *createArray_##toType##_from_## fromType(JNIEnv *env, fromType##Array vr, jsize len) { \

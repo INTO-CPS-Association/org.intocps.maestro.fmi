@@ -91,7 +91,7 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
         if(enumField != NULL){
             jobject enumVal = env->GetStaticObjectField(cls, enumField);
             if(enumVal != NULL){
-                env->SetObjectArrayElement(jQualifiers, i, enumVal);
+                env->SetObjectArrayElement(jDependencyKinds, i, enumVal);
                 env->DeleteLocalRef(enumVal);
             }
         }
