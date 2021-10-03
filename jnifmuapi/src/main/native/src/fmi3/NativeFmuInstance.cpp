@@ -351,7 +351,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
     std::map<jbyteArray, jbyte *> reservedByteValues;
     fmi3ValueReference *nativeValueReferences = createArray_uint_from_jlong(env, valueReferences, nValueReferences);
 
-    DECLARE_ARRAY(long unsigned int, nativeValueSizes, nValues);
+    DECLARE_ARRAY(size_t, nativeValueSizes, nValues);
 
     auto elems = env->GetIntArrayElements( valueSizes, NULL);
     for (int i = 0; i < nValues; i++) {
@@ -421,7 +421,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
 
     fmi3ValueReference nativeValueReference = (fmi3ValueReference) valueReference;
-    long unsigned int nDependencies;
+    size_t nDependencies;
     fmi3Status status = fmuPtr_->fmi3GetNumberOfVariableDependencies(instancePtr_, nativeValueReference, &nDependencies);
 
     jint *nDependenciesElem = env->GetIntArrayElements(nDependenciesArrPtr, NULL);
@@ -445,8 +445,8 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 
     fmi3ValueReference nativeDependent = (fmi3ValueReference) dependent;
     DECLARE_ARRAY(fmi3ValueReference, nativeIndependents, nDependencies);
-    DECLARE_ARRAY(long unsigned int, nativeElementIndicesOfDependent, nDependencies);
-    DECLARE_ARRAY(long unsigned int, nativeElementIndicesOfIndependents, nDependencies);
+    DECLARE_ARRAY(size_t, nativeElementIndicesOfDependent, nDependencies);
+    DECLARE_ARRAY(size_t, nativeElementIndicesOfIndependents, nDependencies);
     DECLARE_ARRAY(fmi3DependencyKind, nativeDependencyKinds, nDependencies);
 
     fmi3Status status = fmuPtr_->fmi3GetVariableDependencies(instancePtr_, nativeDependent,
@@ -485,7 +485,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
 
-    fmi3FMUstate state = NULL;
+    fmi3FMUState state = NULL;
     fmi3Status status = fmuPtr_->fmi3GetFMUState(instancePtr_, &state);
 
     jlong *vbody = env->GetLongArrayElements(statePtrArr, NULL);
@@ -506,7 +506,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
 
-    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+    fmi3FMUState state = ((fmi3FMUState) statePtr);
     fmi3Status status = fmuPtr_->fmi3SetFMUState(instancePtr_, state);
 
     return convertStatus(env, status);
@@ -523,7 +523,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFr
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
 
-    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+    fmi3FMUState state = ((fmi3FMUState) statePtr);
     fmi3Status status = fmuPtr_->fmi3FreeFMUState(instancePtr_, &state);
 
     return convertStatus(env, status);
@@ -535,15 +535,15 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFr
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSerializedFMUStateSize
-        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong statePtrArr, jintArray sizeArrPtr) {
+        (JNIEnv *env, jobject obj, jlong fmuPtr, jlong instancePtr, jlong statePtr, jintArray sizeArrPtr) {
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
 
-    fmi3FMUstate state = ((fmi3FMUstate) statePtr);
+    fmi3FMUState state = ((fmi3FMUState) statePtr);
 
     jsize len = env->GetArrayLength(sizeArrPtr);
 
-    unsigned long int size;
+    size_t size;
     fmi3Status status = fmuPtr_->fmi3SerializedFMUStateSize(instancePtr_, state, &size);
 
     jint *sizeElem = env->GetIntArrayElements(sizeArrPtr, NULL);
@@ -1014,7 +1014,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 
     jsize len = env->GetArrayLength(nEventIndicatorsArrPtr);
 
-    long unsigned int nEventIndicators;
+    size_t nEventIndicators;
 
     fmi3Status status = fmuPtr_->fmi3GetNumberOfEventIndicators(instancePtr_, &nEventIndicators);
 
@@ -1037,7 +1037,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 
     jsize len = env->GetArrayLength(nContinuousStatesArrPtr);
 
-    long unsigned int  nContinuousStates;
+    size_t nContinuousStates;
 
     fmi3Status status = fmuPtr_->fmi3GetNumberOfContinuousStates(instancePtr_, &nContinuousStates);
 
