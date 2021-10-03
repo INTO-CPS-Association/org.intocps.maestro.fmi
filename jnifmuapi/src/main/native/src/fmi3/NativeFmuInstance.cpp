@@ -224,7 +224,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 
         valueSizesElems[i] =(jint) nativeValueSizes[i];
     }
-    env->ReleaseIntArrayElements( valueSizes, valueSizesElems, NULL);
+    env->ReleaseIntArrayElements(valueSizes, valueSizesElems, 0);
 
     free(nativeValueReferences);
     free(nativeValueSizes);
@@ -463,9 +463,9 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
         elementIndicesOfDependentElems[i] = (jint) nativeElementIndicesOfDependent[i];
         elementIndicesOfIndependentsElems[i] =(jint) nativeElementIndicesOfIndependents[i];
     }
-    env->ReleaseLongArrayElements( independents, independentsElems, NULL);
-    env->ReleaseIntArrayElements( elementIndicesOfDependent, elementIndicesOfDependentElems, NULL);
-    env->ReleaseIntArrayElements( elementIndicesOfIndependents, elementIndicesOfIndependentsElems, NULL);
+    env->ReleaseLongArrayElements( independents, independentsElems, 0);
+    env->ReleaseIntArrayElements( elementIndicesOfDependent, elementIndicesOfDependentElems, 0);
+    env->ReleaseIntArrayElements( elementIndicesOfIndependents, elementIndicesOfIndependentsElems, 0);
 
     free(nativeDependencyKinds);
     free(nativeIndependents);
