@@ -69,6 +69,7 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
 
     for(int i = 0; i < len; i++) {
         switch (dependencyKinds[i]) {
+            // Not needed but reserved for future use?
             case fmi3Independent:
                 enumField = env->GetStaticFieldID(cls , "fmi3Independent", signature);
                 break;
