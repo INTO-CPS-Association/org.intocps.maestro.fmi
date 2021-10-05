@@ -165,7 +165,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (J[JI[I[JI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetBinary
-  (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jlongArray, jint);
+  (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jobjectArray, jint);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -269,7 +269,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (J[JI[I[[BI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetBinary
-  (JNIEnv *, jobject, jlong, jlongArray, jint, jintArray, jobjectArray, jint);
+  (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jobjectArray, jint);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -277,7 +277,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfVariableDependencies
-  (JNIEnv *, jobject, jlong, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jlong, jlongArray);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -285,7 +285,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JJJ[I[J[I[Lorg/intocps/fmi3/Fmi3DependencyKind;I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetVariableDependencies
-  (JNIEnv *, jobject, jlong, jlong, jlong, jintArray, jlongArray, jintArray, jobjectArray, jint);
+  (JNIEnv *, jobject, jlong, jlong, jlong, jlongArray, jlongArray, jlongArray, jobjectArray, jint);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -317,7 +317,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFr
  * Signature: (JJJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSerializedFMUStateSize
-  (JNIEnv *, jobject, jlong, jlong, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jlong, jlong, jlongArray);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -477,7 +477,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfEventIndicators
-  (JNIEnv *, jobject, jlong, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jlong, jlongArray);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -485,7 +485,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
  * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfContinuousStates
-  (JNIEnv *, jobject, jlong, jlong, jintArray);
+  (JNIEnv *, jobject, jlong, jlong, jlongArray);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3

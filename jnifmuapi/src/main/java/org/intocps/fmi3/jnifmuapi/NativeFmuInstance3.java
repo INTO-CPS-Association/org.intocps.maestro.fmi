@@ -74,7 +74,7 @@ public class NativeFmuInstance3 {
 
     native Fmi3Status nGetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
 
-    native Fmi3Status nGetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], long values[], int nValues);
+    native Fmi3Status nGetBinary(long instance, long valueReferences[], int nValueReferences, long sizes[], byte values[], int nValues);
     /* end::Getters[] */
 
     /* tag::Setters[] */
@@ -102,17 +102,17 @@ public class NativeFmuInstance3 {
 
     native Fmi3Status nSetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
 
-    native Fmi3Status nSetBinary(long instance, long valueReferences[], int nValueReferences, int sizes[], byte array_name[][], int nValues);
+    native Fmi3Status nSetBinary(long instance, long valueReferences[], int nValueReferences, long sizes[], byte array_name[][], int nValues);
     /* end::Setters[] */
 
     /* Getting Variable Dependency Information */
     /* tag::GetNumberOfVariableDependencies[] */
-    native Fmi3Status nGetNumberOfVariableDependencies(long instance, long valueReference, int[] nDependencies);
+    native Fmi3Status nGetNumberOfVariableDependencies(long instance, long valueReference, long[] nDependencies);
     /* end::GetNumberOfVariableDependencies[] */
 
     /* tag::GetVariableDependencies[] */
-    native Fmi3Status nGetVariableDependencies(long fmu, long instance, long dependent, int elementIndicesOfDependent[], long independents[],
-                                               int elementIndicesOfIndependents[], Fmi3DependencyKind dependencyKinds[], int nDependencies);
+    native Fmi3Status nGetVariableDependencies(long fmu, long instance, long dependent, long elementIndicesOfDependent[], long independents[],
+                                               long elementIndicesOfIndependents[], Fmi3DependencyKind dependencyKinds[], int nDependencies);
     /* end::GetVariableDependencies[] */
 
     /* Getting and setting the internal FMU state */
@@ -129,7 +129,7 @@ public class NativeFmuInstance3 {
     /* end::FreeFMUState[] */
 
     /* tag::SerializedFMUStateSize[] */
-    native Fmi3Status nSerializedFMUStateSize(long fmu, long instance, long FMUState, int[] size);
+    native Fmi3Status nSerializedFMUStateSize(long fmu, long instance, long FMUState, long[] size);
     /* end::SerializedFMUStateSize[] */
 
     //    /* tag::SerializeFMUState[] */
@@ -239,11 +239,11 @@ public class NativeFmuInstance3 {
     /* end::GetNominalsOfContinuousStates[] */
 
     /* tag::GetNumberOfEventIndicators[] */
-    native Fmi3Status nGetNumberOfEventIndicators(long fmu, long instance, int[] nEventIndicators);
+    native Fmi3Status nGetNumberOfEventIndicators(long fmu, long instance, long[] nEventIndicators);
     /* end::GetNumberOfEventIndicators[] */
 
     /* tag::GetNumberOfContinuousStates[] */
-    native Fmi3Status nGetNumberOfContinuousStates(long fmu, long instance, int[] nContinuousStates);
+    native Fmi3Status nGetNumberOfContinuousStates(long fmu, long instance, long[] nContinuousStates);
     /* end::GetNumberOfContinuousStates[] */
 
     /***************************************************
