@@ -45,7 +45,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEx
  * Signature: (JJZ[IIZ)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
-  (JNIEnv *, jobject, jlong, jlong, jboolean, jintArray, jint, jboolean);
+  (JNIEnv *, jobject, jlong, jlong, jboolean, jboolean, jintArray, jint, jboolean);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3

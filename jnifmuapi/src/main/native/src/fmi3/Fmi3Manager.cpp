@@ -25,7 +25,7 @@ Fmi3InstanceNode* Fmi3Manager::Fmi3Manager::getInstanceNode(fmi3Instance instanc
 
 
 void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
-                                  fmi2String *target, jsize len) {
+                                  fmi3String *target, jsize len) {
     int i = 0;
     for (i = 0; i < len; i++) {
         auto s = static_cast<jstring>(env->GetObjectArrayElement(source, i));
@@ -104,7 +104,7 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
     }
 }
 
-void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len) {
+void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len) {
     if(len < 1){
         return;
     }
@@ -198,4 +198,5 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 FMU3 *getFmuPtr(jlong fmuPtr) { return (FMU3 *) fmuPtr; }
 
 fmi3Instance getInstancePtr(jlong compPtr){return (fmi3Instance) compPtr;}
+
 

@@ -58,7 +58,7 @@ public class NativeFmu3 {
             boolean loggingOn, long instanceEnvironment, ICallbackLogMessage logMessage);
 
     native long nInstantiateCoSimulation(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, boolean eventModeUsed, long requiredIntermediateVariables[], long nRequiredIntermediateVariables,
+            boolean loggingOn, boolean eventModeUsed, boolean earlyReturnAllowed, long requiredIntermediateVariables[], long nRequiredIntermediateVariables,
             long instanceEnvironment, ICallbackLogMessage logMessage, ICallbackIntermediateUpdate intermediateUpdate);
 
     native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,

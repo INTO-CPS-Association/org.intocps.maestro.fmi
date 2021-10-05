@@ -213,8 +213,6 @@ int loadDll3(const char *dllPath, FMU3 *fmu) {
   fmu->fmi3SetTime = (fmi3SetTimeTYPE *)getAdr(&s, h, "fmi3SetTime");
   fmu->fmi3SetContinuousStates =
       (fmi3SetContinuousStatesTYPE *)getAdr(&s, h, "fmi3SetContinuousStates");
-  fmu->fmi3GetDerivatives =
-      (fmi3GetDerivativesTYPE *)getAdr(&s, h, "fmi3GetDerivatives");
   fmu->fmi3GetEventIndicators =
       (fmi3GetEventIndicatorsTYPE *)getAdr(&s, h, "fmi3GetEventIndicators");
   fmu->fmi3GetContinuousStates =

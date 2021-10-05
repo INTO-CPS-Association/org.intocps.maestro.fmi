@@ -214,7 +214,7 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateM
  */
 JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateCoSimulation
         (JNIEnv *env, jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken, jstring resourceLocation,
-         jboolean visible, jboolean loggingOn, jboolean eventModeUsed, jlongArray requiredIntermediateVariables,
+         jboolean visible, jboolean loggingOn, jboolean eventModeUsed, jboolean earlyReturnAllowed, jlongArray requiredIntermediateVariables,
          jlong nRequiredIntermediateVariables, jlong instanceEnvironment, jobject logMessage,
          jobject intermediateUpdate) {
 
@@ -253,11 +253,11 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateC
         env->ExceptionDescribe();
     }
 
-    fmi2ValueReference *requiredIntermediateVariablesArr = createArray_uint_from_jlong(env, requiredIntermediateVariables,
+    fmi3ValueReference *requiredIntermediateVariablesArr = createArray_uint_from_jlong(env, requiredIntermediateVariables,
                                                                                   nRequiredIntermediateVariables);
 
     auto instance = fmuNode->fmi3InstantiateCoSimulation(instanceName, guid, fmuResourceLocation, visible,
-                                                             loggingOn, eventModeUsed, requiredIntermediateVariablesArr,
+                                                             loggingOn, eventModeUsed, earlyReturnAllowed, requiredIntermediateVariablesArr,
                                                              nRequiredIntermediateVariables, &node,
                                                              node->callback_logMessage.logMessage,
                                                              node->callback_intermediateUpdate.intermediateUpdate);

@@ -29,7 +29,7 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateM
  * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;)J
  */
 JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateCoSimulation
-  (JNIEnv *, jobject, jlong, jstring, jstring, jstring, jboolean, jboolean, jboolean, jlongArray, jlong, jlong, jobject, jobject);
+  (JNIEnv *, jobject, jlong, jstring, jstring, jstring, jboolean, jboolean, jboolean, jboolean, jlongArray, jlong, jlong, jobject, jobject);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmu3

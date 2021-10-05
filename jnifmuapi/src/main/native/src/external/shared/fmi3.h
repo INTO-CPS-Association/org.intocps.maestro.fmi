@@ -97,7 +97,6 @@ typedef struct {
     fmi3CompletedIntegratorStepTYPE *fmi3CompletedIntegratorStep;
     fmi3SetTimeTYPE *fmi3SetTime;
     fmi3SetContinuousStatesTYPE *fmi3SetContinuousStates;
-    fmi3GetDerivativesTYPE *fmi3GetDerivatives;
     fmi3GetEventIndicatorsTYPE *fmi3GetEventIndicators;
     fmi3GetContinuousStatesTYPE *fmi3GetContinuousStates;
     fmi3GetNominalsOfContinuousStatesTYPE *fmi3GetNominalsOfContinuousStates;
