@@ -34,17 +34,15 @@
 
 package org.intocps.fmi.jnifmuapi;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.xpath.XPathExpressionException;
-
 import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
 import org.intocps.fmi.IFmiComponent;
-import org.intocps.fmi.jnifmuapi.Fmu;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.xml.xpath.XPathExpressionException;
+import java.io.File;
+import java.io.IOException;
 
 public class LoadInstantiateFreeUnloadTest
 {

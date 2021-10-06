@@ -34,19 +34,14 @@
 
 package org.intocps.fmi.jnifmuapi;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.intocps.fmi.FmiInvalidNativeStateException;
 import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
 import org.intocps.fmi.IFmiComponent;
-import org.intocps.fmi.jnifmuapi.Fmu;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.*;
+
+import java.io.File;
+import java.io.IOException;
 
 public abstract class BaseFmuComponent
 {

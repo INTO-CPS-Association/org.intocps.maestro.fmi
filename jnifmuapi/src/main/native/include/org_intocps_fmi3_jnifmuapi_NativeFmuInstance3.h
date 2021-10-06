@@ -42,7 +42,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEx
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nEnterEventMode
- * Signature: (JJZ[IIZ)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJZZ[IIZ)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nEnterEventMode
   (JNIEnv *, jobject, jlong, jlong, jboolean, jboolean, jintArray, jint, jboolean);
@@ -162,10 +162,10 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nGetBinary
- * Signature: (J[JI[I[JI)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (J[JI[J[BI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetBinary
-  (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jobjectArray, jint);
+  (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jbyteArray, jint);
 
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
@@ -266,7 +266,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nSetBinary
- * Signature: (J[JI[I[[BI)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (J[JI[J[[BI)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSetBinary
   (JNIEnv *, jobject, jlong, jlongArray, jint, jlongArray, jobjectArray, jint);
@@ -274,7 +274,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nGetNumberOfVariableDependencies
- * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJ[J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfVariableDependencies
   (JNIEnv *, jobject, jlong, jlong, jlongArray);
@@ -282,7 +282,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nGetVariableDependencies
- * Signature: (JJJ[I[J[I[Lorg/intocps/fmi3/Fmi3DependencyKind;I)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJJ[J[J[J[Lorg/intocps/fmi3/Fmi3DependencyKind;I)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetVariableDependencies
   (JNIEnv *, jobject, jlong, jlong, jlong, jlongArray, jlongArray, jlongArray, jobjectArray, jint);
@@ -314,7 +314,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nFr
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nSerializedFMUStateSize
- * Signature: (JJJ[I)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJJ[J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nSerializedFMUStateSize
   (JNIEnv *, jobject, jlong, jlong, jlong, jlongArray);
@@ -474,7 +474,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nGetNumberOfEventIndicators
- * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJ[J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfEventIndicators
   (JNIEnv *, jobject, jlong, jlong, jlongArray);
@@ -482,7 +482,7 @@ JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGe
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmuInstance3
  * Method:    nGetNumberOfContinuousStates
- * Signature: (JJ[I)Lorg/intocps/fmi3/Fmi3Status;
+ * Signature: (JJ[J)Lorg/intocps/fmi3/Fmi3Status;
  */
 JNIEXPORT jobject JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmuInstance3_nGetNumberOfContinuousStates
   (JNIEnv *, jobject, jlong, jlong, jlongArray);
