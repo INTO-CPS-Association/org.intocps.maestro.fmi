@@ -1,6 +1,7 @@
 package org.intocps.fmi3.jnifmuapi;
 
-import org.intocps.fmi3.Fmi3Status;
+import org.intocps.fmi3.ICallbackIntermediateUpdate;
+import org.intocps.fmi3.ICallbackLogMessage;
 
 public class NativeFmu3 {
 
@@ -18,16 +19,6 @@ public class NativeFmu3 {
     //                fmi3Dependent = 5
     //    } fmi3DependencyKind;
     /* end::DependencyKind[] */
-
-    interface ICallbackLogMessage {
-        void logMessage(long instanceEnvironment, String instanceName, Fmi3Status status, String category, String message);
-    }
-
-    interface ICallbackIntermediateUpdate {
-        void intermediateUpdate(long instanceEnvironment, double intermediateUpdateTime, boolean clocksTicked,
-                boolean intermediateVariableSetRequested, boolean intermediateVariableGetAllowed, boolean intermediateStepFinished,
-                boolean canReturnEarly, boolean[] earlyReturnRequested, double[] earlyReturnTime);
-    }
 
     interface ICallbackLockPreemption {
         void fmi3CallbackLockPreemption();
@@ -48,20 +39,20 @@ public class NativeFmu3 {
 
     /* Inquire version numbers and setting logging status */
     /* tag::GetVersion[] */
-    native String nGetVersion(long fmuPtr);
+    protected native String nGetVersion(long fmuPtr);
     /* end::GetVersion[] */
 
 
     /* Creation and destruction of FMU instances and setting debug status */
     /* tag::Instantiate[] */
-    native long nInstantiateModelExchange(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
+    protected native long nInstantiateModelExchange(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
             boolean loggingOn, long instanceEnvironment, ICallbackLogMessage logMessage);
 
-    native long nInstantiateCoSimulation(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
+    protected native long nInstantiateCoSimulation(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
             boolean loggingOn, boolean eventModeUsed, boolean earlyReturnAllowed, long requiredIntermediateVariables[], long nRequiredIntermediateVariables,
             long instanceEnvironment, ICallbackLogMessage logMessage, ICallbackIntermediateUpdate intermediateUpdate);
 
-    native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
+    protected native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation, boolean visible,
             boolean loggingOn, long requiredIntermediateVariables[], long nRequiredIntermediateVariables, long instanceEnvironment,
             ICallbackLogMessage logMessage, ICallbackIntermediateUpdate intermediateUpdate, ICallbackLockPreemption lockPreemption,
             ICallbackUnlockPreemption unlockPreemption);
