@@ -4,11 +4,11 @@ import org.intocps.fmi3.Fmi3Status;
 import org.intocps.fmi3.Fmi3DependencyKind;
 import org.intocps.fmi3.Fmi3IntervalQualifier;
 
-public class NativeFmuInstance3 {
+public class NativeFmu3Instance {
 
     final long fmuPtr;
 
-    public NativeFmuInstance3(long fmuPtr) {
+    public NativeFmu3Instance(long fmuPtr) {
         this.fmuPtr = fmuPtr;
     }
 
