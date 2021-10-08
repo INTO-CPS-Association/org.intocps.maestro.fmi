@@ -11,9 +11,11 @@ To generate a shared library for the platform you are working on do the followin
 1. Get submodules: FIRST CHECKOUT: `git submodule update --init --recursive`
    otherwise: `git submodule update --recursive`
 2. Navigate to org.intocps.maestro.fmi/jnifmuapi/src/main/native 
-3. run cmake .
+3. run cmake . (You might need a generator here. I.e. "-GMsys Makefiles" for Windows. Environment setup is described here: https://github.com/INTO-CPS-Association/maestro#windows)
 4. run make
-5. This generates libfmuapi.dylib (for mac), which can be placed within the lib/Mac-x86_64 directory of jnifmuapi-*.jar
+5. This generates libfmuapi.dylib (for mac), which can be placed within the lib/Mac-x86_64 directory of jnifmuapi-.jar (see * below)
+
+*For the development it can be useful to place this file within `jnifmuapi/src/test/resources/lib/<platform>/<library>` and `jnifmuapi/target/lib/<platform>/<library>`
 
 *OR:* Push the branch, run it at build.overture.au and download the jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/ 
 
