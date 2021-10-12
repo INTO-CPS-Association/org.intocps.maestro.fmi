@@ -42,7 +42,7 @@ public class NativeFmuLibrary {
         //	String libPath = NativeFmuApi.getPlatformSpecificLibaryPath("fmuapi");
         //	System.out.println("Loading library: " + libPath);
         //	File lib = new NativeLibraryLoader().loadLibrary(libPath);
-        NativeFmu.loadNativeApi();
+        NativeFmuLibraryLoader.loadNativeApi();
         System.out.println("API version is: " + NativeFmu.nGetJniApiVersion());
         //	System.out.println("Loaded Library file: " + lib);
     }

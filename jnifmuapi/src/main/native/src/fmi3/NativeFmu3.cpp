@@ -4,7 +4,7 @@
 
 #include "Fmi3Manager.h"
 #include "config.h"
-#include "org_intocps_fmi3_jnifmuapi_NativeFmu3.h"
+#include "org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3.h"
 extern "C"
 {
 #include "sim_support3.h"
@@ -19,13 +19,13 @@ extern "C"
 * Method:    getJniApiVersion
 * Signature: ()J
 */
-JNIEXPORT jstring JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_getJniApiVersion
+JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_getJniApiVersion
         (JNIEnv *env, jclass) {
     jstring result = env->NewStringUTF(PROJECT_VER);
     return result;
 }
 
-JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nLoadLibrary(
+JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nLoadLibrary(
         JNIEnv *env, jobject obj, jstring libraryPath) {
     const char *path;
 
@@ -44,7 +44,7 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nLoadLibrary(
     return (jlong) node;
 }
 
-JNIEXPORT void JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nUnLoad(
+JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nUnLoad(
         JNIEnv *env, jobject obj, jlong fmuptr) {
     FMU3* ptr = getFmuPtr(fmuptr);
 #ifdef _WIN32
@@ -81,7 +81,7 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
 
     auto cb = node->callback_logMessage;
 
-    if (cb.logMessage != nullptr) {
+    if (cb.logMessage != NULL) {
         reported = 1;
         JNIEnv *env = cb.env;
         JavaVM *vm = cb.g_vm;
@@ -187,7 +187,7 @@ CallbackJniInfo createBasicCallback(JNIEnv *env, jobject obj, const char *method
  * Method:    nGetVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nGetVersion
+JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nGetVersion
         (JNIEnv *env, jobject, jlong fmuPtr) {
 
     jstring result = env->NewStringUTF(getFmuPtr(fmuPtr)->fmi3GetVersion());
@@ -200,7 +200,7 @@ JNIEXPORT jstring JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nGetVersion
  * Method:    nInstantiateModelExchange
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;)J
  */
-JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateModelExchange
+JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateModelExchange
         (JNIEnv *, jobject, jlong fmuPtr, jstring, jstring, jstring, jboolean, jboolean, jlong, jobject) {
 
     return (jlong) nullptr;
@@ -212,24 +212,24 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateM
  * Method:    nInstantiateCoSimulation
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;)J
  */
-JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateCoSimulation
+JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateCoSimulation
         (JNIEnv *env, jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken, jstring resourceLocation,
          jboolean visible, jboolean loggingOn, jboolean eventModeUsed, jboolean earlyReturnAllowed, jlongArray requiredIntermediateVariables,
          jlong nRequiredIntermediateVariables, jlong instanceEnvironment, jobject logMessage,
          jobject intermediateUpdate) {
-
     auto fmuNode = getFmuPtr(fmuPtr);
     const char *instanceName = GetString(env, name);
-    const char *fmuResourceLocation = GetString(env, resourceLocation);
+    const char *fmuResourceLocation = nullptr;
+    if(resourceLocation != NULL)
+        fmuResourceLocation = GetString(env, resourceLocation);
     const char *guid = GetString(env, instantiationToken);
     auto node = new Fmi3InstanceNode();
     node->type = CoSimulation;
 
     //callback: jobject logMessage
     if (logMessage != NULL) {
-
-        node->callback_logMessage = createBasicCallback(env, obj, "logMessage",
-                                                        "(JLjava/lang/String;Lorg/intocps/fmi3/Fmi3Status;Ljava/lang/String;Ljava/lang/String;)V");
+        node->callback_logMessage = createBasicCallback(env, logMessage, "logMessage",
+                                                        "(Ljava/lang/String;Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3Status;Ljava/lang/String;Ljava/lang/String;)V");
         node->callback_logMessage.logMessage = jniFmi3CallbackLogMessage;
 
     }
@@ -247,22 +247,22 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateC
         node->callback_intermediateUpdate.intermediateUpdate = jniFmi3CallbackIntermediateUpdate;
     }
 
-
     if (env->ExceptionCheck()) {
         printf("exception\n");
         env->ExceptionDescribe();
     }
+    fmi3ValueReference *requiredIntermediateVariablesArr = NULL;
+    if(nRequiredIntermediateVariables > 0 && requiredIntermediateVariables != NULL) {
 
-    fmi3ValueReference *requiredIntermediateVariablesArr = createArray_uint_from_jlong(env, requiredIntermediateVariables,
-                                                                                  nRequiredIntermediateVariables);
-
+        requiredIntermediateVariablesArr = createArray_uint_from_jlong(env, requiredIntermediateVariables,
+                                                                       nRequiredIntermediateVariables);
+    }
     auto instance = fmuNode->fmi3InstantiateCoSimulation(instanceName, guid, fmuResourceLocation, visible,
                                                              loggingOn, eventModeUsed, earlyReturnAllowed, requiredIntermediateVariablesArr,
-                                                             nRequiredIntermediateVariables, &node,
+                                                             nRequiredIntermediateVariables, node,
                                                              node->callback_logMessage.logMessage,
                                                              node->callback_intermediateUpdate.intermediateUpdate);
     delete requiredIntermediateVariablesArr;
-
     if (instance != NULL) {
         Fmi3Manager::getInstance()->store(instance, node);
     } else {
@@ -273,10 +273,13 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateC
         throwException(env, "exception - 2\n");
         env->ExceptionDescribe();
     }
-
     env->ReleaseStringUTFChars(name, instanceName);
-    env->ReleaseStringUTFChars(resourceLocation, fmuResourceLocation);
-    env->ReleaseStringUTFChars(instantiationToken, guid);
+    if(fmuResourceLocation != nullptr) {
+        env->ReleaseStringUTFChars(resourceLocation, fmuResourceLocation);
+    }
+    if(guid != nullptr) {
+        env->ReleaseStringUTFChars(instantiationToken, guid);
+    }
 
     return (jlong) instance;
 }
@@ -286,7 +289,7 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_nInstantiateC
  * Method:    n3InstantiateScheduledExecution
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLockPreemption;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackUnlockPreemption;)J
  */
-JNIEXPORT jlong JNICALL Java_org_intocps_fmi3_jnifmuapi_NativeFmu3_n3InstantiateScheduledExecution
+JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_n3InstantiateScheduledExecution
         (JNIEnv *, jobject, jlong fmuPtr, jstring, jstring, jstring, jboolean, jboolean, jlongArray, jlong, jlong,
          jobject, jobject, jobject, jobject) {
     return (jlong) nullptr;

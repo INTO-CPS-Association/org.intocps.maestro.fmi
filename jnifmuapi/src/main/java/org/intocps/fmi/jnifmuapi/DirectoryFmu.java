@@ -108,7 +108,7 @@ class DirectoryFmu extends NativeFmu implements IFmu {
         String osName = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
 
-        return FmiUtil.generateLibraryFileFromPlatform(osName, arch, modelIdentifier, dir);
+        return FmiUtil.generateLibraryFileFromPlatform(osName, arch, modelIdentifier, dir, FmiUtil.FMIVersion.FMI2);
     }
 
     public static String logMessageLibraryPath(File libraryPath) {
@@ -129,7 +129,7 @@ class DirectoryFmu extends NativeFmu implements IFmu {
         }
 
         logger.debug("Loading FMU library: {}", libraryPath);
-        NativeFmu.loadNativeApi();
+        NativeFmuLibraryLoader.loadNativeApi();
         // load dll
         synchronized (lock) {
             fmuPtr = nLoadLibrary(libraryPath.getAbsolutePath());
@@ -275,7 +275,7 @@ class DirectoryFmu extends NativeFmu implements IFmu {
     }
 
     public static String getJniApiVersion() {
-        NativeFmu.loadNativeApi();
+        NativeFmuLibraryLoader.loadNativeApi();
         
         return NativeFmu.nGetJniApiVersion();
     }

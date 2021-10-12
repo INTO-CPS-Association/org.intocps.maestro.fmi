@@ -51,6 +51,17 @@ check contains system headers
 `/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include/darwin`
 check contains system headers.
 
+### Debug JNI
+Compile the native with: `-DCMAKE_BUILD_TYPE=Debug`.  
+For example (MAC) run the following at location `<root>/jnifmuapi/src/main/native`
+```
+cmake -DCMAKE_BUILD_TYPE=Debug  . && make && cp libfmuapi.dylib ../../../src/test/resources/lib/Mac-x86_64
+```
+Run the test in Intellij with breakpoint somewhere
+When the breakpoint is hit, then in CLion attach to process and choose the latest Java Process.
+The continue the test in Intellij, and see it hit a breakpoint in CLion.
+
+
 ## FMI2 project
 This contains the JAVA types and interfaces representing the FMI standard.
 Furthermore, the project contains XSD files from the FMI standard that are used for verifying model description files.

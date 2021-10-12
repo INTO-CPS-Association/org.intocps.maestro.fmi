@@ -49,6 +49,8 @@ import org.intocps.fmi.FmuResult;
 import org.intocps.fmi.IFmiComponent;
 import org.intocps.fmi.IFmuCallback;
 import org.intocps.fmi.InvalidParameterException;
+import org.intocps.fmi.jnifmuapi.shared.NativeFmuApi;
+import org.intocps.fmi.jnifmuapi.shared.NativeLibraryLoader;
 import org.xml.sax.SAXException;
 
 public class Main

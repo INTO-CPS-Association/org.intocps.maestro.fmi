@@ -152,13 +152,17 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
     jstring name = NULL;
     jobject eval = NULL;
 
-    cls = env->FindClass("org/intocps/fmi3/Fmi3Status");
-    if (cls == NULL)
+    cls = env->FindClass("org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
+    if (cls == NULL) {
+        printf("Failed to find class: org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
         goto done;
+    }
 
-    mid = env->GetStaticMethodID(cls, "valueOf", "(Ljava/lang/String;)Lorg/intocps/fmi3/Fmi3Status;");
-    if (mid == NULL)
+    mid = env->GetStaticMethodID(cls, "valueOf", "(Ljava/lang/String;)Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3Status;");
+    if (mid == NULL) {
+        printf("Failed to find class: org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
         goto done;
+    }
 
 
     switch (status) {
@@ -180,8 +184,10 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
     }
 
 
-    if (name == NULL)
+    if (name == NULL) {
+        printf("Failed to create name for status: " + status);
         goto done;
+    }
 
     eval = env->CallStaticObjectMethod(cls, mid, name);
 

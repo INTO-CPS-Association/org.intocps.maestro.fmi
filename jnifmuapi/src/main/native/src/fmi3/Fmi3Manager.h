@@ -47,6 +47,12 @@ enum Fmi2InstanceType{
 
 class Fmi3InstanceNode {
 public:
+    Fmi3InstanceNode() {
+        callback_logMessage.logMessage = NULL;
+        callback_logMessage.lockPreemption = NULL;
+        callback_logMessage.unlockPreemption = NULL;
+        callback_logMessage.intermediateUpdate = NULL;
+    }
     Fmi2InstanceType type;
     CallbackJniInfo callback_intermediateUpdate;
     CallbackJniInfo callback_logMessage;

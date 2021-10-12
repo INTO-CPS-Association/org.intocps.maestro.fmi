@@ -32,34 +32,44 @@
 *		Kenneth Lausdahl
 */
 
-package org.intocps.fmi.jnifmuapi;
+package org.intocps.fmi.jnifmuapi.shared;
 
-
-import org.junit.Assert;
-import org.junit.Test;
-
-public class NativeFmuExceptionTest
+public class NativeFmuApi
 {
-	@Test
-	public void testException()
+
+	final static String LIB_BASE = "lib";
+
+	public static String getPlatformSpecificLibraryPath(String name)
 	{
-		NativeFmu fmu = new NativeFmu()
+		String osName = System.getProperty("os.name");
+
+		int index = osName.indexOf(' ');
+		if (index != -1)
 		{
-			@Override
-			public String toString()
-			{
-				try
-				{
-					NativeFmuLibraryLoader.loadNativeApi();
-					this.throwExceptionTest();
-				} catch (Exception e)
-				{
-					return e.getMessage();
-				}
-				return "";
-			}
-		};
-		
-		Assert.assertEquals("this is a test exception throw", fmu.toString());
+			osName = osName.substring(0, index);
+		}
+
+		String libPath = LIB_BASE + "/" + osName + "-"
+				+ System.getProperty("os.arch") + "/" + name;
+
+		if (osName.equalsIgnoreCase("windows"))
+		{
+			libPath += ".dll";
+			return libPath;
+		} else if (osName.equalsIgnoreCase("linux"))
+		{
+			libPath = LIB_BASE + "/" + osName + "-"
+					+ System.getProperty("os.arch") + "/lib" + name + ".so";
+
+			return libPath;
+		} else if (osName.equalsIgnoreCase("Mac"))
+		{
+			libPath = LIB_BASE + "/" + osName + "-"
+					+ System.getProperty("os.arch") + "/lib" + name + ".dylib";
+
+			return libPath;
+		}
+		return null;
 	}
+
 }

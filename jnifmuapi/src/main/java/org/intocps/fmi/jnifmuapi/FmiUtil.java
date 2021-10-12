@@ -34,6 +34,7 @@
 
 package org.intocps.fmi.jnifmuapi;
 
+import org.intocps.fmi.FmuInvocationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -48,8 +49,12 @@ import javax.xml.xpath.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 public class FmiUtil {
+
+    public enum FMIVersion{FMI2, FMI3}
+
     final static Logger logger = LoggerFactory.getLogger(FmiUtil.class);
 
     /**
@@ -61,7 +66,7 @@ public class FmiUtil {
      * @param fmuRoot         root path
      * @return the platform file
      */
-    public static File generateLibraryFileFromPlatform(String osName, String osArch, String modelIdentifier, File fmuRoot) {
+    public static File generateLibraryFileFromPlatform(String osName, String osArch, String modelIdentifier, File fmuRoot, FMIVersion fmiVersion) {
         String arch = osArch;
 
         String libDir = "";
@@ -86,12 +91,23 @@ public class FmiUtil {
         } else if (osName.toLowerCase().contains("mac"))// extension
         {
             libExtension = ".dylib";
-
-            if (arch.contains("x86_64")) {
-                libDir = "darwin64";
-            } else {
-                // x86
-                libDir = "darwin32";
+            switch (fmiVersion) {
+                case FMI2:
+                    if (arch.contains("x86_64")) {
+                        libDir = "darwin64";
+                    } else {
+                        // x86
+                        libDir = "darwin32";
+                    }
+                    break;
+                case FMI3:
+                    if (arch.contains("x86_64")) {
+                        libDir = "x86_64-darwin";
+                    } else {
+                        // x86
+                        libDir = "x86_32-darwin";
+                    }
+                    break;
             }
         }
 
@@ -128,5 +144,47 @@ public class FmiUtil {
             logger.error("Unable to parse model description", e);
         }
         return null;
+    }
+
+    public static File generateLibraryFile(String modelIdentifier, File dir, FMIVersion fmiVersion) {
+        String osName = System.getProperty("os.name");
+        String arch = System.getProperty("os.arch");
+
+        return FmiUtil.generateLibraryFileFromPlatform(osName, arch, modelIdentifier, dir, fmiVersion);
+    }
+
+    public static String logMessageLibraryPath(File libraryPath) {
+        Path p = libraryPath.toPath();
+        int pLength = p.getNameCount();
+        String desiredPath = p.subpath(pLength - 3, pLength).toString();
+        return desiredPath;
+    }
+
+    public static File createTempDir(String prefix)
+    {
+        TempDirectory dir = new TempDirectory(prefix);
+        dir.deleteOnExit();
+        return dir.getPath().toFile();
+    }
+
+    public static void unPack(File fromFile, File toDirectory) throws IOException
+    {
+        toDirectory.mkdirs();
+        logger.debug("Extracting: " + fromFile.getAbsolutePath() + " to "
+                + toDirectory.getAbsolutePath());
+        ZipUtility.unzipApacheCompress(fromFile, toDirectory);
+        logger.debug("Extracted '" + fromFile.getAbsolutePath() + "' to '"
+                + toDirectory.getAbsolutePath() + "'");
+    }
+
+    public static String getFmuName(File path) throws FmuInvocationException
+    {
+        if (path.getName().indexOf(".fmu") == -1)
+        {
+            throw new FmuInvocationException("invalid fmu name: "
+                    + path.getName());
+        }
+
+        return path.getName().substring(0, path.getName().indexOf('.'));
     }
 }
