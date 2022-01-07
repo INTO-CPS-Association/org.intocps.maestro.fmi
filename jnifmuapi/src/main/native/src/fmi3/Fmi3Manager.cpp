@@ -185,7 +185,7 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 
 
     if (name == NULL) {
-        printf("Failed to create name for status: " + status);
+        printf("Failed to create name for status: %d" , status);
         goto done;
     }
 
