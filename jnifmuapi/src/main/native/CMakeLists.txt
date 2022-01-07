@@ -49,7 +49,8 @@ if (UNIX)
 endif ()
 
 #include_directories(${libshmfmi_SOURCE_DIR})
-include_directories(include src/fmi3 src/external/shared src/external/shared/fmi2/headers src/external/shared/fmi3/headers)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src/fmi3 ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared/fmi2/headers ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared/fmi3/headers)
 
 #add_library(${PROJECT_NAME} SHARED src/main/native/sharedmemory.cpp ${PROTO_SRCS} ${PROTO_HDRS})
 
