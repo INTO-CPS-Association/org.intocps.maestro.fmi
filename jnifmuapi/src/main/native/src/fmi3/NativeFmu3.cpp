@@ -76,6 +76,8 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
                                fmi3String category,
                                fmi3String message) {
 
+                               //fixme bad implementation crashing on linux, probably wrong handling or in or out strings, not belonging to the current context
+
     auto node = (Fmi3InstanceNode *) instanceEnvironment;
     bool reported = 0;
 
