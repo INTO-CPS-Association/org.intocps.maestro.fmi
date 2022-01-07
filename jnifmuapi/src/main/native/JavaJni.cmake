@@ -1,0 +1,26 @@
+#Author Kenneth Lausdahl
+include(TargetArch.cmake)
+
+
+function(add_java_jni)
+    if (DEFINED  $ENV{CI})
+        target_architecture(arch)
+        if (UNIX AND NOT APPLE)
+            if ("${arch}" STREQUAL "amd64" OR "${arch}" STREQUAL "x86_64")
+                include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/jvm/linux64/include)
+            else ()
+                include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/jvm/linux32/include)
+            endif ()
+        elseif (APPLE)
+            include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/jvm/darwin64/include)
+        elseif (WIN32)
+            set(OS_NAME "Win")
+            if ("${arch}" STREQUAL "amd64" OR "${arch}" STREQUAL "x86_64")
+                include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/jvm/win64/include)
+            else ()
+                include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../third_party/jvm/win32/include)
+            endif ()
+        endif ()
+    endif ()
+
+endfunction()
