@@ -208,24 +208,66 @@
                                 <phase>process-classes</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+                                        <exec executable="cmake"
                                               failonerror="true">
-                                            <arg value="--version"/>
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-S"/>
+                                            <arg value="${project.basedir}/src/main/native"/>
+                                            <arg value="-B"/>
+                                            <arg value="${project.build.directory}/native"/>
 
                                         </exec>
-                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+
+                                        <exec dir="${project.build.directory}/native" executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+
+                            <execution>
+                                <id>cmake-bounchingball</id>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <target>
+
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/bouncingball/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/bouncingball/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi3/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi3/bounchingball"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                              executable="cmake"
                                               failonerror="true">
                                             <arg value="-G"/>
                                             <arg value="Unix Makefiles"/>
                                             <arg value="."/>
+
                                         </exec>
 
-                                        <exec dir="${project.basedir}/src/main/native/" executable="make"
+                                        <exec dir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                              executable="make"
                                               failonerror="true">
                                             <arg value="-j12"/>
-
                                             <arg value="--always-make"/>
-
                                         </exec>
                                     </target>
                                 </configuration>
@@ -255,25 +297,21 @@
                                 <phase>process-classes</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
-                                              failonerror="true">
-                                            <arg value="--version"/>
-
-                                        </exec>
-                                        <exec dir="${project.basedir}/src/main/native/" executable="cmake"
+                                        <exec executable="cmake"
                                               failonerror="true">
                                             <arg value="-DCMAKE_GENERATOR_PLATFORM=x86"/>
                                             <arg value="-G"/>
                                             <arg value="Unix Makefiles"/>
-                                            <arg value="."/>
+                                            <arg value="-S"/>
+                                            <arg value="${project.basedir}/src/main/native"/>
+                                            <arg value="-B"/>
+                                            <arg value="${project.build.directory}/native"/>
                                         </exec>
 
-                                        <exec dir="${project.basedir}/src/main/native/" executable="make"
+                                        <exec dir="${project.build.directory}/native" executable="make"
                                               failonerror="true">
                                             <arg value="-j12"/>
-
                                             <arg value="--always-make"/>
-
                                         </exec>
                                     </target>
                                 </configuration>

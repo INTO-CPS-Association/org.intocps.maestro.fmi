@@ -38,32 +38,27 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-public class BouncingBallFmi3Test
-{
-    static final String FMU_PATH = "src/test/resources/fmus/BouncingBall.fmu".replace('/', File.separatorChar);
-    static final String FMU_UNPACKED_PATH = "src/test/resources/fmus/bouncingball".replace('/', File.separatorChar);
-    static final String FMU_UNPACKED_PATH_BIN = "src/test/sources/fmus/bouncingball/binaries/darwin64/BouncingBall.dylib".replace('/', File.separatorChar);
+public class BouncingBallFmi3Test {
+    static final String FMU_UNPACKED_PATH = "target/fmus/fmi3/bounchingball".replace('/', File.separatorChar);
     static final String FMU_GUID = "{8c4e810f-3df3-4a00-8276-176fa3c9f003}";
 
     @Test
-    public void LoadFmuTempDir() throws Exception
-    {
-        Fmi3Fmu f = new Fmi3Fmu(new File(FMU_UNPACKED_PATH));
+    public void LoadFmuTempDir() throws Exception {
+        DirectoryFmi3Fmu f = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "bouncingball");
         f.load();
         f.unLoad();
     }
 
     @Test
     public void InstantiateForCoSimulation() throws Exception {
-        Fmi3Fmu f = new Fmi3Fmu(new File(FMU_UNPACKED_PATH));
+        DirectoryFmi3Fmu f = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "bouncingball");
         f.load();
         final String[] instanceName_ = new String[1];
         final Fmi3Status[] status_ = new Fmi3Status[1];
         final String[] category_ = new String[1];
         final String[] message_ = new String[1];
-        ICallbackLogMessage lm = new ICallbackLogMessage(){
+        ICallbackLogMessage lm = new ICallbackLogMessage() {
 
             @Override
             public void logMessage(String instanceName, Fmi3Status status, String category, String message) {
@@ -71,22 +66,19 @@ public class BouncingBallFmi3Test
                 status_[0] = status;
                 category_[0] = category;
                 message_[0] = message;
-                System.out.println(String.format("Received log message:\n" +
-                        "instanceName: %s\n" +
-                        "Status: %s\n" +
-                        "Category: %s\n" +
-                        "Message: %s", instanceName, status.name(), category, message));
+                System.out.println(String.format("Received log message:\n" + "instanceName: %s\n" + "Status: %s\n" + "Category: %s\n" + "Message: %s",
+                        instanceName, status.name(), category, message));
             }
         };
         IFmi3Instance instance = f.instantiateCoSimulation("Bouncing Ball", FMU_GUID, null, false, false, false, false, null, 0, 0, lm, null);
         Assert.assertNotNull("Instantiate returned null", instance);
         Fmi3Instance fmi3Instance = null;
-        if(instance instanceof Fmi3Instance){
+        if (instance instanceof Fmi3Instance) {
             fmi3Instance = (Fmi3Instance) instance;
         }
         Fmi3Status status = fmi3Instance.terminate();
         Fmi3Status expectedFmi3Status = Fmi3Status.fmi3Error;
-        Assert.assertEquals("Terminate result status did not match",expectedFmi3Status, status);
+        Assert.assertEquals("Terminate result status did not match", expectedFmi3Status, status);
         Assert.assertEquals("Log Instance name did not match", "Bouncing Ball", instanceName_[0]);
         Assert.assertEquals("Log Fmi3Status did not match", expectedFmi3Status, status_[0]);
         Assert.assertEquals("Log Category", "logStatusError", category_[0]);

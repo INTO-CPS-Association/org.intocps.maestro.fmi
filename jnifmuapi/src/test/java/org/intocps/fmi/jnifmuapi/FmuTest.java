@@ -56,8 +56,7 @@ public class FmuTest {
 
         // fmu.unPack();
         // fmu.load();
-
-        fmu.internalLoad(TestUtils.getLibraryPath());
+        fmu.lifeCycle.internalLoad(TestUtils.getLibraryPath());
 
     }
 
