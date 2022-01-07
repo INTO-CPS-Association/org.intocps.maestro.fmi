@@ -73,6 +73,9 @@ jobs:
             jnifmuapi/target/classes/lib/**/libfmuapi.so
             jnifmuapi/target/classes/lib/**/libfmuapi.dylib
             jnifmuapi/target/classes/lib/**/fmuapi.dll
+            jnifmuapi/target/fmus/**/*.so
+            jnifmuapi/target/fmus/**/*.dylib
+            jnifmuapi/target/fmus/**/*.dll
           retention-days: 1
 
   pack:
