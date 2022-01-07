@@ -1,4 +1,4 @@
-
+#Author Kenneth Lausdahl
 include(TargetArch.cmake)
 
 
