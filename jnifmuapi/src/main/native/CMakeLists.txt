@@ -6,7 +6,7 @@ project(fmuapi
 
 configure_file(src/config.h.in config.h)
 
-influde(JavaJni.cmake)
+include(JavaJni.cmake)
 add_java_jni()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
