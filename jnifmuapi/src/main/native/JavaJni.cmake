@@ -3,7 +3,7 @@ include(TargetArch.cmake)
 
 
 function(add_java_jni)
-    if (DEFINED  $ENV{CI})
+    if (DEFINED  ENV{CI})
         target_architecture(arch)
         if (UNIX AND NOT APPLE)
             if ("${arch}" STREQUAL "amd64" OR "${arch}" STREQUAL "x86_64")
