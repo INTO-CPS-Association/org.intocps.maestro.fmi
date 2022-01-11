@@ -56,7 +56,7 @@ public class NativeLoadManager {
      * @see intocps.fmuapi.IFmu#load()
      * The reason for the recovering behaviour is based on several FMUs having a wrong modelIdentifier attribute in the modelDescription.xml.
      */
-    public void load(String modelIdentifier) throws FmuInvocationException, FmuMissingLibraryException {
+    public void load(String modelIdentifier, FmiUtil.FMIVersion fmiVersion) throws FmuInvocationException, FmuMissingLibraryException {
         if (loaded) {
             return;
         }
@@ -73,24 +73,24 @@ public class NativeLoadManager {
             logger.warn(recovery_log_message, name);
         }
 
-        File libraryPath = generateLibraryFile(modelIdentifier);
+        File libraryPath = generateLibraryFile(modelIdentifier, fmiVersion);
 
         if (!libraryPath.exists()) {
             logger.error(String.format("The library corresponding to the modelIdentifier '%s' could not be found at: '%s", modelIdentifier,
                     logMessageLibraryPath(libraryPath)));
             logger.warn(String.format(recovery_log_message, name));
             modelIdentifier = name;
-            libraryPath = generateLibraryFile(modelIdentifier);
+            libraryPath = generateLibraryFile(modelIdentifier, fmiVersion);
         }
         internalLoad(libraryPath);
     }
 
 
-    public File generateLibraryFile(String modelIdentifier) {
+    public File generateLibraryFile(String modelIdentifier, FmiUtil.FMIVersion fmiVersion) {
         String osName = System.getProperty("os.name");
         String arch = System.getProperty("os.arch");
 
-        return FmiUtil.generateLibraryFileFromPlatform(osName, arch, modelIdentifier, dir, FmiUtil.FMIVersion.FMI2);
+        return FmiUtil.generateLibraryFileFromPlatform(osName, arch, modelIdentifier, dir, fmiVersion);
     }
 
     public static String logMessageLibraryPath(File libraryPath) {

@@ -98,7 +98,7 @@ class DirectoryFmu extends NativeFmu implements IFmu {
         }
 
 
-        this.lifeCycle.load(modelIdentifier);
+        this.lifeCycle.load(modelIdentifier, FmiUtil.FMIVersion.FMI2);
     }
 
     /*

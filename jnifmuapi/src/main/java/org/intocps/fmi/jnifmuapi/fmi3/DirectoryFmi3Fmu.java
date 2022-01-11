@@ -68,7 +68,7 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
         }
 
 
-        this.lifeCycle.load(modelIdentifier);
+        this.lifeCycle.load(modelIdentifier, FmiUtil.FMIVersion.FMI3);
     }
 
     //    public void internalLoad(File libraryPath) throws FmuInvocationException, FmuMissingLibraryException {
