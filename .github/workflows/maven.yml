@@ -7,7 +7,7 @@ on: [ workflow_dispatch, push, pull_request ]
 env:
   JAVA_VERSION: 1.8
   SERVER_ID: snapshots
-  PYTHON_VERSION: '3.9.7'
+  PYTHON_VERSION: '3.9.9'
 
 
 
