@@ -53,7 +53,10 @@ import java.nio.file.Path;
 
 public class FmiUtil {
 
-    public enum FMIVersion{FMI2, FMI3}
+    public enum FMIVersion {
+        FMI2,
+        FMI3
+    }
 
     final static Logger logger = LoggerFactory.getLogger(FmiUtil.class);
 
@@ -75,18 +78,18 @@ public class FmiUtil {
         if (osName.toLowerCase().contains("windows")) {
             libExtension = ".dll";
             if (arch.contains("amd64")) {
-                libDir = "win64";
+                libDir = "x86_64-windows";
             } else {
                 // x86
-                libDir = "win32";
+                libDir = "x86-windows";
             }
-        } else if (osName.indexOf("nix") >= 0 || osName.indexOf("nux") >= 0 || osName.indexOf("aix") > 0) {
+        } else if (osName.contains("nix") || osName.contains("nux") || osName.indexOf("aix") > 0) {
             libExtension = ".so";
             if (arch.contains("amd64")) {
-                libDir = "linux64";
+                libDir = "x86_64-linux";
             } else {
                 // x86
-                libDir = "linux32";
+                libDir = "x86-linux";
             }
         } else if (osName.toLowerCase().contains("mac"))// extension
         {
@@ -160,29 +163,22 @@ public class FmiUtil {
         return desiredPath;
     }
 
-    public static File createTempDir(String prefix)
-    {
+    public static File createTempDir(String prefix) {
         TempDirectory dir = new TempDirectory(prefix);
         dir.deleteOnExit();
         return dir.getPath().toFile();
     }
 
-    public static void unPack(File fromFile, File toDirectory) throws IOException
-    {
+    public static void unPack(File fromFile, File toDirectory) throws IOException {
         toDirectory.mkdirs();
-        logger.debug("Extracting: " + fromFile.getAbsolutePath() + " to "
-                + toDirectory.getAbsolutePath());
+        logger.debug("Extracting: " + fromFile.getAbsolutePath() + " to " + toDirectory.getAbsolutePath());
         ZipUtility.unzipApacheCompress(fromFile, toDirectory);
-        logger.debug("Extracted '" + fromFile.getAbsolutePath() + "' to '"
-                + toDirectory.getAbsolutePath() + "'");
+        logger.debug("Extracted '" + fromFile.getAbsolutePath() + "' to '" + toDirectory.getAbsolutePath() + "'");
     }
 
-    public static String getFmuName(File path) throws FmuInvocationException
-    {
-        if (path.getName().indexOf(".fmu") == -1)
-        {
-            throw new FmuInvocationException("invalid fmu name: "
-                    + path.getName());
+    public static String getFmuName(File path) throws FmuInvocationException {
+        if (path.getName().indexOf(".fmu") == -1) {
+            throw new FmuInvocationException("invalid fmu name: " + path.getName());
         }
 
         return path.getName().substring(0, path.getName().indexOf('.'));
