@@ -109,7 +109,7 @@ if args.build:
         cmkae_lines += 'file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/s.c "")\n'
         cmkae_lines += 'add_library("%s" SHARED s.c)\n' % model_identifier
         cmkae_lines += 'set_target_properties("%s" PROPERTIES POSITION_INDEPENDENT_CODE ON, PREFIX "")\n' % model_identifier
-        cmkae_lines += 'target_link_libraries("%s" PUBLIC %s)\n' % (
+        cmkae_lines += 'target_link_libraries("%s" %s)\n' % (
             model_identifier, " ".join([model_identifier + "_" + str(idx) for idx, n in enumerate(source_file_sets)]))
         cmkae_lines += 'SET(output_folder "%s")\n' % args.platform
 
