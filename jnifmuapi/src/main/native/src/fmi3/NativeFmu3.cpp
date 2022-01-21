@@ -100,7 +100,6 @@ bool checkJenvCallback(JavaVM *vm, JNIEnv *env) {
 
 
 void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
-                               fmi3String instanceName,
                                fmi3Status status,
                                fmi3String category,
                                fmi3String message) {
@@ -112,7 +111,7 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
     JavaVM *vm = cb.g_vm;
 
     if (cb.logMessage != nullptr && checkJenvCallback(vm, env)) {
-        jstring jinstanceName = env->NewStringUTF(instanceName);
+        jstring jinstanceName = env->NewStringUTF(node->name.c_str());
 
         if (env->ExceptionCheck()) {
             printf("exception\n");
@@ -142,7 +141,7 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
         vm->DetachCurrentThread();
     } else {
         // no receiver found
-        printf("Unable to find receiver for %s reporting: %s\n", instanceName, message);
+        printf("Unable to find receiver for %s reporting: %s\n", node->name.c_str(), message);
     }
 }
 
@@ -150,7 +149,6 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
 void jniFmi3CallbackIntermediateUpdate(
         fmi3InstanceEnvironment instanceEnvironment,
         fmi3Float64 intermediateUpdateTime,
-        fmi3Boolean clocksTicked,
         fmi3Boolean intermediateVariableSetRequested,
         fmi3Boolean intermediateVariableGetAllowed,
         fmi3Boolean intermediateStepFinished,
@@ -173,7 +171,6 @@ void jniFmi3CallbackIntermediateUpdate(
         env->CallVoidMethod(cb.callbackObj,
                             cb.callbackMethod, instanceEnvironment,
                             intermediateUpdateTime,
-                            clocksTicked,
                             intermediateVariableSetRequested,
                             intermediateVariableGetAllowed,
                             intermediateStepFinished,
@@ -239,7 +236,8 @@ __attribute__((unused)) JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;)J
  */
 __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateModelExchange
-        (JNIEnv *, jobject, __attribute__((unused)) jlong fmuPtr, jstring, jstring, jstring, jboolean, jboolean, jlong, jobject) {
+        (JNIEnv *, jobject, __attribute__((unused)) jlong fmuPtr, jstring, jstring, jstring, jboolean, jboolean, jlong,
+         jobject) {
 
     return (jlong) nullptr;
 
@@ -251,7 +249,8 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;)J
  */
 __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateCoSimulation
-        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken, jstring resourceLocation,
+        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken,
+         jstring resourceLocation,
          jboolean visible, jboolean loggingOn, jboolean eventModeUsed, jboolean earlyReturnAllowed,
          jlongArray requiredIntermediateVariables,
          jlong nRequiredIntermediateVariables, jlong instanceEnvironment, jobject logMessage,
@@ -264,6 +263,7 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
     const char *guid = GetString(env, instantiationToken);
     auto node = new Fmi3InstanceNode();
     node->type = CoSimulation;
+    node->name = string(instanceName);
 
     //callback: jobject logMessage
     if (logMessage != nullptr) {
@@ -349,8 +349,8 @@ void jniPreemptLockCallback(Fmi3InstanceNode *handler, bool lock) {
 }
 
 struct PreeStruct {
-    fmi3CallbackLockPreemption lock;
-    fmi3CallbackUnlockPreemption unlock;
+    fmi3LockPreemptionCallback lock;
+    fmi3UnlockPreemptionCallback unlock;
     Fmi3InstanceNode *handler;
 };
 
@@ -413,7 +413,7 @@ void initialize_preempt_locking() {
 
 
 PreeStruct *get_preemtp_lock_handler(Fmi3InstanceNode *handler) {
-    for (auto & preemptionHandler : preemptionHandlers) {
+    for (auto &preemptionHandler: preemptionHandlers) {
         if (preemptionHandler.handler == nullptr) {
             preemptionHandler.handler = handler;
             return &preemptionHandler;
@@ -422,18 +422,31 @@ PreeStruct *get_preemtp_lock_handler(Fmi3InstanceNode *handler) {
     return nullptr;
 }
 
+void jnifmi3ClockUpdateCallback(fmi3InstanceEnvironment  instanceEnvironment)
+{
+
+}
+
 /*
  * Class:     org_intocps_fmi3_jnifmuapi_NativeFmu3
  * Method:    n3InstantiateScheduledExecution
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLockPreemption;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackUnlockPreemption;)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZ[JJJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ILogMessageCallback;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackIntermediateUpdate;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLockPreemption;Lorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackUnlockPreemption;)J
  */
-__attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_n3InstantiateScheduledExecution
+
+//JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_n3InstantiateScheduledExecution
+//  (JNIEnv *, jobject, jlong, jstring, jstring, jstring, jboolean, jboolean, jlong, jobject, jobject, jobject, jobject);
+
+//  protected native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
+//            boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate,
+//            ILockPreemptionCallback lockPreemption, IUnlockPreemptionCallback unlockPreemption);
+__attribute__((unused)) JNIEXPORT jlong JNICALL
+Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_n3InstantiateScheduledExecution
         (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken,
          jstring resourceLocation,
          jboolean visible,
-         jboolean loggingOn, jlongArray requiredIntermediateVariables, jlong nRequiredIntermediateVariables,
+         jboolean loggingOn,
          jlong instanceEnvironment,
-         jobject logMessage, jobject intermediateUpdate, jobject lockPreemption, jobject unlockPreemption) {
+         jobject logMessage, jobject clockUpdate, jobject lockPreemption, jobject unlockPreemption) {
     auto fmuNode = getFmuPtr(fmuPtr);
     const char *instanceName = GetString(env, name);
     const char *fmuResourceLocation = nullptr;
@@ -457,10 +470,10 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
 
     }
     //callback: jobject intermediateUpdate
-    if (intermediateUpdate != nullptr) {
+    if (clockUpdate != nullptr) {
 
-        node->callback_intermediateUpdate = createBasicCallback(env, intermediateUpdate, "intermediateUpdate",
-                                                                "(JFZZZZZZ[Z[)V");
+        node->callback_intermediateUpdate = createBasicCallback(env, clockUpdate, "updated",
+                                                                "()V");
 
         //JFZZZZZZ[Z[
         //long instanceEnvironment, double intermediateUpdateTime, boolean clocksTicked,
@@ -490,24 +503,17 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
         printf("exception\n");
         env->ExceptionDescribe();
     }
-    fmi3ValueReference *requiredIntermediateVariablesArr = nullptr;
-    if (nRequiredIntermediateVariables > 0 && requiredIntermediateVariables != nullptr) {
 
-        requiredIntermediateVariablesArr = createArray_uint_from_jlong(env, requiredIntermediateVariables,
-                                                                       nRequiredIntermediateVariables);
-    }
 
 
     auto instance = fmuNode->fmi3InstantiateScheduledExecution(instanceName, token, fmuResourceLocation,
                                                                visible,
                                                                loggingOn,
-                                                               requiredIntermediateVariablesArr,
-                                                               nRequiredIntermediateVariables, node,
+                                                               node,
                                                                node->callback_logMessage.logMessage,
-                                                               node->callback_intermediateUpdate.intermediateUpdate,
+                                                               node->callback_clockUpdate.clockUpdated,
                                                                node->callback_lockPreemption.lockPreemption,
                                                                node->callback_unlockPreemption.unlockPreemption);
-    delete requiredIntermediateVariablesArr;
     if (instance != nullptr) {
         Fmi3Manager::getInstance()->store(instance, node);
     } else {
