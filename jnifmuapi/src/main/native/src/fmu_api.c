@@ -204,7 +204,7 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_ninstantiate(
     // store for later free
     storeComponent(compNode);
   } else {
-    free(compNode->callback->name);
+    free((void*)compNode->callback->name);
     free(compNode->callbackFunctions);
     compNode->callbackFunctions = NULL;
     free(compNode);
