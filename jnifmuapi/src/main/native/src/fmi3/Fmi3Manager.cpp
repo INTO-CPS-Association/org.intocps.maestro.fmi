@@ -4,9 +4,9 @@
 
 #include "Fmi3Manager.h"
 
-Fmi3Manager* Fmi3Manager::instance;
+Fmi3Manager* Fmi3Manager::_instance;
 
-Fmi3Manager::Fmi3Manager(){}
+Fmi3Manager::Fmi3Manager()= default;
 
 void Fmi3Manager::store(fmi3Instance instance, Fmi3InstanceNode* node) {
     this->instanceToInstanceNode[instance] = node;
@@ -26,22 +26,22 @@ Fmi3InstanceNode* Fmi3Manager::Fmi3Manager::getInstanceNode(fmi3Instance instanc
 
 void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
                                   fmi3String *target, jsize len) {
-    int i = 0;
+    int i;
     for (i = 0; i < len; i++) {
         auto s = static_cast<jstring>(env->GetObjectArrayElement(source, i));
         jboolean blnIsCopy;
         const char *myarray = env->GetStringUTFChars( s, &blnIsCopy);
 
-        if (myarray == NULL) {
+        if (myarray == nullptr) {
             throwException(env, "JNI SetString failed to get string");
             return;
         }
 
-        int slen = strlen(myarray) + 1;  // Add NULL termination
+        auto slen = strlen(myarray) + 1;  // Add NULL termination
 
         char *tmp = (char *)malloc(sizeof(char) * slen);
 
-        if (tmp == NULL) {
+        if (tmp == nullptr) {
             throwException(env, "calloc tmp of char* failed");
         }
 
@@ -58,12 +58,12 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
         return;
     }
 
-    jclass cls = NULL;
-    jfieldID enumField = NULL;
+    jclass cls;
+    jfieldID enumField = nullptr;
     const char* signature = "Lorg/intocps/fmi3/Fmi3DependencyKind;";
     
     cls = env->FindClass("org/intocps/fmi3/Fmi3DependencyKind");
-    if (cls == NULL) {
+    if (cls == nullptr) {
         return;
     }
 
@@ -89,9 +89,9 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
                 enumField = env->GetStaticFieldID(cls , "fmi3Dependent", signature);
                 break;
         }
-        if(enumField != NULL){
+        if(enumField != nullptr){
             jobject enumVal = env->GetStaticObjectField(cls, enumField);
-            if(enumVal != NULL){
+            if(enumVal != nullptr){
                 env->SetObjectArrayElement(jDependencyKinds, i, enumVal);
                 env->DeleteLocalRef(enumVal);
             }
@@ -99,9 +99,7 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
     }
 
     env->ExceptionClear();
-    if (cls != NULL){
-        env->DeleteLocalRef(cls);
-    }
+    env->DeleteLocalRef(cls);
 }
 
 void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len) {
@@ -109,12 +107,12 @@ void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3Interva
         return;
     }
 
-    jclass cls = NULL;
-    jfieldID enumField = NULL;
+    jclass cls;
+    jfieldID enumField = nullptr;
     const char* signature = "Lorg/intocps/fmi3/Fmi3IntervalQualifier;";
 
     cls = env->FindClass("org/intocps/fmi3/Fmi3IntervalQualifier");
-    if (cls == NULL) {
+    if (cls == nullptr) {
         return;
     }
 
@@ -130,9 +128,9 @@ void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3Interva
                 enumField = env->GetStaticFieldID(cls , "fmi3IntervalChanged", signature);
                 break;
         }
-        if(enumField != NULL){
+        if(enumField != nullptr){
             jobject enumVal = env->GetStaticObjectField(cls, enumField);
-            if(enumVal != NULL){
+            if(enumVal != nullptr){
                 env->SetObjectArrayElement(jQualifiers, i, enumVal);
                 env->DeleteLocalRef(enumVal);
             }
@@ -140,26 +138,24 @@ void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3Interva
     }
 
     env->ExceptionClear();
-    if (cls != NULL){
-        env->DeleteLocalRef(cls);
-    }
+    env->DeleteLocalRef(cls);
 }
 
 
 jobject convertStatus(JNIEnv *env, fmi3Status status) {
     jclass cls;
     jmethodID mid;
-    jstring name = NULL;
-    jobject eval = NULL;
+    jstring name = nullptr;
+    jobject eval = nullptr;
 
     cls = env->FindClass("org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
-    if (cls == NULL) {
+    if (cls == nullptr) {
         printf("Failed to find class: org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
         goto done;
     }
 
     mid = env->GetStaticMethodID(cls, "valueOf", "(Ljava/lang/String;)Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3Status;");
-    if (mid == NULL) {
+    if (mid == nullptr) {
         printf("Failed to find class: org/intocps/fmi/jnifmuapi/fmi3/Fmi3Status");
         goto done;
     }
@@ -184,7 +180,7 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
     }
 
 
-    if (name == NULL) {
+    if (name == nullptr) {
         printf("Failed to create name for status: %d" , status);
         goto done;
     }
@@ -193,9 +189,9 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 
     done:
     env->ExceptionClear();
-    if (name != NULL)
+    if (name != nullptr)
         env->DeleteLocalRef(name);
-    if (cls != NULL)
+    if (cls != nullptr)
         env->DeleteLocalRef(cls);
 
     return eval;
@@ -204,5 +200,7 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 FMU3 *getFmuPtr(jlong fmuPtr) { return (FMU3 *) fmuPtr; }
 
 fmi3Instance getInstancePtr(jlong compPtr){return (fmi3Instance) compPtr;}
+
+
 
 

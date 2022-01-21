@@ -39,6 +39,9 @@ struct CallbackJniInfo {
     jmethodID callbackMethod;  // free
     JavaVM *g_vm;
     JNIEnv *env;
+
+
+
 };
 
 enum Fmi2InstanceType{
@@ -66,7 +69,7 @@ public:
 
 
 class Fmi3Manager {
-    static Fmi3Manager *instance;
+    static Fmi3Manager *_instance;
     map<fmi3Instance, Fmi3InstanceNode*> instanceToInstanceNode;
 
 private:
@@ -74,10 +77,10 @@ private:
 
 public:
     static Fmi3Manager *getInstance() {
-        if (!instance) {
-            instance = new Fmi3Manager();
+        if (!_instance) {
+            _instance = new Fmi3Manager();
         }
-        return instance;
+        return _instance;
     };
 
     void store(fmi3Instance instance, Fmi3InstanceNode* node);
