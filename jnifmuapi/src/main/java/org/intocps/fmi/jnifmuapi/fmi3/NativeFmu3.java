@@ -50,7 +50,7 @@ public abstract class NativeFmu3 {
             IIntermediateUpdateCallback intermediateUpdate);
 
     @SuppressWarnings("CStyleArrayDeclaration")
-    protected native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
+    protected native long nInstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
             boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate,
             ILockPreemptionCallback lockPreemption, IUnlockPreemptionCallback unlockPreemption);
     /* end::Instantiate[] */

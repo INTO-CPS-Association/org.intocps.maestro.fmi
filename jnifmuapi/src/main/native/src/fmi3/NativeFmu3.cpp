@@ -440,7 +440,7 @@ void jnifmi3ClockUpdateCallback(fmi3InstanceEnvironment  instanceEnvironment)
 //            boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate,
 //            ILockPreemptionCallback lockPreemption, IUnlockPreemptionCallback unlockPreemption);
 __attribute__((unused)) JNIEXPORT jlong JNICALL
-Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_n3InstantiateScheduledExecution
+Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateScheduledExecution
         (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jstring name, jstring instantiationToken,
          jstring resourceLocation,
          jboolean visible,
