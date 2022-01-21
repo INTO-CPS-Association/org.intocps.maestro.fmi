@@ -1,5 +1,5 @@
 package org.intocps.fmi.jnifmuapi.fmi3;
 
-public interface ICallbackLockPreemption {
+public interface ILockPreemptionCallback {
     void locked();
 }

@@ -132,15 +132,15 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
 
     @Override
     public IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, org.intocps.fmi.jnifmuapi.fmi3.ICallbackLogMessage logMessage) {
+            boolean loggingOn, ILogMessageCallback logMessage) {
         return null;
     }
 
     @Override
     public IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
             boolean loggingOn, boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables,
-            int nRequiredIntermediateVariables, long instanceEnvironment, ICallbackLogMessage logMessage,
-            ICallbackIntermediateUpdate intermediateUpdate) {
+            int nRequiredIntermediateVariables, long instanceEnvironment, ILogMessageCallback logMessage,
+            IIntermediateUpdateCallback intermediateUpdate) {
         if (!lifeCycle.isLoaded()) {
             return null;
         }
@@ -153,9 +153,8 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
 
     @Override
     public IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, long[] requiredIntermediateVariables, int nRequiredIntermediateVariables, ICallbackLogMessage logMessage,
-            ICallbackIntermediateUpdate intermediateUpdate, org.intocps.fmi.jnifmuapi.fmi3.ICallbackLockPreemption lockPreemption,
-            org.intocps.fmi.jnifmuapi.fmi3.ICallbackUnlockPreemption unlockPreemption) {
+            boolean loggingOn, long[] requiredIntermediateVariables, int nRequiredIntermediateVariables, ILogMessageCallback logMessage,
+            IIntermediateUpdateCallback intermediateUpdate, ILockPreemptionCallback lockPreemption, IUnlockPreemptionCallback unlockPreemption) {
         return null;
     }
 

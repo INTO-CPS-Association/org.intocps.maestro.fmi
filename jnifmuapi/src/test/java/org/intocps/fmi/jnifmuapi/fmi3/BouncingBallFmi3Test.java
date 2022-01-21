@@ -58,7 +58,7 @@ public class BouncingBallFmi3Test {
         final Fmi3Status[] status_ = new Fmi3Status[1];
         final String[] category_ = new String[1];
         final String[] message_ = new String[1];
-        ICallbackLogMessage lm = new ICallbackLogMessage() {
+        ILogMessageCallback lm = new ILogMessageCallback() {
 
             @Override
             public void logMessage(String instanceName, Fmi3Status status, String category, String message) {

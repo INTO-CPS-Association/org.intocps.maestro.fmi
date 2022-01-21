@@ -30,18 +30,16 @@ using namespace std;
 
 struct CallbackJniInfo {
     union {
-        fmi3CallbackIntermediateUpdate intermediateUpdate;
-        fmi3CallbackLogMessage logMessage;
-        fmi3CallbackLockPreemption lockPreemption;
-        fmi3CallbackUnlockPreemption unlockPreemption;
+        fmi3IntermediateUpdateCallback intermediateUpdate;
+        fmi3LogMessageCallback logMessage;
+        fmi3LockPreemptionCallback lockPreemption;
+        fmi3UnlockPreemptionCallback unlockPreemption;
+        fmi3ClockUpdateCallback clockUpdated;
     };
     jobject callbackObj;       // free
     jmethodID callbackMethod;  // free
     JavaVM *g_vm;
     JNIEnv *env;
-
-
-
 };
 
 enum Fmi2InstanceType{
@@ -51,17 +49,19 @@ enum Fmi2InstanceType{
 class Fmi3InstanceNode {
 public:
     Fmi3InstanceNode() {
-        callback_logMessage.logMessage = NULL;
-        callback_logMessage.lockPreemption = NULL;
-        callback_logMessage.unlockPreemption = NULL;
-        callback_logMessage.intermediateUpdate = NULL;
+        callback_logMessage.logMessage = nullptr;
+        callback_logMessage.lockPreemption = nullptr;
+        callback_logMessage.unlockPreemption = nullptr;
+        callback_logMessage.intermediateUpdate = nullptr;
     }
     Fmi2InstanceType type;
     CallbackJniInfo callback_intermediateUpdate;
     CallbackJniInfo callback_logMessage;
+    CallbackJniInfo callback_clockUpdate;
     CallbackJniInfo callback_lockPreemption;
     CallbackJniInfo callback_unlockPreemption;
     Fmi3Node* owner;
+    std::string name;
     ~Fmi3InstanceNode() {
 
     }

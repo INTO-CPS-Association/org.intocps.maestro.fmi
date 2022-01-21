@@ -41,19 +41,18 @@ public abstract class NativeFmu3 {
     /* Creation and destruction of FMU instances and setting debug status */
     /* tag::Instantiate[] */
     protected native long nInstantiateModelExchange(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
-            boolean visible, boolean loggingOn, long instanceEnvironment, ICallbackLogMessage logMessage);
+            boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage);
 
     @SuppressWarnings("CStyleArrayDeclaration")
     protected native long nInstantiateCoSimulation(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
             boolean visible, boolean loggingOn, boolean eventModeUsed, boolean earlyReturnAllowed, long requiredIntermediateVariables[],
-            long nRequiredIntermediateVariables, long instanceEnvironment, ICallbackLogMessage logMessage,
-            ICallbackIntermediateUpdate intermediateUpdate);
+            long nRequiredIntermediateVariables, long instanceEnvironment, ILogMessageCallback logMessage,
+            IIntermediateUpdateCallback intermediateUpdate);
 
     @SuppressWarnings("CStyleArrayDeclaration")
-    protected native long n3InstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
-            boolean visible, boolean loggingOn, long requiredIntermediateVariables[], long nRequiredIntermediateVariables, long instanceEnvironment,
-            ICallbackLogMessage logMessage, ICallbackIntermediateUpdate intermediateUpdate, ICallbackLockPreemption lockPreemption,
-            ICallbackUnlockPreemption unlockPreemption);
+    protected native long nInstantiateScheduledExecution(long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
+            boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate,
+            ILockPreemptionCallback lockPreemption, IUnlockPreemptionCallback unlockPreemption);
     /* end::Instantiate[] */
 
 
