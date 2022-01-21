@@ -47,6 +47,18 @@ jint throwException(JNIEnv *env,const char *message) {
   return (*env)->ThrowNew(env, exClass, message);
 }
 
+jint throwException3(JNIEnv *env,const char *message) {
+    jclass exClass;
+    char *className = "org/intocps/fmi/jnifmuapi/fmi3/NativeFmu3Exception";
+
+    exClass = (*env)->FindClass(env, className);
+    if (exClass == NULL) {
+        return -1;
+    }
+
+    return (*env)->ThrowNew(env, exClass, message);
+}
+
 const char *GetString(JNIEnv *env, jstring libraryPath) {
   return (*env)->GetStringUTFChars(env, libraryPath, NULL);
 }

@@ -44,6 +44,7 @@ extern "C" {
 #endif
 
 jint throwException(JNIEnv *env,const char *message);
+jint throwException3(JNIEnv *env,const char *message);
 
 const char *GetString(JNIEnv *env, jstring libraryPath);
 
