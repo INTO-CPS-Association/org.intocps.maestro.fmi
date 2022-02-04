@@ -12,6 +12,8 @@ extern "C"
 #include "../jni_util.h"
 }
 
+
+
 #include <cstdio>
 /********************************************************
  * Utils
@@ -122,6 +124,7 @@ void jniFmi3CallbackLogMessage(fmi3InstanceEnvironment instanceEnvironment,
         jstring jmessage = env->NewStringUTF(message);
         auto jstatus = convertStatus(env, status);
         // call callback
+
         env->CallVoidMethod(cb.callbackObj,
                             cb.callbackMethod, jinstanceName, jstatus,
                             jcategory, jmessage);

@@ -105,3 +105,6 @@ Makefile
 *.dylib
 .idea
 .csettings/
+
+
+jnifmuapi/src/main/native/include/*.h

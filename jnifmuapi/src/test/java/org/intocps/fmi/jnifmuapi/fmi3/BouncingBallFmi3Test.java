@@ -58,17 +58,13 @@ public class BouncingBallFmi3Test {
         final Fmi3Status[] status_ = new Fmi3Status[1];
         final String[] category_ = new String[1];
         final String[] message_ = new String[1];
-        ILogMessageCallback lm = new ILogMessageCallback() {
-
-            @Override
-            public void logMessage(String instanceName, Fmi3Status status, String category, String message) {
-                instanceName_[0] = instanceName;
-                status_[0] = status;
-                category_[0] = category;
-                message_[0] = message;
-                System.out.println(String.format("Received log message:\n" + "instanceName: %s\n" + "Status: %s\n" + "Category: %s\n" + "Message: %s",
-                        instanceName, status.name(), category, message));
-            }
+        ILogMessageCallback lm = (instanceName, status, category, message) -> {
+            instanceName_[0] = instanceName;
+            status_[0] = status;
+            category_[0] = category;
+            message_[0] = message;
+            System.out.printf("Received log message:\n" + "instanceName: '%s'\n" + "Status: '%s'\n" + "Category: '%s'\n" + "Message: '%s'%n",
+                    instanceName, status.name(), category, message);
         };
         IFmi3Instance instance = f.instantiateCoSimulation("Bouncing Ball", FMU_GUID, null, false, false, false, false, null, 0, 0, lm, null);
         Assert.assertNotNull("Instantiate returned null", instance);

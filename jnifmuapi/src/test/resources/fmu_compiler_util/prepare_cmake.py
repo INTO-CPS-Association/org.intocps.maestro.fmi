@@ -38,6 +38,12 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 import shutil
 import platform
+import os
+
+default_platform=str(platform.machine()) + '-' + str(platform.system()).lower()
+if 'AMD64' in default_platform:
+    default_platform='x86_64-' + str(platform.system()).lower()
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--build-description', dest='build', type=str, required=False)
@@ -46,14 +52,14 @@ parser.add_argument('--template-dir', dest="template_dir", type=str, required=Tr
 parser.add_argument('--output-dir', dest='output', type=str, required=True)
 parser.add_argument('--fmi-headers', dest='fmi', type=str, required=True)
 parser.add_argument('--platform', dest='platform', type=str,
-                    default=str(platform.machine()) + '-' + str(platform.system()).lower())
+                    default=default_platform)
 
 args = parser.parse_args()
 
 
 def make_output_relative(input_path_name):
     p = Path(input_path_name)
-    return str(Path(args.build).parent / p)
+    return str(Path(args.build).parent / p).replace('\\','/') #.replace('/', '\\' if os.name == 'nt' else '/')
 
 
 if args.build:
@@ -79,7 +85,7 @@ if args.build:
 
             includes = [make_output_relative(e.attrib['name']) for e in
                         source_file_set.findall("./IncludeDirectory")]
-            includes.append(args.fmi)
+            includes.append(make_output_relative(args.fmi))
 
             sources = [make_output_relative(e.attrib['name']) for e in source_file_set.findall("./SourceFile")]
 
@@ -91,12 +97,14 @@ if args.build:
 
             define_string = " ".join([str(d[0]) + ("=" + str(d[1]) if d[1] else "") for d in defines])
 
-            cmkae_lines += 'add_library("%s" OBJECT %s)\n' % (
-                target_name, " ".join(sources))
+            def quoted(list):
+                return ['"'+str(s)+'"' for s in list]
+
+            cmkae_lines += 'add_library("%s" OBJECT %s)\n' % (target_name, " ".join(quoted(sources)))
 
             cmkae_lines += 'set_target_properties("%s" PROPERTIES POSITION_INDEPENDENT_CODE ON, PREFIX "")\n' % target_name
             if len(includes) > 0:
-                cmkae_lines += 'target_include_directories("%s" PUBLIC %s)\n' % (target_name, " ".join(includes))
+                cmkae_lines += 'target_include_directories("%s" PUBLIC %s)\n' % (target_name, " ".join(quoted(includes)))
 
             if language and 'C++' in language:
                 cmkae_lines += 'set_property(TARGET %s PROPERTY CXX_STANDARD %s)\n' % (target_name, language[3:])

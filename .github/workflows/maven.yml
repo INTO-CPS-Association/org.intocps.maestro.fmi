@@ -39,21 +39,31 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'true'
+
       - name: ubuntu add 32bit compiler
         run: sudo apt-get update && sudo apt-get install gcc-multilib
         if: matrix.platform == 'x32' && matrix.os == 'ubuntu-latest'
+
       - name: Set up Java x64
         if: matrix.platform == 'x64'
         uses: actions/setup-java@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           architecture: x64
+
       - name: Set up Java x32
         if: matrix.platform == 'x86'
         uses: actions/setup-java@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           architecture: x32
+
+      - name: Put MSYS2_MinGW64 on PATH for windows
+        if: matrix.os == 'windows-latest'
+        # there is not yet an environment variable for this path from msys2/setup-msys2
+        # We need this to get a gcc 11.2 that is new enough to compile the reference FMU3
+        run: echo "C:\msys64/mingw64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet
       #      - name: Alter path
@@ -62,9 +72,11 @@ jobs:
       - name: Maven Build x32
         run: mvn -B package --file pom.xml -Pmake32
         if: matrix.platform == 'x32'
+
       - name: Maven Build x64
         run: mvn -B package --file pom.xml -Pmake
         if: matrix.platform == 'x64'
+
       - name: artifact
         uses: actions/upload-artifact@v2
         with:
@@ -77,6 +89,16 @@ jobs:
             jnifmuapi/target/fmus/**/*.dylib
             jnifmuapi/target/fmus/**/*.dll
           retention-days: 1
+
+  #      - name: artifact
+  #        if: always() && matrix.os == 'windows-latest'
+  #        uses: actions/upload-artifact@v2
+  #        with:
+  #          name: bblog
+  #          path: |
+  #
+  #            jnifmuapi/target/fmus/*
+  #          retention-days: 1
 
   pack:
     runs-on: ubuntu-latest
@@ -95,16 +117,20 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           architecture: x64
+
       - name: Set up Java x32
         if: matrix.platform == 'x86'
         uses: actions/setup-java@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           architecture: x32
+
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet
+
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+
       - name: upload jnifmuapi
         uses: actions/upload-artifact@v2
         with:
