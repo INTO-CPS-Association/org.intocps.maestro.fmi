@@ -13,7 +13,7 @@
 
     <groupId>org.intocps.fmi</groupId>
     <artifactId>root</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>${revision}${sha1}${changelist}</version>
 
     <name>The FMI interface and implementations</name>
     <packaging>pom</packaging>
@@ -26,6 +26,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <revision>1.3.0</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <sha1/>
     </properties>
 
     <dependencyManagement>
@@ -79,7 +82,19 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>com.outbrain.swinfra</groupId>
+                <artifactId>ci-friendly-flatten-maven-plugin</artifactId>
+                <version>1.0.14</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
 
@@ -266,6 +281,7 @@
                 <version>2.4</version>
             </extension>
         </extensions>
+
     </build>
 
     <scm>
@@ -280,6 +296,13 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>au-artifactory-snapshots</id>
+            <name>overture.au.dk-snapshots</name>
+            <url>https://overture.au.dk/artifactory/into-cps</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <developers>
 
