@@ -6,7 +6,7 @@ name: jnifmuapi
 on: [ workflow_dispatch, push, pull_request ]
 env:
   JAVA_VERSION: 1.8
-  SERVER_ID: snapshots
+  SERVER_ID: au-artifactory-snapshots
   PYTHON_VERSION: '3.9.9'
 
 
@@ -100,12 +100,16 @@ jobs:
   #            jnifmuapi/target/fmus/*
   #          retention-days: 1
 
-  pack:
+  final:
     runs-on: ubuntu-latest
 
     needs: build
     steps:
       - uses: actions/checkout@v2
+
+      - name: Environment variables
+        run: echo ${{ env.SERVER_ID }}
+
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v2
         with:
@@ -125,11 +129,42 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           architecture: x32
 
+      - name: Deploy server
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          server-id: ${{ env.SERVER_ID }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+
       - name: Maven download
         run: mvn validate dependency:resolve-plugins -B --quiet
 
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+
+      - name: Maven Deploy
+        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' || github.ref != 'refs/heads/master' )
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae
+        env:
+          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Maven Deploy SNAPSHOT
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/development' )
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1= -Dmaven.test.skip=true -DskipITs -fae
+        env:
+          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Maven Deploy RELEASE
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' )
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae
+        env:
+          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
 
       - name: upload jnifmuapi
         uses: actions/upload-artifact@v2
@@ -139,4 +174,6 @@ jobs:
             jnifmuapi/target/jnifmuapi-*-SNAPSHOT.jar
             fmi2/target/fmi2-*-SNAPSHOT.jar
           retention-days: 5
+
+
 
