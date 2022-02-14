@@ -121,7 +121,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: lib
-          path: jnifmuapi/target/classes
+          path: jnifmuapi/target/classes/lib
       - name: Set up Java x64
         if: matrix.platform == 'x64'
         uses: actions/setup-java@v1
