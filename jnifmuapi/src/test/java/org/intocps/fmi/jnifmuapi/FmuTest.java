@@ -89,13 +89,4 @@ public class FmuTest {
     }
 
 
-    @Test
-    public void testNativeVersion() {
-
-        String apiVersion = Fmu.getJniApiVersion();
-        Assert.assertTrue("Library should have been loaded", NativeFmuLibraryLoader.isNativeApiLoaded());
-        Assert.assertEquals("2.0.0", apiVersion);
-
-    }
-
 }

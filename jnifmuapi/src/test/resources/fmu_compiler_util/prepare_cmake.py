@@ -53,9 +53,21 @@ parser.add_argument('--output-dir', dest='output', type=str, required=True)
 parser.add_argument('--fmi-headers', dest='fmi', type=str, required=True)
 parser.add_argument('--platform', dest='platform', type=str,
                     default=default_platform)
+parser.add_argument('--fmi-bin-platform-version', dest='bin_platform_version', type=int,default=3)
+
 
 args = parser.parse_args()
 
+fmi_bin_platform=args.platform
+
+if args.bin_platform_version<3:
+    # we just do a simple mapping from 3 to 2
+    if args.platform=='x86_64-darwin':
+        fmi_bin_platform='darwin64'
+    elif args.platform=='x86_64-linux':
+        fmi_bin_platform='linux64'
+    elif args.platform=='x86_64-windows':
+            fmi_bin_platform='win64'
 
 def make_output_relative(input_path_name):
     p = Path(input_path_name)
@@ -119,7 +131,7 @@ if args.build:
         cmkae_lines += 'set_target_properties("%s" PROPERTIES POSITION_INDEPENDENT_CODE ON, PREFIX "")\n' % model_identifier
         cmkae_lines += 'target_link_libraries("%s" %s)\n' % (
             model_identifier, " ".join([model_identifier + "_" + str(idx) for idx, n in enumerate(source_file_sets)]))
-        cmkae_lines += 'SET(output_folder "%s")\n' % args.platform
+        cmkae_lines += 'SET(output_folder "%s")\n' % fmi_bin_platform
 
         # dump ##GENERATED##
         with open(Path(args.template_dir) / 'CMakeLists_template3.txt', 'r') as file:

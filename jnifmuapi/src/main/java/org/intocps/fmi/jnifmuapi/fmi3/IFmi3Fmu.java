@@ -29,24 +29,21 @@ public interface IFmi3Fmu {
 
     String getVersion() throws FmiInvalidNativeStateException;
 
-    String getTypesPlatform() throws FmiInvalidNativeStateException;
 
     InputStream getModelDescription() throws ZipException, IOException;
 
     boolean isValid();
 
     IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn,
-            //            fmi3InstanceEnvironment    instanceEnvironment,
-            ILogMessageCallback logMessage);
+            boolean loggingOn, ILogMessageCallback logMessage);
 
     IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, String resourceLocation, boolean visible, boolean loggingOn,
-            boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables, int nRequiredIntermediateVariables,
-            long instanceEnvironment, ILogMessageCallback logMessage, IIntermediateUpdateCallback intermediateUpdate);
+            boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables, ILogMessageCallback logMessage,
+            IIntermediateUpdateCallback intermediateUpdate);
 
     IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, long[] requiredIntermediateVariables, int nRequiredIntermediateVariables,
-            //   fmi3InstanceEnvironment        instanceEnvironment,
-            ILogMessageCallback logMessage, IIntermediateUpdateCallback intermediateUpdate, ILockPreemptionCallback lockPreemption,
+            boolean loggingOn, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate, ILockPreemptionCallback lockPreemption,
             IUnlockPreemptionCallback unlockPreemption);
+
+
 }

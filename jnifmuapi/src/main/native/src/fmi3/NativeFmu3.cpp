@@ -23,11 +23,12 @@ extern "C"
 * Method:    getJniApiVersion
 * Signature: ()J
 */
-__attribute__((unused)) JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_getJniApiVersion
+__attribute__((unused)) JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nGetJniApiFmiVersion
         (JNIEnv *env, jclass) {
-    jstring result = env->NewStringUTF(PROJECT_VER);
+    jstring result = env->NewStringUTF(fmi3Version);
     return result;
 }
+
 
 __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nLoadLibrary(
         JNIEnv *env, __attribute__((unused)) jobject obj, jstring libraryPath) {
@@ -239,11 +240,55 @@ __attribute__((unused)) JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZJLorg/intocps/fmi3/jnifmuapi/NativeFmu3/ICallbackLogMessage;)J
  */
 __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateModelExchange
-        (JNIEnv *, jobject, __attribute__((unused)) jlong fmuPtr, jstring, jstring, jstring, jboolean, jboolean, jlong,
-         jobject) {
+        (JNIEnv *env, __attribute__((unused)) jobject obj,jlong fmuPtr, jstring name, jstring instantiationToken, jstring resourceLocation, jboolean visible, jboolean loggingOn,
+         jobject logMessage) {
+//long fmuPtr, String instanceName, String instantiationToken, String resourceLocation,
+//            boolean visible, boolean loggingOn, long instanceEnvironment, ILogMessageCallback logMessage
+    auto fmuNode = getFmuPtr(fmuPtr);
+    const char *instanceName = GetString(env, name);
+    const char *fmuResourceLocation = nullptr;
+    if (resourceLocation != nullptr)
+        fmuResourceLocation = GetString(env, resourceLocation);
+    const char *guid = GetString(env, instantiationToken);
+    auto node = new Fmi3InstanceNode();
+    node->type = CoSimulation;
+    node->name = string(instanceName);
 
-    return (jlong) nullptr;
+    //callback: jobject logMessage
+    if (logMessage != nullptr) {
+        node->callback_logMessage = createBasicCallback(env, logMessage, "logMessage",
+                                                        "(Ljava/lang/String;Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3Status;Ljava/lang/String;Ljava/lang/String;)V");
+        node->callback_logMessage.logMessage = jniFmi3CallbackLogMessage;
 
+    }
+
+    if (env->ExceptionCheck()) {
+        printf("exception\n");
+        env->ExceptionDescribe();
+    }
+
+    auto instance = fmuNode->fmi3InstantiateModelExchange(instanceName, guid, fmuResourceLocation, visible,
+                                                         loggingOn, node,
+                                                         node->callback_logMessage.logMessage);
+    if (instance != nullptr) {
+        Fmi3Manager::getInstance()->store(instance, node);
+    } else {
+        delete node;
+    }
+
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        throwException3(env, "exception - 2\n");
+    }
+    env->ReleaseStringUTFChars(name, instanceName);
+    if (fmuResourceLocation != nullptr) {
+        env->ReleaseStringUTFChars(resourceLocation, fmuResourceLocation);
+    }
+    if (guid != nullptr) {
+        env->ReleaseStringUTFChars(instantiationToken, guid);
+    }
+
+    return (jlong) instance;
 }
 
 /*
@@ -256,7 +301,7 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
          jstring resourceLocation,
          jboolean visible, jboolean loggingOn, jboolean eventModeUsed, jboolean earlyReturnAllowed,
          jlongArray requiredIntermediateVariables,
-         jlong nRequiredIntermediateVariables, jlong instanceEnvironment, jobject logMessage,
+         jlong nRequiredIntermediateVariables, jobject logMessage,
          jobject intermediateUpdate) {
     auto fmuNode = getFmuPtr(fmuPtr);
     const char *instanceName = GetString(env, name);
@@ -448,7 +493,7 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateScheduledExecution
          jstring resourceLocation,
          jboolean visible,
          jboolean loggingOn,
-         jlong instanceEnvironment,
+
          jobject logMessage, jobject clockUpdate, jobject lockPreemption, jobject unlockPreemption) {
     auto fmuNode = getFmuPtr(fmuPtr);
     const char *instanceName = GetString(env, name);

@@ -226,14 +226,56 @@
                                 <phase>process-test-classes</phase>
                                 <configuration>
                                     <target>
-
+                                        <!-- FMI2 API FUNCTION TEST -->
                                         <exec executable="python3"
                                               failonerror="true">
                                             <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
                                             <arg value="--build-description"/>
-                                            <arg value="${project.basedir}/src/test/resources/fmus/bouncingball/sources/buildDescription.xml"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi2/fmi2functiontest/sources/buildDescription.xml"/>
                                             <arg value="--model-description"/>
-                                            <arg value="${project.basedir}/src/test/resources/fmus/bouncingball/modelDescription.xml"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi2/fmi2functiontest/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi2/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi2/fmi2functiontest"/>
+                                            <arg value="--fmi-bin-platform-version"/>
+                                            <arg value="2"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                              executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="."/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                              executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi2/fmi2functiontest.zip"
+                                             basedir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
+
+
+                                        <!-- Bouncing ball -->
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/bouncingball/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/bouncingball/modelDescription.xml"/>
                                             <arg value="--template-dir"/>
                                             <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
                                             <arg value="--fmi-headers"/>
@@ -260,6 +302,50 @@
                                             <arg value="-j12"/>
                                             <arg value="--always-make"/>
                                         </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/bounchingball.zip"
+                                             basedir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
+
+
+                                        <!-- FMI3 API FUNCTION TEST -->
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/fmi3functiontest/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/fmi3functiontest/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi3/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi3/fmi3functiontest"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                              executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="."/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                              executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/fmi3functiontest.zip"
+                                             basedir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
                                     </target>
                                 </configuration>
                                 <goals>

@@ -62,7 +62,6 @@ target/
 .metadata/
 .classpath
 .settings/
-.metadata/
 .project
 .cproject
 bin
@@ -108,3 +107,4 @@ Makefile
 
 
 jnifmuapi/src/main/native/include/*.h
+/.java-version

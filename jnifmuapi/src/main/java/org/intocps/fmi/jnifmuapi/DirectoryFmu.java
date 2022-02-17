@@ -218,6 +218,11 @@ class DirectoryFmu extends NativeFmu implements IFmu {
         }
     }
 
+    /**
+     * Return the FMI version that the JNI API is implementing
+     *
+     * @return the version of FMI
+     */
     public static String getJniApiVersion() {
         NativeFmuLibraryLoader.loadNativeApi();
 

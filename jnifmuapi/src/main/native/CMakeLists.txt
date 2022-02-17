@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.3)
 project(fmuapi
-        VERSION 2.0.0
+        VERSION 3.0.0
         LANGUAGES C CXX
         )
 
