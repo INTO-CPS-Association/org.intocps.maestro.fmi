@@ -654,7 +654,7 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nGetAdjointDerivative
  */
 __attribute__((unused)) JNIEXPORT jobject JNICALL
 Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nEnterConfigurationMode
-        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong instancePtr, jlong fmuPtr) {
+        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jlong instancePtr) {
 
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
@@ -671,7 +671,7 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nEnterConfigurationMode
  */
 __attribute__((unused)) JNIEXPORT jobject JNICALL
 Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nExitConfigurationMode
-        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong instancePtr, jlong fmuPtr) {
+        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jlong instancePtr) {
 
     fmi3Instance instancePtr_ = getInstancePtr(instancePtr);
     FMU3 *fmuPtr_ = getFmuPtr(fmuPtr);
@@ -1014,7 +1014,7 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nGetDerivatives
  */
 __attribute__((unused)) JNIEXPORT jobject JNICALL
 Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nGetEventIndicators
-        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jlong instancePtr, jlong fmuInstance,
+        (JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuPtr, jlong instancePtr,
          jdoubleArray eventIndicators,
          jint nEventIndicators) {
 
