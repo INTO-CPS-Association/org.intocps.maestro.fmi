@@ -132,12 +132,15 @@ typedef enum {
 #define MASK_fmi2GetBooleanStatus        MASK_fmi2GetStatus
 #define MASK_fmi2GetStringStatus         MASK_fmi2GetStatus
 
+#define MAX_DERIVATIVE_ORDER 3
 typedef struct {
     fmi2Real    *r;
     fmi2Integer *i;
     fmi2Boolean *b;
     fmi2String  *s;
     fmi2Boolean *isPositive;
+
+    fmi2Real	**derivatives;
 
     fmi2Real time;
     fmi2String instanceName;

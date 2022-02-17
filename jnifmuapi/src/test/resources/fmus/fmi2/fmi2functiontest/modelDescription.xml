@@ -3,17 +3,46 @@
         fmiVersion="2.0"
         modelName="fmi2functiontest"
         guid="{8c4e810f-3df3-4a00-8276-176fa3c9f000}"
+        description="A test FMU to test the JNI interface"
+        author="Kenneth Lausdahl"
+        version="1.0.0"
+        copyright="AU"
+        license="MIT"
+        generationTool="gcc"
+        generationDateAndTime="2009-12-08T14:33:22Z"
+        variableNamingConvention="flat"
         numberOfEventIndicators="0">
 
     <CoSimulation
             modelIdentifier="fmi2functiontest"
-            canHandleVariableCommunicationStepSize="true"/>
+            canHandleVariableCommunicationStepSize="true"
+            needsExecutionTool="false"
+            canInterpolateInputs="false"
+            maxOutputDerivativeOrder="false"
+            canRunAsynchronuously="false"
+            canBeInstantiatedOnlyOncePerProcess="false"
+            canNotUseMemoryManagementFunctions="false"
+            canGetAndSetFMUstate="false"
+            canSerializeFMUstate="false"
+            providesDirectionalDerivative="false"/>
 
     <LogCategories>
-        <Category name="logAll"/>
+
         <Category name="logError"/>
         <Category name="logFmiCall"/>
         <Category name="logEvent"/>
+
+        <!-- standard categories -->
+        <Category name="logEvents"/>
+        <Category name="logSingularLinearSystems"/>
+        <Category name="logNonlinearSystems"/>
+        <Category name="logDynamicStateSelection"/>
+        <Category name="logStatusWarning"/>
+        <Category name="logStatusDiscard"/>
+        <Category name="logStatusError"/>
+        <Category name="logStatusFatal"/>
+        <Category name="logStatusPending"/>
+        <Category name="logAll"/>
     </LogCategories>
 
     <ModelVariables>
@@ -55,6 +84,14 @@
         </ScalarVariable>
 
         <ScalarVariable name="valve" valueReference="4"
+                        description="the tank valve state"
+                        causality="output"
+                        variability="tunable"
+                        initial="calculated">
+            <Boolean/>
+        </ScalarVariable>
+
+        <ScalarVariable name="valve2" valueReference="4"
                         description="the tank valve state"
                         causality="output"
                         variability="tunable"

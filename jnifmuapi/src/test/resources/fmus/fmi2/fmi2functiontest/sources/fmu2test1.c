@@ -6,16 +6,23 @@
  * Copyright QTronic GmbH. All rights reserved.
  * ---------------------------------------------------------------------------*/
 
-#define FMI_COSIMULATION
+
 // define class name and unique id
-#define MODEL_IDENTIFIER fmu2test1
-#define MODEL_GUID "{8c4e810f-3df3-4a00-8276-176fa3c9f000}"
+#ifndef MODEL_GUID
+	#define MODEL_GUID "{8c4e810f-3df3-4a00-8276-176fa3c9f000}"
+#endif
+
+#ifndef MODEL_IDENTIFIER
+	#define MODEL_IDENTIFIER fmu2test1
+#endif
+//#define MODEL_IDENTIFIER fmu2test1
+//#define MODEL_GUID "{8c4e810f-3df3-4a00-8276-176fa3c9f000}"
 
 // define model size
 #define NUMBER_OF_REALS 4
-#define NUMBER_OF_INTEGERS 0
+#define NUMBER_OF_INTEGERS 1
 #define NUMBER_OF_BOOLEANS 5
-#define NUMBER_OF_STRINGS 0
+#define NUMBER_OF_STRINGS 1
 #define NUMBER_OF_STATES 1
 #define NUMBER_OF_EVENT_INDICATORS 0
 
@@ -39,8 +46,8 @@
 // Set values for all variables that define a start value
 // Settings used unless changed by fmi2SetX before fmi2EnterInitializationMode
 void setStartValues(ModelInstance *comp) {
-    r(x_) = 1;
-    r(k_) = 1;
+  //  r(x_) = 1;
+  //  r(k_) = 1;
 }
 
 // called by fmi2GetReal, fmi2GetInteger, fmi2GetBoolean, fmi2GetString, fmi2ExitInitialization
@@ -66,7 +73,7 @@ fmi2Real getReal(ModelInstance* comp, fmi2ValueReference vr){
 
 // used to set the next time event, if any.
 void eventUpdate(ModelInstance *comp, fmi2EventInfo *eventInfo, int isTimeEvent) {
-} 
+}
 
 #define VALVE_ID 4
 #define LEVEL_ID 3
@@ -76,14 +83,14 @@ void eventUpdate(ModelInstance *comp, fmi2EventInfo *eventInfo, int isTimeEvent)
 
 fmi2Status fmi2DoStepInternal(ModelInstance *comp, fmi2Real currentCommunicationPoint,
 	fmi2Real communicationStepSize, fmi2Boolean noSetFMUStatePriorToCurrentPoint){
-	
-	
+
+
 	fmi2Real levelMax = comp->r[LEVEL_MAX_ID];
 	fmi2Real level = comp->r[LEVEL_ID];
 #ifdef DEBUG_PRINT
-	printf("\tinternal step controller,\n\t level is: %.16g",level);
+/*	printf("\tinternal step controller,\n\t level is: %.16g",level);
 	printf(" min: %d", LEVEL_MIN);
-	printf(" max: %f\n", levelMax);
+	printf(" max: %f\n", levelMax);*/
 	//comp->b[VALVE_ID] = !comp->b[VALVE_ID];
 #endif
 	if (level >= levelMax)
@@ -104,12 +111,11 @@ fmi2Status fmi2DoStepInternal(ModelInstance *comp, fmi2Real currentCommunication
 	{
 		comp->b[VALVE_ID] = fmi2True;
 	}*/
-	
+
 //	printf(comp->time);
 	return fmi2OK;
 }
 
 // include code that implements the FMI based on the above definitions
 #include "fmuTemplate.c"
-
 
