@@ -41,7 +41,6 @@ import org.intocps.fmi.IFmiComponent;
 import org.junit.*;
 
 import java.io.File;
-import java.io.IOException;
 
 public abstract class BaseFmuComponent {
 
@@ -49,13 +48,9 @@ public abstract class BaseFmuComponent {
     protected IFmiComponent comp;
 
     @BeforeClass
-    public static void setupFmu() throws IOException, FmuInvocationException, FmuMissingLibraryException {
+    public static void setupFmu() throws FmuInvocationException, FmuMissingLibraryException {
         fmu = new Fmu(new File(TestUtils.DUMMY_FMU_PATH), TestUtils.TEST_EXTRACT_DIR);
-
-        // fmu.unPack();
-        // fmu.load();
-
-        fmu.lifeCycle.internalLoad(TestUtils.getLibraryPath());
+        fmu.load();
     }
 
     @AfterClass

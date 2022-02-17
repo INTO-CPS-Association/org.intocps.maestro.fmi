@@ -53,8 +53,7 @@ public class LoadInstantiateFreeUnloadTest {
         IFmiComponent comp;
 
         fmu = new Fmu(new File(TestUtils.DUMMY_FMU_PATH), TestUtils.TEST_EXTRACT_DIR);
-        fmu.lifeCycle.internalLoad(TestUtils.getLibraryPath());
-
+        fmu.load();
         for (int i = 0; i < 10; i++) {
 
             // setup

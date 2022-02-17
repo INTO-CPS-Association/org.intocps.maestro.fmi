@@ -108,3 +108,4 @@ Makefile
 
 jnifmuapi/src/main/native/include/*.h
 /.java-version
+*.ci-friendly-pom.xml

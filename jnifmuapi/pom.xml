@@ -263,7 +263,7 @@
                                             <arg value="--always-make"/>
                                         </exec>
 
-                                        <zip destfile="${project.build.directory}/fmus/fmi2/fmi2functiontest.zip"
+                                        <zip destfile="${project.build.directory}/fmus/fmi2/fmi2functiontest.fmu"
                                              basedir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
                                              excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
 
@@ -303,7 +303,7 @@
                                             <arg value="--always-make"/>
                                         </exec>
 
-                                        <zip destfile="${project.build.directory}/fmus/fmi3/bounchingball.zip"
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/bounchingball.fmu"
                                              basedir="${project.build.directory}/fmus/fmi3/bounchingball"
                                              excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
 
@@ -343,7 +343,7 @@
                                             <arg value="--always-make"/>
                                         </exec>
 
-                                        <zip destfile="${project.build.directory}/fmus/fmi3/fmi3functiontest.zip"
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/fmi3functiontest.fmu"
                                              basedir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
                                              excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
                                     </target>

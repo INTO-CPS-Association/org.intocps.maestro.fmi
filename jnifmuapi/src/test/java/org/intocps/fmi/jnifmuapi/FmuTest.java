@@ -45,19 +45,13 @@ import org.junit.Test;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 
-// Before running these tests extract the latest fmi.native lib. Place it in jnifmuapi/src/test/resources/lib/<PLATFORM>/
-// See https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi
 public class FmuTest {
     Fmu fmu;
 
     @Before
     public void setup() throws Exception {
         fmu = new Fmu(new File(TestUtils.DUMMY_FMU_PATH), TestUtils.TEST_EXTRACT_DIR);
-
-        // fmu.unPack();
-        // fmu.load();
-        fmu.lifeCycle.internalLoad(TestUtils.getLibraryPath());
-
+        fmu.load();
     }
 
     @After
