@@ -10,9 +10,9 @@ package org.intocps.fmi.jnifmuapi.fmi3;
 //    } fmi3Status;
 /* end::Status[] */
 public enum Fmi3Status {
-    fmi3OK,
-    fmi3Warning,
-    fmi3Discard,
-    fmi3Error,
-    fmi3Fatal
+    OK,
+    Warning,
+    Discard,
+    Error,
+    Fatal
 }

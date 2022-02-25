@@ -73,7 +73,7 @@ public class BouncingBallFmi3Test {
             fmi3Instance = (Fmi3Instance) instance;
         }
         Fmi3Status status = fmi3Instance.terminate();
-        Fmi3Status expectedFmi3Status = Fmi3Status.fmi3Error;
+        Fmi3Status expectedFmi3Status = Fmi3Status.Error;
         Assert.assertEquals("Terminate result status did not match", expectedFmi3Status, status);
         Assert.assertEquals("Log Instance name did not match", "Bouncing Ball", instanceName_[0]);
         Assert.assertEquals("Log Fmi3Status did not match", expectedFmi3Status, status_[0]);

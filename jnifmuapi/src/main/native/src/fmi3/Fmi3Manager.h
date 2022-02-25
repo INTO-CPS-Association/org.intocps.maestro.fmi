@@ -62,8 +62,8 @@ public:
     CallbackJniInfo callback_unlockPreemption;
     Fmi3Node* owner;
     std::string name;
+    fmi3Instance instance;
     ~Fmi3InstanceNode() {
-
     }
 };
 
@@ -88,9 +88,9 @@ public:
     void freeInstance(fmi3Instance instance);
 };
 
-FMU3 *getFmuPtr(jlong fmuPtr);
+Fmi3Node *getFmuNodePtr(jlong fmuNodePtr);
 
-fmi3Instance getInstancePtr(jlong compPtr);
+Fmi3InstanceNode* getInstancePtr(jlong instanceNodePtr);
 
 jobject convertStatus(JNIEnv *env, fmi3Status status);
 void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyKind *dependencyKinds, jobjectArray jDependencyKinds, jsize len);
@@ -118,6 +118,7 @@ return vr_arr;\
 
 
 COPY_ARRAY_TEMPLATE(jlong,Long,long)
+
 COPY_ARRAY_TEMPLATE(jlong,Long,uint)
 COPY_ARRAY_TEMPLATE(jint,Int,int)
 COPY_ARRAY_TEMPLATE(jdouble,Double,long)
@@ -150,10 +151,10 @@ COPY_TO_JNI_ARRAY(float,Double,jdouble)
 
 COPY_TO_JNI_ARRAY(fmi3Float32,Float,jfloat)
 COPY_TO_JNI_ARRAY(fmi3Float64,Double,jdouble)
-COPY_TO_JNI_ARRAY(fmi3Int8,Int,jint)
-COPY_TO_JNI_ARRAY(fmi3UInt8,Int,jint)
-COPY_TO_JNI_ARRAY(fmi3Int16,Int,jint)
-COPY_TO_JNI_ARRAY(fmi3UInt16,Int,jint)
+COPY_TO_JNI_ARRAY(fmi3Int8,Byte,jbyte)
+COPY_TO_JNI_ARRAY(fmi3UInt8,Byte,jbyte)
+COPY_TO_JNI_ARRAY(fmi3Int16,Short,jshort)
+COPY_TO_JNI_ARRAY(fmi3UInt16,Short,jshort)
 COPY_TO_JNI_ARRAY(fmi3Int32,Int,jint)
 COPY_TO_JNI_ARRAY(fmi3UInt32,Int,jint)
 COPY_TO_JNI_ARRAY(fmi3Int64,Long,jlong)
@@ -176,10 +177,10 @@ COPY_TO_JNI_ARRAY(fmi3Binary,Long,jlong)
 
 COPY_FROM_JNI_ARRAY(fmi3Float32,Float,jfloat)
 COPY_FROM_JNI_ARRAY(fmi3Float64,Double,jdouble)
-COPY_FROM_JNI_ARRAY(fmi3Int8,Int,jint)
-COPY_FROM_JNI_ARRAY(fmi3UInt8,Int,jint)
-COPY_FROM_JNI_ARRAY(fmi3Int16,Int,jint)
-COPY_FROM_JNI_ARRAY(fmi3UInt16,Int,jint)
+COPY_FROM_JNI_ARRAY(fmi3Int8,Byte,jbyte)
+COPY_FROM_JNI_ARRAY(fmi3UInt8,Byte,jbyte)
+COPY_FROM_JNI_ARRAY(fmi3Int16,Short,jshort)
+COPY_FROM_JNI_ARRAY(fmi3UInt16,Short,jshort)
 COPY_FROM_JNI_ARRAY(fmi3Int32,Int,jint)
 COPY_FROM_JNI_ARRAY(fmi3UInt32,Int,jint)
 COPY_FROM_JNI_ARRAY(fmi3Int64,Long,jlong)

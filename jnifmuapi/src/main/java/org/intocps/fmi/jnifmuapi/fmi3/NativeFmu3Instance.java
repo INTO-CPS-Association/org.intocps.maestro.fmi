@@ -42,23 +42,23 @@ public class NativeFmu3Instance {
 
     /* Getting and setting variable values */
     /* tag::Getters[] */
-    native Fmi3Status nGetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi3Status nGetFloat32(long instance, long valueReferences[], int nValueReferences, float values[], int nValues);
 
     native Fmi3Status nGetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native Fmi3Status nGetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nGetInt8(long instance, long valueReferences[], int nValueReferences, byte values[], int nValues);
 
-    native Fmi3Status nGetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nGetUInt8(long instance, long valueReferences[], int nValueReferences, byte values[], int nValues);
 
-    native Fmi3Status nGetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nGetInt16(long instance, long valueReferences[], int nValueReferences, short values[], int nValues);
 
-    native Fmi3Status nGetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nGetUInt16(long instance, long valueReferences[], int nValueReferences, short values[], int nValues);
 
     native Fmi3Status nGetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
     native Fmi3Status nGetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native Fmi3Status nGetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nGetInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 
     native Fmi3Status nGetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 
@@ -66,27 +66,27 @@ public class NativeFmu3Instance {
 
     native Fmi3Status nGetString(long instance, long valueReferences[], int nValueReferences, String values[], int nValues);
 
-    native Fmi3Status nGetBinary(long instance, long valueReferences[], int nValueReferences, long sizes[], byte values[], int nValues);
+    native Fmi3Status nGetBinary(long instance, long valueReferences[], int nValueReferences, byte values[][], int nValues);
     /* end::Getters[] */
 
     /* tag::Setters[] */
-    native Fmi3Status nSetFloat32(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
+    native Fmi3Status nSetFloat32(long instance, long valueReferences[], int nValueReferences, float values[], int nValues);
 
     native Fmi3Status nSetFloat64(long instance, long valueReferences[], int nValueReferences, double values[], int nValues);
 
-    native Fmi3Status nSetInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nSetInt8(long instance, long valueReferences[], int nValueReferences, byte values[], int nValues);
 
-    native Fmi3Status nSetUInt8(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nSetUInt8(long instance, long valueReferences[], int nValueReferences, byte values[], int nValues);
 
-    native Fmi3Status nSetInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nSetInt16(long instance, long valueReferences[], int nValueReferences, short values[], int nValues);
 
-    native Fmi3Status nSetUInt16(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nSetUInt16(long instance, long valueReferences[], int nValueReferences, short values[], int nValues);
 
     native Fmi3Status nSetInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
     native Fmi3Status nSetUInt32(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
 
-    native Fmi3Status nSetInt64(long instance, long valueReferences[], int nValueReferences, int values[], int nValues);
+    native Fmi3Status nSetInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 
     native Fmi3Status nSetUInt64(long instance, long valueReferences[], int nValueReferences, long values[], int nValues);
 

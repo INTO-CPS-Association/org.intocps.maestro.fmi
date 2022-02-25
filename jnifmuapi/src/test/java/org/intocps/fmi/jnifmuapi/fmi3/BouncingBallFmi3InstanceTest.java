@@ -83,11 +83,11 @@ public class BouncingBallFmi3InstanceTest {
     public void terminate() throws Exception {
 
         Fmi3Status status = instance.terminate();
-        Assert.assertEquals("Terminate result status did not match", Fmi3Status.fmi3Error, status);
+        Assert.assertEquals("Terminate result status did not match", Fmi3Status.Error, status);
         Assert.assertEquals("One log entry expected", 1, logData.size());
         Object[] logEntry = logData.get(0);
         Assert.assertEquals("Log Instance name did not match", "Bouncing Ball", logEntry[0]);
-        Assert.assertEquals("Log Fmi3Status did not match", Fmi3Status.fmi3Error, logEntry[1]);
+        Assert.assertEquals("Log Fmi3Status did not match", Fmi3Status.Error, logEntry[1]);
         Assert.assertEquals("Log Category", "logStatusError", logEntry[2]);
         Assert.assertEquals("Log Message", "fmi3Terminate: Illegal call sequence.", logEntry[3]);
 
@@ -96,43 +96,43 @@ public class BouncingBallFmi3InstanceTest {
     @Test
     public void reset() throws Exception {
         Fmi3Status status = instance.reset();
-        Assert.assertEquals(Fmi3Status.fmi3OK, status);
+        Assert.assertEquals(Fmi3Status.OK, status);
     }
 
     @Test
     public void enterInitializationMode() throws Exception {
-        Assert.assertEquals(Fmi3Status.fmi3OK, instance.enterInitializationMode(null, 0, null));
+        Assert.assertEquals(Fmi3Status.OK, instance.enterInitializationMode(null, 0, null));
     }
 
     @Test
     public void exitInitializationMode() throws Exception {
         enterInitializationMode();
-        Assert.assertEquals(Fmi3Status.fmi3OK, instance.exitInitializationMode());
+        Assert.assertEquals(Fmi3Status.OK, instance.exitInitializationMode());
 
     }
 
     @Test
     public void enterEventMode() throws Exception {
         exitInitializationMode();
-        Assert.assertEquals(Fmi3Status.fmi3OK, instance.enterEventMode(false, false, null, false));
+        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(false, false, null, false));
     }
 
     @Test
     public void enterConfigurationMode() throws Exception {
-        Assert.assertEquals(Fmi3Status.fmi3OK, instance.enterConfigurationMode());
+        Assert.assertEquals(Fmi3Status.OK, instance.enterConfigurationMode());
     }
 
     @Test
     public void exitConfigurationMode() throws Exception {
         enterConfigurationMode();
-        Assert.assertEquals(Fmi3Status.fmi3OK, instance.exitConfigurationMode());
+        Assert.assertEquals(Fmi3Status.OK, instance.exitConfigurationMode());
     }
 
     @Test
     public void doStep() throws Exception {
         exitInitializationMode();
         FmuResult<IFmi3Instance.DoStepResult> result = instance.doStep(0.0, 0.1, false);
-        Assert.assertEquals(Fmi3Status.fmi3OK, result.status);
+        Assert.assertEquals(Fmi3Status.OK, result.status);
 
     }
 

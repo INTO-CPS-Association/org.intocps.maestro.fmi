@@ -4,22 +4,22 @@
 
 #include "Fmi3Manager.h"
 
-Fmi3Manager* Fmi3Manager::_instance;
+Fmi3Manager *Fmi3Manager::_instance;
 
-Fmi3Manager::Fmi3Manager()= default;
+Fmi3Manager::Fmi3Manager() = default;
 
-void Fmi3Manager::store(fmi3Instance instance, Fmi3InstanceNode* node) {
+void Fmi3Manager::store(fmi3Instance instance, Fmi3InstanceNode *node) {
     this->instanceToInstanceNode[instance] = node;
 }
 
-void Fmi3Manager::freeInstance(fmi3Instance instance){
+void Fmi3Manager::freeInstance(fmi3Instance instance) {
     auto instanceNode = this->getInstanceNode(instance);
-    delete(instanceNode);
+    delete (instanceNode);
     this->instanceToInstanceNode.erase(instance);
 
 }
 
-Fmi3InstanceNode* Fmi3Manager::Fmi3Manager::getInstanceNode(fmi3Instance instance) {
+Fmi3InstanceNode *Fmi3Manager::Fmi3Manager::getInstanceNode(fmi3Instance instance) {
     return this->instanceToInstanceNode[instance];
 }
 
@@ -30,7 +30,7 @@ void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
     for (i = 0; i < len; i++) {
         auto s = static_cast<jstring>(env->GetObjectArrayElement(source, i));
         jboolean blnIsCopy;
-        const char *myarray = env->GetStringUTFChars( s, &blnIsCopy);
+        const char *myarray = env->GetStringUTFChars(s, &blnIsCopy);
 
         if (myarray == nullptr) {
             throwException(env, "JNI SetString failed to get string");
@@ -39,7 +39,7 @@ void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
 
         auto slen = strlen(myarray) + 1;  // Add NULL termination
 
-        char *tmp = (char *)malloc(sizeof(char) * slen);
+        char *tmp = (char *) malloc(sizeof(char) * slen);
 
         if (tmp == nullptr) {
             throwException(env, "calloc tmp of char* failed");
@@ -48,50 +48,51 @@ void createStringToconstcharArray(JNIEnv *env, jobjectArray source,
         strcpy(tmp, myarray);
         target[i] = tmp;
 
-        env->ReleaseStringUTFChars( s, myarray);
-        env->DeleteLocalRef( s);
+        env->ReleaseStringUTFChars(s, myarray);
+        env->DeleteLocalRef(s);
     }
 }
 
-void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyKind *dependencyKinds, jobjectArray jDependencyKinds, jsize len) {
-    if(len < 1){
+void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyKind *dependencyKinds,
+                                              jobjectArray jDependencyKinds, jsize len) {
+    if (len < 1) {
         return;
     }
 
     jclass cls;
     jfieldID enumField = nullptr;
-    const char* signature = "Lorg/intocps/fmi3/Fmi3DependencyKind;";
-    
+    const char *signature = "Lorg/intocps/fmi3/Fmi3DependencyKind;";
+
     cls = env->FindClass("org/intocps/fmi3/Fmi3DependencyKind");
     if (cls == nullptr) {
         return;
     }
 
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         switch (dependencyKinds[i]) {
             // Not needed but reserved for future use?
             case fmi3Independent:
-                enumField = env->GetStaticFieldID(cls , "fmi3Independent", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Independent", signature);
                 break;
             case fmi3Constant:
-                enumField = env->GetStaticFieldID(cls , "fmi3Constant", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Constant", signature);
                 break;
             case fmi3Fixed:
-                enumField = env->GetStaticFieldID(cls , "fmi3Fixed", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Fixed", signature);
                 break;
             case fmi3Tunable:
-                enumField = env->GetStaticFieldID(cls , "fmi3Tunable", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Tunable", signature);
                 break;
             case fmi3Discrete:
-                enumField = env->GetStaticFieldID(cls , "fmi3Discrete", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Discrete", signature);
                 break;
             case fmi3Dependent:
-                enumField = env->GetStaticFieldID(cls , "fmi3Dependent", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3Dependent", signature);
                 break;
         }
-        if(enumField != nullptr){
+        if (enumField != nullptr) {
             jobject enumVal = env->GetStaticObjectField(cls, enumField);
-            if(enumVal != nullptr){
+            if (enumVal != nullptr) {
                 env->SetObjectArrayElement(jDependencyKinds, i, enumVal);
                 env->DeleteLocalRef(enumVal);
             }
@@ -102,35 +103,36 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
     env->DeleteLocalRef(cls);
 }
 
-void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3IntervalQualifier *qualifiers, jobjectArray jQualifiers, jsize len) {
-    if(len < 1){
+void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3IntervalQualifier *qualifiers,
+                                                  jobjectArray jQualifiers, jsize len) {
+    if (len < 1) {
         return;
     }
 
     jclass cls;
     jfieldID enumField = nullptr;
-    const char* signature = "Lorg/intocps/fmi3/Fmi3IntervalQualifier;";
+    const char *signature = "Lorg/intocps/fmi3/Fmi3IntervalQualifier;";
 
     cls = env->FindClass("org/intocps/fmi3/Fmi3IntervalQualifier");
     if (cls == nullptr) {
         return;
     }
 
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         switch (qualifiers[i]) {
             case fmi3IntervalNotYetKnown:
-                enumField = env->GetStaticFieldID(cls , "fmi3IntervalNotYetKnown", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3IntervalNotYetKnown", signature);
                 break;
             case fmi3IntervalUnchanged:
-                enumField = env->GetStaticFieldID(cls , "fmi3IntervalUnchanged", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3IntervalUnchanged", signature);
                 break;
             case fmi3IntervalChanged:
-                enumField = env->GetStaticFieldID(cls , "fmi3IntervalChanged", signature);
+                enumField = env->GetStaticFieldID(cls, "fmi3IntervalChanged", signature);
                 break;
         }
-        if(enumField != nullptr){
+        if (enumField != nullptr) {
             jobject enumVal = env->GetStaticObjectField(cls, enumField);
-            if(enumVal != nullptr){
+            if (enumVal != nullptr) {
                 env->SetObjectArrayElement(jQualifiers, i, enumVal);
                 env->DeleteLocalRef(enumVal);
             }
@@ -163,25 +165,25 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
 
     switch (status) {
         case fmi3OK:
-            name = env->NewStringUTF("fmi3OK");
+            name = env->NewStringUTF("OK");
             break;
         case fmi3Warning:
-            name = env->NewStringUTF("fmi3Warning");
+            name = env->NewStringUTF("Warning");
             break;
         case fmi3Discard:
-            name = env->NewStringUTF("fmi3Discard");
+            name = env->NewStringUTF("Discard");
             break;
         case fmi3Error:
-            name = env->NewStringUTF("fmi3Error");
+            name = env->NewStringUTF("Error");
             break;
         case fmi3Fatal:
-            name = env->NewStringUTF("fmi3Fatal");
+            name = env->NewStringUTF("Fatal");
             break;
     }
 
 
     if (name == nullptr) {
-        printf("Failed to create name for status: %d" , status);
+        printf("Failed to create name for status: %d", status);
         goto done;
     }
 
@@ -197,9 +199,9 @@ jobject convertStatus(JNIEnv *env, fmi3Status status) {
     return eval;
 }
 
-FMU3 *getFmuPtr(jlong fmuPtr) { return (FMU3 *) fmuPtr; }
+Fmi3Node *getFmuNodePtr(jlong fmuNodePtr) { return (Fmi3Node *) fmuNodePtr; }
 
-fmi3Instance getInstancePtr(jlong compPtr){return (fmi3Instance) compPtr;}
+Fmi3InstanceNode* getInstancePtr(jlong instanceNodePtr) { return (Fmi3InstanceNode *) instanceNodePtr; }
 
 
 

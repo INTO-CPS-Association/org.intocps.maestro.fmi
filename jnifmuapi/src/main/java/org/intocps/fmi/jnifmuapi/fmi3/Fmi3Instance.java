@@ -107,6 +107,183 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
                 eventHandlingNeeded, terminateSimulation, earlyReturn, lastSuccessfulTime);
     }
 
+    @Override
+    public FmuResult<float[]> getFloat32(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        float[] out = new float[valueReferences.length];
+        return new FmuResult<>(nGetFloat32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<double[]> getFloat64(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        double[] out = new double[valueReferences.length];
+        return new FmuResult<>(nGetFloat64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<byte[]> getInt8(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        byte[] out = new byte[valueReferences.length];
+        return new FmuResult<>(nGetInt8(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<byte[]> getUInt8(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        byte[] out = new byte[valueReferences.length];
+        return new FmuResult<>(nGetUInt8(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<short[]> getInt16(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        short[] out = new short[valueReferences.length];
+        return new FmuResult<>(nGetInt16(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<short[]> getUInt16(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        short[] out = new short[valueReferences.length];
+        return new FmuResult<>(nGetUInt16(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<int[]> getInt32(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        int[] out = new int[valueReferences.length];
+        return new FmuResult<>(nGetInt32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<int[]> getUInt32(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        int[] out = new int[valueReferences.length];
+        return new FmuResult<>(nGetUInt32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<long[]> getInt64(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        long[] out = new long[valueReferences.length];
+        return new FmuResult<>(nGetInt64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<long[]> getUInt64(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        long[] out = new long[valueReferences.length];
+        return new FmuResult<>(nGetUInt64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<boolean[]> getBoolean(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        boolean[] out = new boolean[valueReferences.length];
+        return new FmuResult<>(nGetBoolean(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<String[]> getString(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        String[] out = new String[valueReferences.length];
+        return new FmuResult<>(nGetString(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public FmuResult<byte[][]> getBinary(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        byte[][] out = new byte[valueReferences.length][];
+        return new FmuResult<>(nGetBinary(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+    }
+
+    @Override
+    public Fmi3Status setFloat32(long[] valueReferences, float[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetFloat32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setFloat64(long[] valueReferences, double[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetFloat64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetInt8(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setUInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetUInt8(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetInt16(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setUInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetUInt16(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetInt32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setUInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetUInt32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetInt64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setUInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetUInt64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setBoolean(long[] valueReferences, boolean[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetBoolean(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setString(long[] valueReferences, String[] values) throws FmiInvalidNativeStateException {
+        checkState();
+        return nSetString(instancePtr, valueReferences, valueReferences.length, values, values.length);
+    }
+
+    @Override
+    public Fmi3Status setBinary(long[] valueReferences, byte[][] array_name) throws FmiInvalidNativeStateException {
+        checkState();
+        long[] sizes = new long[array_name.length];
+        for (int i = 0; i < array_name.length; i++) {
+            if (array_name[i] == null) {
+                sizes[i] = 0;
+            } else {
+                sizes[i] = array_name[i].length;
+            }
+        }
+        return nSetBinary(instancePtr, valueReferences, valueReferences.length, sizes, array_name, array_name.length);
+    }
+
 
     @Override
     public boolean isValid() {
