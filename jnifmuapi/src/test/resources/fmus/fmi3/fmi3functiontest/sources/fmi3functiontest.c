@@ -50,7 +50,9 @@ fmi3Instance instantiateModel(fmi3String instanceName,
                               fmi3InstanceEnvironment instanceEnvironment,
                               fmi3LogMessageCallback logMessage) {
     struct Model *model = calloc(1, sizeof(struct Model));
-    model->instanceName = strdup((instanceName));
+    if (instanceName != NULL) {
+        model->instanceName = strdup((instanceName));
+    }
     model->loggingOn = loggingOn;
     model->logMessage = logMessage;
     model->instanceEnvironment = instanceEnvironment;
@@ -67,7 +69,24 @@ fmi3Instance fmi3InstantiateModelExchange(
         fmi3InstanceEnvironment instanceEnvironment,
         fmi3LogMessageCallback logMessage) {
 
+    if (instanceName == NULL || instantiationToken == NULL || resourcePath == NULL) {
+        printf("Getting nulls\n");
+        return NULL;
+    }
+
+    if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
+        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn) {
+        printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d\n", instanceName,
+               instantiationToken, resourcePath, visible, loggingOn);
+        return NULL;
+    }
+
     struct Model *model = instantiateModel(instanceName, loggingOn, instanceEnvironment, logMessage);
+
+    if (logMessage != NULL) {
+        printf("Calling logMessage\n");
+        logMessage(instanceEnvironment, fmi3OK, "som category", "some message");
+    }
 
     return model;
 }
@@ -87,7 +106,48 @@ fmi3Instance fmi3InstantiateCoSimulation(
         fmi3IntermediateUpdateCallback intermediateUpdate) {
 
 
+    if (instanceName == NULL || instantiationToken == NULL || resourcePath == NULL) {
+        printf("Getting nulls\n");
+        return NULL;
+    }
+
+    if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
+        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn || !eventModeUsed || !earlyReturnAllowed) {
+        printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d, eventModeUsed: %d, earlyReturnAllowed: %d\n",
+               instanceName,
+               instantiationToken, resourcePath, visible, loggingOn, eventModeUsed, earlyReturnAllowed);
+        return NULL;
+    }
+
+    if (nRequiredIntermediateVariables != 2 || requiredIntermediateVariables == NULL ||
+        requiredIntermediateVariables[0] != 1 || requiredIntermediateVariables[1] != 2) {
+        printf("Wrong required intermediate variables count: %zu\n", nRequiredIntermediateVariables);
+        if (requiredIntermediateVariables != NULL) {
+            printf("Wrong required intermediate variables: %d, %d\n", requiredIntermediateVariables[0],
+                   requiredIntermediateVariables[1]);
+        }
+        return NULL;
+    }
+
     struct Model *model = instantiateModel(instanceName, loggingOn, instanceEnvironment, logMessage);
+
+
+    if (intermediateUpdate != NULL) {
+        printf("Calling intermediateUpdate\n");
+        bool returnEarly;
+        double earlyTime;
+        intermediateUpdate(instanceEnvironment, 1.1, true, true, true, true, &returnEarly, &earlyTime);
+        printf("Calling intermediateUpdate. Call completed checking returned variables\n");
+        if (!returnEarly || earlyTime != 555.555) {
+            printf("IntermediateUpdate returned: %d, %f\n", returnEarly, earlyTime);
+            return NULL;
+        }
+    }
+    if (logMessage != NULL) {
+        printf("Calling logMessage\n");
+        logMessage(instanceEnvironment, fmi3OK, "som category", "some message");
+    }
+
 
     return model;
 }
@@ -104,8 +164,38 @@ fmi3Instance fmi3InstantiateScheduledExecution(
         fmi3LockPreemptionCallback lockPreemption,
         fmi3UnlockPreemptionCallback unlockPreemption) {
 
+    if (instanceName == NULL || instantiationToken == NULL || resourcePath == NULL) {
+        printf("Getting nulls\n");
+        return NULL;
+    }
+
+    if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
+        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn) {
+        printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d\n", instanceName,
+               instantiationToken, resourcePath, visible, loggingOn);
+        return NULL;
+    }
 
     struct Model *model = instantiateModel(instanceName, loggingOn, instanceEnvironment, logMessage);
+
+    if (clockUpdate != NULL) {
+        printf("Calling clockUpdate\n");
+        clockUpdate(instanceEnvironment);
+    }
+
+    if (lockPreemption != NULL) {
+        printf("Calling lockPreemption\n");
+        lockPreemption();
+    }
+
+    if (unlockPreemption != NULL) {
+        printf("Calling unlockPreemption\n");
+        unlockPreemption();
+    }
+    if (logMessage != NULL) {
+        printf("Calling logMessage\n");
+        logMessage(instanceEnvironment, fmi3OK, "som category", "some message");
+    }
 
     return model;
 }
@@ -269,8 +359,8 @@ fmi3Status fmi3GetBinary(fmi3Instance instance, const fmi3ValueReference valueRe
         size_t binSize = model->v_fmiBinarySizes[vref];
 //        values[i]= malloc(binSize);
 //        memcpy((void *) values[i], val, binSize);
-        values[i]=val;
-valueSizes[i] = binSize;
+        values[i] = val;
+        valueSizes[i] = binSize;
 
     }
     return fmi3OK;

@@ -110,6 +110,9 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
         }
         long instancePtr = nInstantiateModelExchange(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible, loggingOn,
                 logMessage);
+        if (instancePtr == 0) {
+            return null;
+        }
         return new Fmi3Instance(instancePtr, this);
     }
 
@@ -129,6 +132,9 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
         long instancePtr = nInstantiateCoSimulation(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible, loggingOn,
                 eventModeUsed, earlyReturnAllowed, requiredIntermediateVariables, requiredIntermediateVariables.length, logMessage,
                 intermediateUpdate);
+        if (instancePtr == 0) {
+            return null;
+        }
         return new Fmi3Instance(instancePtr, this);
     }
 
@@ -143,6 +149,9 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
 
         long instancePtr = nInstantiateScheduledExecution(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible,
                 loggingOn, logMessage, clockUpdate, lockPreemption, unlockPreemption);
+        if (instancePtr == 0) {
+            return null;
+        }
         return new Fmi3Instance(instancePtr, this);
 
     }

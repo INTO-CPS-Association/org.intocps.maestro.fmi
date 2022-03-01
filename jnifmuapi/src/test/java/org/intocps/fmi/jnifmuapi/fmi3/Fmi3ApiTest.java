@@ -29,7 +29,7 @@ public class Fmi3ApiTest {
 
 
     static final String FMU_UNPACKED_PATH = "target/fmus/fmi3/fmi3functiontest".replace('/', File.separatorChar);
-    static final String FMU_GUID = "{8c4e810f-3df3-4a00-8276-176fa3c9f003}";
+    static final String VALID_TOKEN = "{FMI3_TEST_TOKEN}";
 
     IFmi3Fmu fmu = null;
     IFmi3Instance instance = null;
@@ -45,7 +45,7 @@ public class Fmi3ApiTest {
             System.out.printf("Received log message:\n" + "instanceName: '%s'\n" + "Status: '%s'\n" + "Category: '%s'\n" + "Message: '%s'%n",
                     instanceName, status.name(), category, message);
         };
-        instance = fmu.instantiateCoSimulation("fmi3functiontest", FMU_GUID, null, false, true, false, false, null, lm, null);
+        instance = fmu.instantiateCoSimulation("fmi3functiontest", VALID_TOKEN, "/tmp", true, true, true, true, new long[]{1, 2}, lm, null);
 
         Assert.assertNotNull("Instantiate returned null", instance);
         Assert.assertTrue(instance.isValid());
@@ -59,6 +59,229 @@ public class Fmi3ApiTest {
         if (fmu != null) {
             fmu.unLoad();
         }
+    }
+
+    @Test
+    public void instantiateModelExchangeNoCallback() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+
+        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null);
+        Assert.assertNotNull("Parameters not send correctly", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        validInstance.freeInstance();
+
+
+        Assert.assertNull("Name not send correctly",
+                fmu.instantiateModelExchange("not as expected", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null));
+        Assert.assertNull("Token not send correctly",
+                fmu.instantiateModelExchange(validName, "123", validResourceLocation, validVisible, validLoginOn, null));
+        Assert.assertNull("ResourcePath not send correctly",
+                fmu.instantiateModelExchange(validName, VALID_TOKEN, "123", validVisible, validLoginOn, null));
+        Assert.assertNull("Visible not send correctly",
+                fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, null));
+        Assert.assertNull("LoggingOn not send correctly",
+                fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, false, null));
+        Assert.assertNull("All not send correctly", fmu.instantiateModelExchange(null, null, null, false, false, null));
+    }
+
+    @Test
+    public void instantiateModelExchangeCallbackCheck() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+
+        class CallbackChecker implements ILogMessageCallback {
+            List<Object[]> logs = new Vector<>();
+
+            @Override
+            public void logMessage(String instanceName, Fmi3Status status, String category, String message) {
+                logs.add(new Object[]{instanceName, status, category, message});
+            }
+        }
+
+
+        CallbackChecker callbacks = new CallbackChecker();
+        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
+                callbacks);
+        Assert.assertNotNull("Instantiation failed", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        Assert.assertFalse("log cb not working", callbacks.logs.isEmpty());
+        validInstance.freeInstance();
+
+
+    }
+
+
+    @Test
+    public void instantiateScheduledNoCallback() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+
+        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
+                null, null, null, null);
+        Assert.assertNotNull("Parameters not send correctly", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        validInstance.freeInstance();
+
+
+        Assert.assertNull("Name not send correctly",
+                fmu.instantiateScheduledExecution("not as expected", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null, null, null,
+                        null));
+        Assert.assertNull("Token not send correctly",
+                fmu.instantiateScheduledExecution(validName, "123", validResourceLocation, validVisible, validLoginOn, null, null, null, null));
+        Assert.assertNull("ResourcePath not send correctly",
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, "123", validVisible, validLoginOn, null, null, null, null));
+        Assert.assertNull("Visible not send correctly",
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, null, null, null, null));
+        Assert.assertNull("LoggingOn not send correctly",
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, false, null, null, null, null));
+        Assert.assertNull("All not send correctly", fmu.instantiateScheduledExecution(null, null, null, false, false, null, null, null, null));
+    }
+
+    @Test
+    public void instantiateScheduledCallbackCheck() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+
+        class CallbackChecker implements ILogMessageCallback, IClockUpdateCallback, ILockPreemptionCallback, IUnlockPreemptionCallback {
+
+            Boolean updated = null;
+            Boolean locked = null;
+            Boolean unlocked = null;
+            List<Object[]> logs = new Vector<>();
+
+            @Override
+            public void updated() {
+                updated = true;
+            }
+
+            @Override
+            public void locked() {
+                locked = true;
+            }
+
+            @Override
+            public void logMessage(String instanceName, Fmi3Status status, String category, String message) {
+                logs.add(new Object[]{instanceName, status, category, message});
+            }
+
+            @Override
+            public void unlocked() {
+                unlocked = true;
+            }
+        }
+
+
+        CallbackChecker callbacks = new CallbackChecker();
+        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
+                callbacks, callbacks, callbacks, callbacks);
+        Assert.assertNotNull("Instantiation failed", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        Assert.assertEquals("Locked cb not working", true, callbacks.locked);
+        Assert.assertEquals("unLocked cb not working", true, callbacks.unlocked);
+        Assert.assertEquals("Updated cb not working", true, callbacks.updated);
+        Assert.assertFalse("log cb not working", callbacks.logs.isEmpty());
+        validInstance.freeInstance();
+
+
+    }
+
+    @Test
+    public void instantiateCoSimulationNoCallback() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+        boolean validEventModeUsed = true;
+        boolean validEarlyReturnAllowed = true;
+        long[] validRequiredIntermediateVariables = new long[]{1, 2};
+
+        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
+                validEventModeUsed, validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null);
+        Assert.assertNotNull("Parameters not send correctly", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        validInstance.freeInstance();
+
+        Assert.assertNull("Name not send correctly",
+                fmu.instantiateCoSimulation("not valid", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, validEventModeUsed,
+                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("Token not send correctly",
+                fmu.instantiateCoSimulation(validName, "123", validResourceLocation, validVisible, validLoginOn, validEventModeUsed,
+                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("ResourcePath not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, "123", validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("Visible not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, validEventModeUsed,
+                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("LoggingOn not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed,
+                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("EventModeUsed not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, false, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("EarlyReturnAllowed not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed, false,
+                        validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("RequiredIntermediateVariables not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed,
+                        validEarlyReturnAllowed, new long[]{4, 5, 6}, null, null));
+
+
+        Assert.assertNull("All not send correctly",
+                fmu.instantiateCoSimulation(null, null, null, validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed, null, null,
+                        null));
+
+
+    }
+
+    @Test
+    public void instantiateCoSimulationCallback() throws FmiInvalidNativeStateException {
+
+        String validName = "fmi3functiontest";
+        String validResourceLocation = "/tmp";
+        boolean validVisible = true;
+        boolean validLoginOn = true;
+        boolean validEventModeUsed = true;
+        boolean validEarlyReturnAllowed = true;
+        long[] validRequiredIntermediateVariables = new long[]{1, 2};
+
+        class CallbackChecker implements ILogMessageCallback, IIntermediateUpdateCallback {
+            List<Object[]> logs = new Vector<>();
+
+            @Override
+            public void logMessage(String instanceName, Fmi3Status status, String category, String message) {
+                logs.add(new Object[]{instanceName, status, category, message});
+            }
+
+            @Override
+            public IntermediateUpdateResponse intermediateUpdate(long instanceEnvironment, double intermediateUpdateTime, boolean clocksTicked,
+                    boolean intermediateVariableSetRequested, boolean intermediateVariableGetAllowed, boolean intermediateStepFinished,
+                    boolean canReturnEarly) {
+                return new IntermediateUpdateResponse(true, 555.555);
+            }
+        }
+        CallbackChecker callbacks = new CallbackChecker();
+
+        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
+                validEventModeUsed, validEarlyReturnAllowed, validRequiredIntermediateVariables, callbacks, callbacks);
+        Assert.assertNotNull("Parameters not send correctly", validInstance);
+        Assert.assertTrue(validInstance.isValid());
+        Assert.assertFalse("log cb not working", callbacks.logs.isEmpty());
+        validInstance.freeInstance();
     }
 
     static long[] VREFS = new long[]{0, 1, 2};
