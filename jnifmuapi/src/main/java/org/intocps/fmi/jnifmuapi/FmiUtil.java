@@ -85,6 +85,7 @@ public class FmiUtil {
                         // x86
                         libDir = "win32";
                     }
+                    break;
                 case FMI3:
                     if (arch.contains("amd64")) {
                         libDir = "x86_64-windows";
@@ -92,6 +93,7 @@ public class FmiUtil {
                         // x86
                         libDir = "x86-windows";
                     }
+                    break;
             }
         } else if (osName.contains("nix") || osName.contains("nux") || osName.indexOf("aix") > 0) {
             libExtension = ".so";
@@ -103,6 +105,7 @@ public class FmiUtil {
                         // x86
                         libDir = "linux32";
                     }
+                    break;
                 case FMI3:
                     if (arch.contains("amd64")) {
                         libDir = "x86_64-linux";
@@ -110,6 +113,7 @@ public class FmiUtil {
                         // x86
                         libDir = "x86-linux";
                     }
+                    break;
             }
         } else if (osName.toLowerCase().contains("mac"))// extension
         {
