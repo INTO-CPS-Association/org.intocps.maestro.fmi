@@ -77,19 +77,39 @@ public class FmiUtil {
 
         if (osName.toLowerCase().contains("windows")) {
             libExtension = ".dll";
-            if (arch.contains("amd64")) {
-                libDir = "x86_64-windows";
-            } else {
-                // x86
-                libDir = "x86-windows";
+            switch (fmiVersion) {
+                case FMI2:
+                    if (arch.contains("amd64")) {
+                        libDir = "win64";
+                    } else {
+                        // x86
+                        libDir = "win32";
+                    }
+                case FMI3:
+                    if (arch.contains("amd64")) {
+                        libDir = "x86_64-windows";
+                    } else {
+                        // x86
+                        libDir = "x86-windows";
+                    }
             }
         } else if (osName.contains("nix") || osName.contains("nux") || osName.indexOf("aix") > 0) {
             libExtension = ".so";
-            if (arch.contains("amd64")) {
-                libDir = "x86_64-linux";
-            } else {
-                // x86
-                libDir = "x86-linux";
+            switch (fmiVersion) {
+                case FMI2:
+                    if (arch.contains("amd64")) {
+                        libDir = "linux64";
+                    } else {
+                        // x86
+                        libDir = "linux32";
+                    }
+                case FMI3:
+                    if (arch.contains("amd64")) {
+                        libDir = "x86_64-linux";
+                    } else {
+                        // x86
+                        libDir = "x86-linux";
+                    }
             }
         } else if (osName.toLowerCase().contains("mac"))// extension
         {
