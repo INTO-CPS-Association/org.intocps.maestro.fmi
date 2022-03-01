@@ -52,7 +52,7 @@ __attribute__((unused)) JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_fm
         __attribute__((unused)) JNIEnv *env, __attribute__((unused)) jobject obj, jlong fmuptr) {
     Fmi3Node *ptr = getFmuNodePtr(fmuptr);
 #ifdef _WIN32
-    FreeLibrary(ptr->dllHandle);
+    FreeLibrary(ptr->fmu.dllHandle);
 #elif __APPLE__
 //extern "C"
 //{
@@ -65,7 +65,7 @@ __attribute__((unused)) JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_fm
     throwException(env, "Unsupported platform");
 #endif
 #elif __linux
-    dlclose(ptr->dllHandle);
+    dlclose(ptr->fmu.dllHandle);
 #endif
 
     delete (ptr);
