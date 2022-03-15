@@ -29,8 +29,7 @@ public class NativeFmu3Instance {
     /* end::ExitInitializationMode[] */
 
     /* tag::EnterEventMode[] */
-    native Fmi3Status nEnterEventMode(long instance, boolean stepEvent, boolean stateEvent, int rootsFound[], int nEventIndicators,
-            boolean timeEvent);
+    native Fmi3Status nEnterEventMode(long instance, int stepEvent, int stateEvent, int rootsFound[], int nEventIndicators, int timeEvent);
     /* end::EnterEventMode[] */
 
     /* tag::Terminate[] */

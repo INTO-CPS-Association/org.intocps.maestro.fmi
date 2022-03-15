@@ -19,9 +19,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Fmi3ApiTest {
+
+    public static final String FMI_VERSION = "3.0-beta.5";
+
     @Test
     public void testPlatformVersion() {
-        Assert.assertEquals("3.0-beta.3", DirectoryFmi3Fmu.getJniApiFmiVersion());
+        Assert.assertEquals(FMI_VERSION, DirectoryFmi3Fmu.getJniApiFmiVersion());
     }
 
 
@@ -36,7 +39,7 @@ public class Fmi3ApiTest {
     public void before() throws FmuInvocationException, FmuMissingLibraryException {
         fmu = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "fmi3functiontest");
         fmu.load();
-        Assert.assertEquals("3.0-beta.3", fmu.getVersion());
+        Assert.assertEquals(FMI_VERSION, fmu.getVersion());
         ILogMessageCallback lm = (instanceName, status, category, message) -> {
 
             logData.add(new Object[]{instanceName, status, category, message});
@@ -444,7 +447,8 @@ public class Fmi3ApiTest {
 
     @Test
     public void testEnterEventMode() throws FmiInvalidNativeStateException {
-        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(true, true, new int[]{1, 2, 3}, true));
+        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(Fmi3EventQualifier.EventTrue, Fmi3EventQualifier.EventTrue, new int[]{1, 2, 3},
+                Fmi3EventQualifier.EventTrue));
     }
 
     @Test
@@ -491,11 +495,13 @@ public class Fmi3ApiTest {
         //        typedef fmi3Status fmi3SetFMUStateTYPE (fmi3Instance instance, fmi3FMUState  FMUState);
         //
         //        typedef fmi3Status fmi3FreeFMUStateTYPE(fmi3Instance instance, fmi3FMUState* FMUState);
+        //TODO missing state implementation
     }
 
     @Test
     public void testSerializeState() {
         Assume.assumeTrue(true);
+        //TODO missing state implementation
 
         //        typedef fmi3Status fmi3SerializedFMUStateSizeTYPE(fmi3Instance instance,
         //                fmi3FMUState FMUState,
@@ -514,8 +520,7 @@ public class Fmi3ApiTest {
 
     @Test
     public void testGetDirectionalDerivative() throws FmiInvalidNativeStateException {
-        //FIXME not sure how this works
-        Assume.assumeTrue(true);
+
         long[] unknowns = new long[2];
         long[] knows = new long[2];
         double[] seeds = new double[2];
@@ -534,9 +539,10 @@ public class Fmi3ApiTest {
     }
 
     @Test
-    public void testGetAdjointDerivative() {
+    public void testGetAdjointDerivative() throws FmiInvalidNativeStateException {
         Assume.assumeTrue(true);
-        //FIXME wait for the testGetDirectionalDerivative to be implemented as they are equal
+        FmuResult<double[]> res = instance.getGetAdjointDerivative(new long[0], new long[0], new double[0], 0);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
     }
 
     @Test
@@ -627,6 +633,17 @@ public class Fmi3ApiTest {
     public void testSetIntervalFraction() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.OK, instance.setIntervalFraction(new long[]{1L, 2L}, new long[]{1L, 2L}, new long[]{3L, 4L}));
 
+    }
+
+
+    @Test
+    public void testSetShiftDecimal() {
+        //TODO missing
+    }
+
+    @Test
+    public void testSetShiftFraction() {
+        //TODO missing
     }
 
     @Test

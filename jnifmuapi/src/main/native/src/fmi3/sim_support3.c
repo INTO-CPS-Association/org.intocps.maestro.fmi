@@ -43,7 +43,7 @@
 #include "fmi3.h"
 #include "sim_support3.h"
 
-static void *getAdrOptional(int *success, HMODULE dllHandle,
+static void *getAdrOptional(int *success, HMODULE dllHandle, char **errorMessage,
                             const char *functionName, bool optional) {
 #ifdef _WIN32
     void *fp = (void *)GetProcAddress(dllHandle, functionName);
@@ -65,19 +65,29 @@ static void *getAdrOptional(int *success, HMODULE dllHandle,
     if (!fp) {
         if (!optional) {
             printf("warning: Function %s not found in library\n", functionName);
+            if (*errorMessage == NULL) {
+                *errorMessage = strdup(functionName);
+            }else{size_t newSize = strlen(*errorMessage)+1+ strlen(functionName);
+                 char* m = malloc(newSize);
+                strcat(m,*errorMessage);
+                strcat(m,",");
+                strcat(m,functionName);
+                free(*errorMessage);
+                *errorMessage=m;
+            }
             *success = 0;
         }
     }
     return fp;
 }
 
-static void *getAdr(int *success, HMODULE dllHandle, const char *functionName) {
-    return getAdrOptional(success, dllHandle, functionName, false);
+static void *getAdr(int *success, HMODULE dllHandle, char **errorMessage, const char *functionName) {
+    return getAdrOptional(success, dllHandle, errorMessage, functionName, false);
 }
 
 // Load the given dll and set function pointers in fmu
 // Return 0 to indicate failure
-int loadDll3(const char *dllPath, FMU3 *fmu) {
+int loadDll3(const char *dllPath, FMU3 *fmu, char **errorMessage) {
     int x = 1, s = 1;
 
 #ifdef _WIN32
@@ -121,127 +131,131 @@ int loadDll3(const char *dllPath, FMU3 *fmu) {
     }
     fmu->dllHandle = h;
 
-    fmu->fmi3GetVersion = (fmi3GetVersionTYPE *) getAdr(&s, h, "fmi3GetVersion");
+    fmu->fmi3GetVersion = (fmi3GetVersionTYPE *) getAdr(&s, h, errorMessage, "fmi3GetVersion");
     fmu->fmi3SetDebugLogging =
-            (fmi3SetDebugLoggingTYPE *) getAdr(&s, h, "fmi3SetDebugLogging");
+            (fmi3SetDebugLoggingTYPE *) getAdr(&s, h, errorMessage, "fmi3SetDebugLogging");
     fmu->fmi3InstantiateModelExchange =
             (fmi3InstantiateModelExchangeTYPE *) getAdr(
-                    &s, h, "fmi3InstantiateModelExchange");
+                    &s, h, errorMessage, "fmi3InstantiateModelExchange");
     fmu->fmi3InstantiateCoSimulation = (fmi3InstantiateCoSimulationTYPE *) getAdr(
-            &s, h, "fmi3InstantiateCoSimulation");
+            &s, h, errorMessage, "fmi3InstantiateCoSimulation");
     fmu->fmi3InstantiateScheduledExecution =
             (fmi3InstantiateScheduledExecutionTYPE *) getAdr(
-                    &s, h, "fmi3InstantiateScheduledExecution");
+                    &s, h, errorMessage, "fmi3InstantiateScheduledExecution");
     fmu->fmi3FreeInstance =
-            (fmi3FreeInstanceTYPE *) getAdr(&s, h, "fmi3FreeInstance");
+            (fmi3FreeInstanceTYPE *) getAdr(&s, h, errorMessage, "fmi3FreeInstance");
     fmu->fmi3EnterInitializationMode = (fmi3EnterInitializationModeTYPE *) getAdr(
-            &s, h, "fmi3EnterInitializationMode");
+            &s, h, errorMessage, "fmi3EnterInitializationMode");
     fmu->fmi3ExitInitializationMode = (fmi3ExitInitializationModeTYPE *) getAdr(
-            &s, h, "fmi3ExitInitializationMode");
+            &s, h, errorMessage, "fmi3ExitInitializationMode");
     fmu->fmi3EnterEventMode =
-            (fmi3EnterEventModeTYPE *) getAdr(&s, h, "fmi3EnterEventMode");
-    fmu->fmi3Terminate = (fmi3TerminateTYPE *) getAdr(&s, h, "fmi3Terminate");
-    fmu->fmi3Reset = (fmi3ResetTYPE *) getAdr(&s, h, "fmi3Reset");
-    fmu->fmi3GetFloat32 = (fmi3GetFloat32TYPE *) getAdr(&s, h, "fmi3GetFloat32");
-    fmu->fmi3GetFloat64 = (fmi3GetFloat64TYPE *) getAdr(&s, h, "fmi3GetFloat64");
-    fmu->fmi3GetInt8 = (fmi3GetInt8TYPE *) getAdr(&s, h, "fmi3GetInt8");
-    fmu->fmi3GetUInt8 = (fmi3GetUInt8TYPE *) getAdr(&s, h, "fmi3GetUInt8");
-    fmu->fmi3GetInt16 = (fmi3GetInt16TYPE *) getAdr(&s, h, "fmi3GetInt16");
-    fmu->fmi3GetUInt16 = (fmi3GetUInt16TYPE *) getAdr(&s, h, "fmi3GetUInt16");
-    fmu->fmi3GetInt32 = (fmi3GetInt32TYPE *) getAdr(&s, h, "fmi3GetInt32");
-    fmu->fmi3GetUInt32 = (fmi3GetUInt32TYPE *) getAdr(&s, h, "fmi3GetUInt32");
-    fmu->fmi3GetInt64 = (fmi3GetInt64TYPE *) getAdr(&s, h, "fmi3GetInt64");
-    fmu->fmi3GetUInt64 = (fmi3GetUInt64TYPE *) getAdr(&s, h, "fmi3GetUInt64");
-    fmu->fmi3GetBoolean = (fmi3GetBooleanTYPE *) getAdr(&s, h, "fmi3GetBoolean");
-    fmu->fmi3GetString = (fmi3GetStringTYPE *) getAdr(&s, h, "fmi3GetString");
-    fmu->fmi3GetBinary = (fmi3GetBinaryTYPE *) getAdr(&s, h, "fmi3GetBinary");
-    fmu->fmi3SetFloat32 = (fmi3SetFloat32TYPE *) getAdr(&s, h, "fmi3SetFloat32");
-    fmu->fmi3SetFloat64 = (fmi3SetFloat64TYPE *) getAdr(&s, h, "fmi3SetFloat64");
-    fmu->fmi3SetInt8 = (fmi3SetInt8TYPE *) getAdr(&s, h, "fmi3SetInt8");
-    fmu->fmi3SetUInt8 = (fmi3SetUInt8TYPE *) getAdr(&s, h, "fmi3SetUInt8");
-    fmu->fmi3SetInt16 = (fmi3SetInt16TYPE *) getAdr(&s, h, "fmi3SetInt16");
-    fmu->fmi3SetUInt16 = (fmi3SetUInt16TYPE *) getAdr(&s, h, "fmi3SetUInt16");
-    fmu->fmi3SetInt32 = (fmi3SetInt32TYPE *) getAdr(&s, h, "fmi3SetInt32");
-    fmu->fmi3SetUInt32 = (fmi3SetUInt32TYPE *) getAdr(&s, h, "fmi3SetUInt32");
-    fmu->fmi3SetInt64 = (fmi3SetInt64TYPE *) getAdr(&s, h, "fmi3SetInt64");
-    fmu->fmi3SetUInt64 = (fmi3SetUInt64TYPE *) getAdr(&s, h, "fmi3SetUInt64");
-    fmu->fmi3SetBoolean = (fmi3SetBooleanTYPE *) getAdr(&s, h, "fmi3SetBoolean");
-    fmu->fmi3SetString = (fmi3SetStringTYPE *) getAdr(&s, h, "fmi3SetString");
-    fmu->fmi3SetBinary = (fmi3SetBinaryTYPE *) getAdr(&s, h, "fmi3SetBinary");
+            (fmi3EnterEventModeTYPE *) getAdr(&s, h, errorMessage, "fmi3EnterEventMode");
+    fmu->fmi3Terminate = (fmi3TerminateTYPE *) getAdr(&s, h, errorMessage, "fmi3Terminate");
+    fmu->fmi3Reset = (fmi3ResetTYPE *) getAdr(&s, h, errorMessage, "fmi3Reset");
+    fmu->fmi3GetFloat32 = (fmi3GetFloat32TYPE *) getAdr(&s, h, errorMessage, "fmi3GetFloat32");
+    fmu->fmi3GetFloat64 = (fmi3GetFloat64TYPE *) getAdr(&s, h, errorMessage, "fmi3GetFloat64");
+    fmu->fmi3GetInt8 = (fmi3GetInt8TYPE *) getAdr(&s, h, errorMessage, "fmi3GetInt8");
+    fmu->fmi3GetUInt8 = (fmi3GetUInt8TYPE *) getAdr(&s, h, errorMessage, "fmi3GetUInt8");
+    fmu->fmi3GetInt16 = (fmi3GetInt16TYPE *) getAdr(&s, h, errorMessage, "fmi3GetInt16");
+    fmu->fmi3GetUInt16 = (fmi3GetUInt16TYPE *) getAdr(&s, h, errorMessage, "fmi3GetUInt16");
+    fmu->fmi3GetInt32 = (fmi3GetInt32TYPE *) getAdr(&s, h, errorMessage, "fmi3GetInt32");
+    fmu->fmi3GetUInt32 = (fmi3GetUInt32TYPE *) getAdr(&s, h, errorMessage, "fmi3GetUInt32");
+    fmu->fmi3GetInt64 = (fmi3GetInt64TYPE *) getAdr(&s, h, errorMessage, "fmi3GetInt64");
+    fmu->fmi3GetUInt64 = (fmi3GetUInt64TYPE *) getAdr(&s, h, errorMessage, "fmi3GetUInt64");
+    fmu->fmi3GetBoolean = (fmi3GetBooleanTYPE *) getAdr(&s, h, errorMessage, "fmi3GetBoolean");
+    fmu->fmi3GetString = (fmi3GetStringTYPE *) getAdr(&s, h, errorMessage, "fmi3GetString");
+    fmu->fmi3GetBinary = (fmi3GetBinaryTYPE *) getAdr(&s, h, errorMessage, "fmi3GetBinary");
+    fmu->fmi3SetFloat32 = (fmi3SetFloat32TYPE *) getAdr(&s, h, errorMessage, "fmi3SetFloat32");
+    fmu->fmi3SetFloat64 = (fmi3SetFloat64TYPE *) getAdr(&s, h, errorMessage, "fmi3SetFloat64");
+    fmu->fmi3SetInt8 = (fmi3SetInt8TYPE *) getAdr(&s, h, errorMessage, "fmi3SetInt8");
+    fmu->fmi3SetUInt8 = (fmi3SetUInt8TYPE *) getAdr(&s, h, errorMessage, "fmi3SetUInt8");
+    fmu->fmi3SetInt16 = (fmi3SetInt16TYPE *) getAdr(&s, h, errorMessage, "fmi3SetInt16");
+    fmu->fmi3SetUInt16 = (fmi3SetUInt16TYPE *) getAdr(&s, h, errorMessage, "fmi3SetUInt16");
+    fmu->fmi3SetInt32 = (fmi3SetInt32TYPE *) getAdr(&s, h, errorMessage, "fmi3SetInt32");
+    fmu->fmi3SetUInt32 = (fmi3SetUInt32TYPE *) getAdr(&s, h, errorMessage, "fmi3SetUInt32");
+    fmu->fmi3SetInt64 = (fmi3SetInt64TYPE *) getAdr(&s, h, errorMessage, "fmi3SetInt64");
+    fmu->fmi3SetUInt64 = (fmi3SetUInt64TYPE *) getAdr(&s, h, errorMessage, "fmi3SetUInt64");
+    fmu->fmi3SetBoolean = (fmi3SetBooleanTYPE *) getAdr(&s, h, errorMessage, "fmi3SetBoolean");
+    fmu->fmi3SetString = (fmi3SetStringTYPE *) getAdr(&s, h, errorMessage, "fmi3SetString");
+    fmu->fmi3SetBinary = (fmi3SetBinaryTYPE *) getAdr(&s, h, errorMessage, "fmi3SetBinary");
     fmu->fmi3GetNumberOfVariableDependencies =
             (fmi3GetNumberOfVariableDependenciesTYPE *) getAdr(
-                    &s, h, "fmi3GetNumberOfVariableDependencies");
+                    &s, h, errorMessage, "fmi3GetNumberOfVariableDependencies");
     fmu->fmi3GetVariableDependencies = (fmi3GetVariableDependenciesTYPE *) getAdr(
-            &s, h, "fmi3GetVariableDependencies");
+            &s, h, errorMessage, "fmi3GetVariableDependencies");
     fmu->fmi3GetFMUState =
-            (fmi3GetFMUStateTYPE *) getAdr(&s, h, "fmi3GetFMUState");
+            (fmi3GetFMUStateTYPE *) getAdr(&s, h, errorMessage, "fmi3GetFMUState");
     fmu->fmi3SetFMUState =
-            (fmi3SetFMUStateTYPE *) getAdr(&s, h, "fmi3SetFMUState");
+            (fmi3SetFMUStateTYPE *) getAdr(&s, h, errorMessage, "fmi3SetFMUState");
     fmu->fmi3FreeFMUState =
-            (fmi3FreeFMUStateTYPE *) getAdr(&s, h, "fmi3FreeFMUState");
+            (fmi3FreeFMUStateTYPE *) getAdr(&s, h, errorMessage, "fmi3FreeFMUState");
     fmu->fmi3SerializedFMUStateSize = (fmi3SerializedFMUStateSizeTYPE *) getAdr(
-            &s, h, "fmi3SerializedFMUStateSize");
+            &s, h, errorMessage, "fmi3SerializedFMUStateSize");
     fmu->fmi3SerializeFMUState =
-            (fmi3SerializeFMUStateTYPE *) getAdr(&s, h, "fmi3SerializeFMUState");
-    fmu->fmi3DeSerializeFMUState =
-            (fmi3DeSerializeFMUStateTYPE *) getAdr(&s, h, "fmi3DeSerializeFMUState");
+            (fmi3SerializeFMUStateTYPE *) getAdr(&s, h, errorMessage, "fmi3SerializeFMUState");
+    fmu->fmi3DeserializeFMUState =
+            (fmi3DeserializeFMUStateTYPE *) getAdr(&s, h, errorMessage, "fmi3DeserializeFMUState");
     fmu->fmi3GetDirectionalDerivative =
             (fmi3GetDirectionalDerivativeTYPE *) getAdr(
-                    &s, h, "fmi3GetDirectionalDerivative");
+                    &s, h, errorMessage, "fmi3GetDirectionalDerivative");
     fmu->fmi3GetAdjointDerivative =
-            (fmi3GetAdjointDerivativeTYPE *) getAdr(&s, h, "fmi3GetAdjointDerivative");
+            (fmi3GetAdjointDerivativeTYPE *) getAdr(&s, h, errorMessage, "fmi3GetAdjointDerivative");
     fmu->fmi3EnterConfigurationMode = (fmi3EnterConfigurationModeTYPE *) getAdr(
-            &s, h, "fmi3EnterConfigurationMode");
+            &s, h, errorMessage, "fmi3EnterConfigurationMode");
     fmu->fmi3ExitConfigurationMode = (fmi3ExitConfigurationModeTYPE *) getAdr(
-            &s, h, "fmi3ExitConfigurationMode");
-    fmu->fmi3GetClock = (fmi3GetClockTYPE *) getAdr(&s, h, "fmi3GetClock");
-    fmu->fmi3SetClock = (fmi3SetClockTYPE *) getAdr(&s, h, "fmi3SetClock");
+            &s, h, errorMessage, "fmi3ExitConfigurationMode");
+    fmu->fmi3GetClock = (fmi3GetClockTYPE *) getAdr(&s, h, errorMessage, "fmi3GetClock");
+    fmu->fmi3SetClock = (fmi3SetClockTYPE *) getAdr(&s, h, errorMessage, "fmi3SetClock");
     fmu->fmi3GetIntervalDecimal =
-            (fmi3GetIntervalDecimalTYPE *) getAdr(&s, h, "fmi3GetIntervalDecimal");
+            (fmi3GetIntervalDecimalTYPE *) getAdr(&s, h, errorMessage, "fmi3GetIntervalDecimal");
     fmu->fmi3GetIntervalFraction =
-            (fmi3GetIntervalFractionTYPE *) getAdr(&s, h, "fmi3GetIntervalFraction");
+            (fmi3GetIntervalFractionTYPE *) getAdr(&s, h, errorMessage, "fmi3GetIntervalFraction");
 
-    fmu->fmi3GetShiftDecimal = (fmi3GetShiftDecimalTYPE *) getAdr(&s, h, "fmi3GetShiftDecimal");
-    fmu->fmi3GetShiftFraction = (fmi3GetShiftFractionTYPE *) getAdr(&s, h, "fmi3GetShiftFraction");
+    fmu->fmi3GetShiftDecimal = (fmi3GetShiftDecimalTYPE *) getAdr(&s, h, errorMessage, "fmi3GetShiftDecimal");
+    fmu->fmi3GetShiftFraction = (fmi3GetShiftFractionTYPE *) getAdr(&s, h, errorMessage, "fmi3GetShiftFraction");
 
 
     fmu->fmi3SetIntervalDecimal =
-            (fmi3SetIntervalDecimalTYPE *) getAdr(&s, h, "fmi3SetIntervalDecimal");
+            (fmi3SetIntervalDecimalTYPE *) getAdr(&s, h, errorMessage, "fmi3SetIntervalDecimal");
     fmu->fmi3SetIntervalFraction =
-            (fmi3SetIntervalFractionTYPE *) getAdr(&s, h, "fmi3SetIntervalFraction");
+            (fmi3SetIntervalFractionTYPE *) getAdr(&s, h, errorMessage, "fmi3SetIntervalFraction");
+
+    fmu->fmi3SetShiftDecimal = (fmi3SetShiftDecimalTYPE *) getAdr(&s, h, errorMessage, "fmi3SetShiftDecimal");
+    fmu->fmi3SetShiftFraction = (fmi3SetShiftFractionTYPE *) getAdr(&s, h, errorMessage, "fmi3SetShiftFraction");
+
 
     fmu->fmi3EvaluateDiscreteStates =
-            (fmi3EvaluateDiscreteStatesTYPE *) getAdr(&s, h, "fmi3EvaluateDiscreteStates");
+            (fmi3EvaluateDiscreteStatesTYPE *) getAdr(&s, h, errorMessage, "fmi3EvaluateDiscreteStates");
 
     fmu->fmi3UpdateDiscreteStates =
-            (fmi3UpdateDiscreteStatesTYPE *) getAdr(&s, h, "fmi3UpdateDiscreteStates");
+            (fmi3UpdateDiscreteStatesTYPE *) getAdr(&s, h, errorMessage, "fmi3UpdateDiscreteStates");
     fmu->fmi3EnterContinuousTimeMode = (fmi3EnterContinuousTimeModeTYPE *) getAdr(
-            &s, h, "fmi3EnterContinuousTimeMode");
+            &s, h, errorMessage, "fmi3EnterContinuousTimeMode");
     fmu->fmi3CompletedIntegratorStep = (fmi3CompletedIntegratorStepTYPE *) getAdr(
-            &s, h, "fmi3CompletedIntegratorStep");
-    fmu->fmi3SetTime = (fmi3SetTimeTYPE *) getAdr(&s, h, "fmi3SetTime");
+            &s, h, errorMessage, "fmi3CompletedIntegratorStep");
+    fmu->fmi3SetTime = (fmi3SetTimeTYPE *) getAdr(&s, h, errorMessage, "fmi3SetTime");
     fmu->fmi3SetContinuousStates =
-            (fmi3SetContinuousStatesTYPE *) getAdr(&s, h, "fmi3SetContinuousStates");
+            (fmi3SetContinuousStatesTYPE *) getAdr(&s, h, errorMessage, "fmi3SetContinuousStates");
     fmu->fmi3GetEventIndicators =
-            (fmi3GetEventIndicatorsTYPE *) getAdr(&s, h, "fmi3GetEventIndicators");
+            (fmi3GetEventIndicatorsTYPE *) getAdr(&s, h, errorMessage, "fmi3GetEventIndicators");
     fmu->fmi3GetContinuousStates =
-            (fmi3GetContinuousStatesTYPE *) getAdr(&s, h, "fmi3GetContinuousStates");
+            (fmi3GetContinuousStatesTYPE *) getAdr(&s, h, errorMessage, "fmi3GetContinuousStates");
     fmu->fmi3GetNominalsOfContinuousStates =
             (fmi3GetNominalsOfContinuousStatesTYPE *) getAdr(
-                    &s, h, "fmi3GetNominalsOfContinuousStates");
+                    &s, h, errorMessage, "fmi3GetNominalsOfContinuousStates");
     fmu->fmi3GetNumberOfEventIndicators =
             (fmi3GetNumberOfEventIndicatorsTYPE *) getAdr(
-                    &s, h, "fmi3GetNumberOfEventIndicators");
+                    &s, h, errorMessage, "fmi3GetNumberOfEventIndicators");
     fmu->fmi3GetNumberOfContinuousStates =
             (fmi3GetNumberOfContinuousStatesTYPE *) getAdr(
-                    &s, h, "fmi3GetNumberOfContinuousStates");
+                    &s, h, errorMessage, "fmi3GetNumberOfContinuousStates");
     fmu->fmi3EnterStepMode =
-            (fmi3EnterStepModeTYPE *) getAdr(&s, h, "fmi3EnterStepMode");
+            (fmi3EnterStepModeTYPE *) getAdr(&s, h, errorMessage, "fmi3EnterStepMode");
     fmu->fmi3GetOutputDerivatives =
-            (fmi3GetOutputDerivativesTYPE *) getAdr(&s, h, "fmi3GetOutputDerivatives");
-    fmu->fmi3DoStep = (fmi3DoStepTYPE *) getAdr(&s, h, "fmi3DoStep");
+            (fmi3GetOutputDerivativesTYPE *) getAdr(&s, h, errorMessage, "fmi3GetOutputDerivatives");
+    fmu->fmi3DoStep = (fmi3DoStepTYPE *) getAdr(&s, h, errorMessage, "fmi3DoStep");
     fmu->fmi3ActivateModelPartition = (fmi3ActivateModelPartitionTYPE *) getAdr(
-            &s, h, "fmi3ActivateModelPartition");
+            &s, h, errorMessage, "fmi3ActivateModelPartition");
 
     return s;
 }

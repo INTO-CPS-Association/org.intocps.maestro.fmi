@@ -232,11 +232,11 @@ fmi3Status fmi3ExitInitializationMode(fmi3Instance instance) {
 }
 
 fmi3Status fmi3EnterEventMode(fmi3Instance instance,
-                              fmi3Boolean stepEvent,
-                              fmi3Boolean stateEvent,
+                              fmi3EventQualifier stepEvent,
+                              fmi3EventQualifier stateEvent,
                               const fmi3Int32 rootsFound[],
                               size_t nEventIndicators,
-                              fmi3Boolean timeEvent) {
+                              fmi3EventQualifier timeEvent) {
 
 
     return fmi3OK;
@@ -826,7 +826,7 @@ fmi3Status fmi3SerializeFMUState(fmi3Instance instance,
     return fmi3Discard;
 }
 
-fmi3Status fmi3DeSerializeFMUState(fmi3Instance instance,
+fmi3Status fmi3DeserializeFMUState(fmi3Instance instance,
                                    const fmi3Byte serializedState[],
                                    size_t size,
                                    fmi3FMUState *FMUState) {
@@ -971,6 +971,20 @@ fmi3Status fmi3SetIntervalFraction(fmi3Instance instance,
         return fmi3OK;
     return fmi3Error;
 }
+
+fmi3Status fmi3SetShiftDecimal(fmi3Instance instance,
+                               const fmi3ValueReference valueReferences[],
+                               size_t nValueReferences,
+                               const fmi3Float64 shifts[]) {
+    return fmi3OK;
+}
+
+fmi3Status fmi3SetShiftFraction(fmi3Instance instance,
+                                const fmi3ValueReference valueReferences[],
+                                size_t nValueReferences,
+                                const fmi3UInt64 counters[],
+                                const fmi3UInt64 resolutions[]) { return fmi3OK; }
+
 
 fmi3Status fmi3EvaluateDiscreteStates(fmi3Instance instance) {
     return fmi3OK;

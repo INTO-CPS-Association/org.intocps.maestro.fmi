@@ -39,8 +39,17 @@ __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_f
     auto node = new Fmi3Node();
     node->name = path;
 
-    if (!loadDll3(path, &node->fmu)) {
-        throwException(env, "Load failed!!!");
+    char **errorMessage = (char **) malloc(sizeof(char **));
+    *errorMessage = nullptr;
+
+    if (!loadDll3(path, &node->fmu, errorMessage)) {
+        const char *beginMsg = "Load failed!. Missing functions: [";
+        char *msg = (char *) malloc(strlen(beginMsg) + 1 + strlen(*errorMessage));
+        strcat(msg, beginMsg);
+        strcat(msg, *errorMessage);
+        strcat(msg, "]");
+        throwException(env, msg);
+        free(msg);
         return 0;
     }
 

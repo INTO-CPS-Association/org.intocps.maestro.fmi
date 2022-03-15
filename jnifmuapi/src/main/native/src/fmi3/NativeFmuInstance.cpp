@@ -86,15 +86,15 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nExitInitializationMode
                                           fmi3Boolean timeEvent
  */
 __attribute__((unused)) JNIEXPORT jobject JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3Instance_nEnterEventMode
-        (JNIEnv *env, jobject, jlong instancePtr, jboolean stepEvent, jboolean stateEvent,
+        (JNIEnv *env, jobject, jlong instancePtr, jint stepEvent, jint stateEvent,
          jintArray rootsFound,
-         jint nEventIndicators, jboolean timeEvent) {
+         jint nEventIndicators, jint timeEvent) {
     auto *instanceNode = (Fmi3InstanceNode *) instancePtr;
     fmi3Int32 rootsFound_[nEventIndicators];
-    fmi3Status status = instanceNode->owner->fmu.fmi3EnterEventMode(instanceNode->instance, stepEvent, stateEvent,
+    fmi3Status status = instanceNode->owner->fmu.fmi3EnterEventMode(instanceNode->instance,(fmi3EventQualifier) stepEvent, (fmi3EventQualifier)stateEvent,
                                                                     rootsFound_,
                                                                     nEventIndicators,
-                                                                    timeEvent);
+                                                                    (fmi3EventQualifier) timeEvent);
     if (status == fmi3OK || status == fmi3Warning)
         copyArray_fmi3Int32_to_jint(env, rootsFound_, rootsFound, nEventIndicators);
 

@@ -50,5 +50,5 @@ void fmu3CallbackIntermediateUpdate(
 void fmu3CallbackLockPreemption();
 void fmu3CallbackUnlockPreemption();
 
-int loadDll3(const char *dllPath, FMU3 *fmu);
+int loadDll3(const char *dllPath, FMU3 *fmu,char** errorMessage);
 int error3(const char *message);

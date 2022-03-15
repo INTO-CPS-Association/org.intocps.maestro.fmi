@@ -47,14 +47,14 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public Fmi3Status enterEventMode(boolean stepEvent, boolean stateEvent, int[] rootsFound,
-            boolean timeEvent) throws FmiInvalidNativeStateException {
+    public Fmi3Status enterEventMode(Fmi3EventQualifier stepEvent, Fmi3EventQualifier stateEvent, int[] rootsFound,
+            Fmi3EventQualifier timeEvent) throws FmiInvalidNativeStateException {
         checkState();
         if (rootsFound == null) {
             rootsFound = new int[0];
         }
 
-        return this.nEnterEventMode(instancePtr, stepEvent, stateEvent, rootsFound, rootsFound.length, timeEvent);
+        return this.nEnterEventMode(instancePtr, stepEvent.getValue(), stateEvent.getValue(), rootsFound, rootsFound.length, timeEvent.getValue());
     }
 
     @Override
@@ -163,10 +163,26 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public FmuResult<double[]> getGetAdjointDerivative(long[] unknowns, long[] knowns, double[] seed) throws FmiInvalidNativeStateException {
+    public FmuResult<double[]> getGetAdjointDerivative(long[] unknowns, long[] knowns, double[] seed,
+            int nSensitivity) throws FmiInvalidNativeStateException {
         checkState();
-        //TODO implement this
-        return null;
+
+        if (unknowns == null) {
+            unknowns = new long[0];
+        }
+
+        if (knowns == null) {
+            knowns = new long[0];
+        }
+
+        if (seed == null) {
+            seed = new double[0];
+        }
+
+        double[] sensitivity = new double[nSensitivity];
+        Fmi3Status status = nGetAdjointDerivative(instancePtr, unknowns, unknowns.length, knowns, knowns.length, seed, seed.length, sensitivity,
+                sensitivity.length);
+        return new FmuResult<>(status, sensitivity);
     }
 
     @Override

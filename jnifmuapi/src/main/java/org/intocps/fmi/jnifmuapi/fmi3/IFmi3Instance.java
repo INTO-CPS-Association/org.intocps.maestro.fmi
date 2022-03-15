@@ -35,7 +35,8 @@ public interface IFmi3Instance {
 
     Fmi3Status exitInitializationMode() throws FmiInvalidNativeStateException;
 
-    Fmi3Status enterEventMode(boolean stepEvent, boolean stateEvent, int[] rootsFound, boolean timeEvent) throws FmiInvalidNativeStateException;
+    Fmi3Status enterEventMode(Fmi3EventQualifier stepEvent, Fmi3EventQualifier stateEvent, int[] rootsFound,
+            Fmi3EventQualifier timeEvent) throws FmiInvalidNativeStateException;
 
     Fmi3Status enterConfigurationMode() throws FmiInvalidNativeStateException;
 
@@ -71,7 +72,8 @@ public interface IFmi3Instance {
 
     FmuResult<double[]> getDirectionalDerivative(long unknowns[], long knowns[], double seed[]) throws FmiInvalidNativeStateException;
 
-    FmuResult<double[]> getGetAdjointDerivative(long unknowns[], long knowns[], double seed[]) throws FmiInvalidNativeStateException;
+    FmuResult<double[]> getGetAdjointDerivative(long unknowns[], long knowns[], double seed[],
+            int nSensitivity) throws FmiInvalidNativeStateException;
 
 
     class GetIntervalDecimalResponse {

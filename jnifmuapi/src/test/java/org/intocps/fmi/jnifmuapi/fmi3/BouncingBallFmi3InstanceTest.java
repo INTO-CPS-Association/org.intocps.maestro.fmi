@@ -114,7 +114,8 @@ public class BouncingBallFmi3InstanceTest {
     @Test
     public void enterEventMode() throws Exception {
         exitInitializationMode();
-        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(false, false, null, false));
+        Assert.assertEquals(Fmi3Status.OK,
+                instance.enterEventMode(Fmi3EventQualifier.EventFalse, Fmi3EventQualifier.EventFalse, null, Fmi3EventQualifier.EventFalse));
     }
 
     @Test
