@@ -3,10 +3,7 @@ package org.intocps.fmi.jnifmuapi.fmi3;
 import org.intocps.fmi.FmiInvalidNativeStateException;
 import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,6 +36,7 @@ public class Fmi3ApiTest {
     public void before() throws FmuInvocationException, FmuMissingLibraryException {
         fmu = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "fmi3functiontest");
         fmu.load();
+        Assert.assertEquals("3.0-beta.3", fmu.getVersion());
         ILogMessageCallback lm = (instanceName, status, category, message) -> {
 
             logData.add(new Object[]{instanceName, status, category, message});
@@ -437,4 +435,310 @@ public class Fmi3ApiTest {
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(Arrays.stream(binaryData).map(a -> a == null ? new byte[0] : a).toArray(), result.result);
     }
+
+    @Test
+    public void testSetDebugLogging() throws FmiInvalidNativeStateException {
+
+        Assert.assertEquals(Fmi3Status.OK, instance.setDebugLogging(true, "A", "B"));
+    }
+
+    @Test
+    public void testEnterEventMode() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(true, true, new int[]{1, 2, 3}, true));
+    }
+
+    @Test
+    public void testTerminate() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.terminate());
+    }
+
+    @Test
+    public void testReset() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.reset());
+    }
+
+    @Test
+    public void testGetNumberOfVariableDependencies() throws FmiInvalidNativeStateException {
+        FmuResult<Long> res = instance.getNumberOfVariableDependencies(1);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(5, res.result, 0.0);
+    }
+
+
+    @Test
+    public void testGetVariableDependencies() throws FmiInvalidNativeStateException {
+
+        Assert.assertEquals(Fmi3Status.Error, instance.getVariableDependencies(9, 0).status);
+
+        FmuResult<IFmi3Instance.VariableDependency> res = instance.getVariableDependencies(1, 5);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+        Assert.assertEquals(5, res.result.dependencyKinds.length);
+        for (int i = 0; i < 5; i++) {
+            Assert.assertEquals(Fmi3DependencyKind.valueOf(i), res.result.dependencyKinds[i]);
+            Assert.assertEquals(i, res.result.elementIndicesOfDependent[i]);
+            Assert.assertEquals(i, res.result.independents[i]);
+            Assert.assertEquals(i, res.result.elementIndicesOfIndependents[i]);
+        }
+
+    }
+
+
+    @Test
+    public void testState() {
+        Assume.assumeTrue(true);
+        //        typedef fmi3Status fmi3GetFMUStateTYPE (fmi3Instance instance, fmi3FMUState* FMUState);
+        //        typedef fmi3Status fmi3SetFMUStateTYPE (fmi3Instance instance, fmi3FMUState  FMUState);
+        //
+        //        typedef fmi3Status fmi3FreeFMUStateTYPE(fmi3Instance instance, fmi3FMUState* FMUState);
+    }
+
+    @Test
+    public void testSerializeState() {
+        Assume.assumeTrue(true);
+
+        //        typedef fmi3Status fmi3SerializedFMUStateSizeTYPE(fmi3Instance instance,
+        //                fmi3FMUState FMUState,
+        //                size_t* size);
+        //        typedef fmi3Status fmi3SerializeFMUStateTYPE     (fmi3Instance instance,
+        //                fmi3FMUState FMUState,
+        //                fmi3Byte serializedState[],
+        //        size_t size);
+        //        typedef fmi3Status fmi3DeSerializeFMUStateTYPE   (fmi3Instance instance,
+        //                                                  const fmi3Byte serializedState[],
+        //        size_t size,
+        //        fmi3FMUState* FMUState);
+
+    }
+
+
+    @Test
+    public void testGetDirectionalDerivative() throws FmiInvalidNativeStateException {
+        //FIXME not sure how this works
+        Assume.assumeTrue(true);
+        long[] unknowns = new long[2];
+        long[] knows = new long[2];
+        double[] seeds = new double[2];
+
+        for (int i = 0; i < 2; i++) {
+            unknowns[i] = i;
+            knows[i] = i;
+            seeds[i] = i;
+        }
+
+        FmuResult<double[]> res = instance.getDirectionalDerivative(unknowns, knows, seeds);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        //        for (int i = 0; i < 2; i++) {
+        //            Assert.assertEquals(i * 0.1, res.result[i], 0.0);
+        //        }
+    }
+
+    @Test
+    public void testGetAdjointDerivative() {
+        Assume.assumeTrue(true);
+        //FIXME wait for the testGetDirectionalDerivative to be implemented as they are equal
+    }
+
+    @Test
+    public void testEnterConfigurationMode() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.enterConfigurationMode());
+    }
+
+
+    @Test
+    public void testExitConfigurationMode() throws FmiInvalidNativeStateException {
+
+        Assert.assertEquals(Fmi3Status.OK, instance.exitConfigurationMode());
+    }
+
+    @Test
+    public void testGetIntervalDecimal() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.Error, instance.getIntervalDecimal(new long[]{9L}).status);
+
+        FmuResult<IFmi3Instance.GetIntervalDecimalResponse> res = instance.getIntervalDecimal(new long[]{1L, 2L});
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+        Assert.assertEquals(2, res.result.intervals.length);
+        Assert.assertEquals(2, res.result.qualifiers.length);
+
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(i * 0.1, res.result.intervals[i], 0.0);
+            Assert.assertEquals(Fmi3IntervalQualifier.valueOf(i), res.result.qualifiers[i]);
+        }
+    }
+
+    @Test
+    public void testGetIntervalFraction() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.Error, instance.getIntervalFraction(new long[]{9L}).status);
+
+        FmuResult<IFmi3Instance.IntervalFractionResponse> res = instance.getIntervalFraction(new long[]{1L, 2L});
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+        Assert.assertEquals(2, res.result.intervalCounters.length);
+        Assert.assertEquals(2, res.result.resolutions.length);
+        Assert.assertEquals(2, res.result.qualifiers.length);
+
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(i, res.result.intervalCounters[i]);
+            Assert.assertEquals(i, res.result.resolutions[i]);
+            Assert.assertEquals(Fmi3IntervalQualifier.valueOf(i), res.result.qualifiers[i]);
+        }
+
+    }
+
+    @Test
+    public void testGetShiftDecimal() throws FmiInvalidNativeStateException {
+
+        Assert.assertEquals(Fmi3Status.Error, instance.getShiftDecimal(new long[]{9L}).status);
+
+        FmuResult<double[]> res = instance.getShiftDecimal(new long[]{1L, 2L});
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+        Assert.assertEquals(0 * 0.1, res.result[0], 0.0);
+        Assert.assertEquals(1 * 0.1, res.result[1], 0.0);
+
+    }
+
+    @Test
+    public void testGetShiftFraction() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.Error, instance.getShiftFraction(new long[]{9L}).status);
+
+        FmuResult<IFmi3Instance.GetShiftFractionResponse> res = instance.getShiftFraction(new long[]{1L, 2L});
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+        Assert.assertEquals(2, res.result.shiftCounters.length);
+        Assert.assertEquals(2, res.result.resolutions.length);
+
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(i, res.result.shiftCounters[i]);
+            Assert.assertEquals(i, res.result.resolutions[i]);
+        }
+
+    }
+
+    @Test
+    public void testSetIntervalDecimal() throws FmiInvalidNativeStateException {
+
+        Assert.assertEquals(Fmi3Status.OK, instance.setIntervalDecimal(new long[]{1L, 2L}, new double[]{1.1, 2.2}));
+
+    }
+
+    @Test
+    public void testSetIntervalFraction() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.setIntervalFraction(new long[]{1L, 2L}, new long[]{1L, 2L}, new long[]{3L, 4L}));
+
+    }
+
+    @Test
+    public void testEvaluateDiscreteStates() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.evaluateDiscreteStates());
+
+    }
+
+    @Test
+    public void testUpdateDiscreteStates() throws FmiInvalidNativeStateException {
+
+        FmuResult<IFmi3Instance.UpdateDiscreteStates> res = instance.updateDiscreteStates();
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99.99, res.result.nextEventTime, 0.0);
+
+    }
+
+    @Test
+    public void testEnterContinuousTimeMode() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.enterContinuousTimeMode());
+    }
+
+    @Test
+    public void testCompletedIntegratorStep() throws FmiInvalidNativeStateException {
+        FmuResult<IFmi3Instance.CompletedIntegratorStepResponse> res = instance.completedIntegratorStep(false);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+
+    }
+
+    @Test
+    public void testSetTime() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.setTime(99.99));
+
+    }
+
+    @Test
+    public void testSetContinuousStates() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.setContinuousStates(new double[]{1.1, 2.2}));
+
+    }
+
+    @Test
+    public void testGetContinuousStateDerivatives() throws FmiInvalidNativeStateException {
+        //        FmuResult<double[]> res = instance.getContinuousStateDerivatives();
+        //        Assert.assertEquals(Fmi3Status.OK, res.status);
+        //        Assert.assertEquals(99.99, res.result[0], 0.0);
+        //FIXME not implemented
+    }
+
+    @Test
+    public void testGetEventIndicators() throws FmiInvalidNativeStateException {
+        FmuResult<double[]> res = instance.getGetEventIndicators(1);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99.99, res.result[0], 0.0);
+
+    }
+
+    @Test
+    public void testGetContinuousStates() throws FmiInvalidNativeStateException {
+        FmuResult<double[]> res = instance.getGetContinuousStates(1);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99.99, res.result[0], 0.0);
+    }
+
+    @Test
+    public void testGetNominalsOfContinuousStates() throws FmiInvalidNativeStateException {
+        FmuResult<double[]> res = instance.getGetNominalsOfContinuousStates(1);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99.99, res.result[0], 0.0);
+
+    }
+
+    @Test
+    public void testGetNumberOfEventIndicators() throws FmiInvalidNativeStateException {
+        FmuResult<Long> res = instance.getNumberOfEventIndicators();
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99L, (long) res.result);
+
+    }
+
+    @Test
+    public void testGetNumberOfContinuousStates() throws FmiInvalidNativeStateException {
+        FmuResult<Long> res = instance.getNumberOfContinuousStates();
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99L, (long) res.result);
+
+    }
+
+    @Test
+    public void testEnterStepMode() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.enterStepMode());
+    }
+
+
+    @Test
+    public void testGetOutputDerivatives() throws FmiInvalidNativeStateException {
+        FmuResult<double[]> res = instance.getOutputDerivatives(new long[]{1L, 2L}, new int[]{0, 1, 2});
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Assert.assertEquals(99.99, res.result[0], 0.0);
+    }
+
+    @Test
+    public void testDoStep() throws FmiInvalidNativeStateException {
+        FmuResult<IFmi3Instance.DoStepResult> res = instance.doStep(0.0, 1.1, false);
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+    }
+
+    @Test
+    public void testActivateModelPartition() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.activateModelPartition(1L, 99.99));
+
+    }
+
+
 }

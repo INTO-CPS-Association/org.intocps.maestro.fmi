@@ -61,9 +61,9 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
 
     jclass cls;
     jfieldID enumField = nullptr;
-    const char *signature = "Lorg/intocps/fmi3/Fmi3DependencyKind;";
+    const char *signature = "Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3DependencyKind;";
 
-    cls = env->FindClass("org/intocps/fmi3/Fmi3DependencyKind");
+    cls = env->FindClass("org/intocps/fmi/jnifmuapi/fmi3/Fmi3DependencyKind");
     if (cls == nullptr) {
         return;
     }
@@ -72,22 +72,22 @@ void copyArray_fmi3DependencyKind_to_javaEnum(JNIEnv *env, const fmi3DependencyK
         switch (dependencyKinds[i]) {
             // Not needed but reserved for future use?
             case fmi3Independent:
-                enumField = env->GetStaticFieldID(cls, "fmi3Independent", signature);
+                enumField = env->GetStaticFieldID(cls, "Independent", signature);
                 break;
             case fmi3Constant:
-                enumField = env->GetStaticFieldID(cls, "fmi3Constant", signature);
+                enumField = env->GetStaticFieldID(cls, "Constant", signature);
                 break;
             case fmi3Fixed:
-                enumField = env->GetStaticFieldID(cls, "fmi3Fixed", signature);
+                enumField = env->GetStaticFieldID(cls, "Fixed", signature);
                 break;
             case fmi3Tunable:
-                enumField = env->GetStaticFieldID(cls, "fmi3Tunable", signature);
+                enumField = env->GetStaticFieldID(cls, "Tunable", signature);
                 break;
             case fmi3Discrete:
-                enumField = env->GetStaticFieldID(cls, "fmi3Discrete", signature);
+                enumField = env->GetStaticFieldID(cls, "Discrete", signature);
                 break;
             case fmi3Dependent:
-                enumField = env->GetStaticFieldID(cls, "fmi3Dependent", signature);
+                enumField = env->GetStaticFieldID(cls, "Dependent", signature);
                 break;
         }
         if (enumField != nullptr) {
@@ -111,9 +111,9 @@ void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3Interva
 
     jclass cls;
     jfieldID enumField = nullptr;
-    const char *signature = "Lorg/intocps/fmi3/Fmi3IntervalQualifier;";
+    const char *signature = "Lorg/intocps/fmi/jnifmuapi/fmi3/Fmi3IntervalQualifier;";
 
-    cls = env->FindClass("org/intocps/fmi3/Fmi3IntervalQualifier");
+    cls = env->FindClass("org/intocps/fmi/jnifmuapi/fmi3/Fmi3IntervalQualifier");
     if (cls == nullptr) {
         return;
     }
@@ -121,13 +121,13 @@ void copyArray_fmi3IntervalQualifiers_to_javaEnum(JNIEnv *env, const fmi3Interva
     for (int i = 0; i < len; i++) {
         switch (qualifiers[i]) {
             case fmi3IntervalNotYetKnown:
-                enumField = env->GetStaticFieldID(cls, "fmi3IntervalNotYetKnown", signature);
+                enumField = env->GetStaticFieldID(cls, "IntervalNotYetKnown", signature);
                 break;
             case fmi3IntervalUnchanged:
-                enumField = env->GetStaticFieldID(cls, "fmi3IntervalUnchanged", signature);
+                enumField = env->GetStaticFieldID(cls, "IntervalUnchanged", signature);
                 break;
             case fmi3IntervalChanged:
-                enumField = env->GetStaticFieldID(cls, "fmi3IntervalChanged", signature);
+                enumField = env->GetStaticFieldID(cls, "IntervalChanged", signature);
                 break;
         }
         if (enumField != nullptr) {

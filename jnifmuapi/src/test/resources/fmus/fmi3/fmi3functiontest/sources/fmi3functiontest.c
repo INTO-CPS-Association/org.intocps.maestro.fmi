@@ -42,7 +42,16 @@ fmi3Status fmi3SetDebugLogging(fmi3Instance instance,
                                size_t nCategories,
                                const fmi3String categories[]) {
 
-    return fmi3OK;
+    if (loggingOn && nCategories == 2 && categories != NULL && strcmp(categories[0], "A") == 0 &&
+        strcmp(categories[1], "B") == 0) {
+        return fmi3OK;
+    }
+    printf("LoggingOn: %d, Categories: %zu, \n", loggingOn, nCategories);
+    if (categories != NULL && nCategories > 1) {
+        printf("Category: '%s'\n", categories[0]);
+        printf("Category: '%s'\n", categories[1]);
+    }
+    return fmi3Error;
 }
 
 fmi3Instance instantiateModel(fmi3String instanceName,
@@ -756,6 +765,7 @@ fmi3Status fmi3SetClock(fmi3Instance instance, const fmi3ValueReference valueRef
 fmi3Status fmi3GetNumberOfVariableDependencies(fmi3Instance instance,
                                                fmi3ValueReference valueReference,
                                                size_t *nDependencies) {
+    *nDependencies = 5;
     return fmi3OK;
 }
 
@@ -766,6 +776,17 @@ fmi3Status fmi3GetVariableDependencies(fmi3Instance instance,
                                        size_t elementIndicesOfIndependents[],
                                        fmi3DependencyKind dependencyKinds[],
                                        size_t nDependencies) {
+
+    if (dependent == 9)
+        return fmi3Error;
+
+
+    for (int i = 0; i < nDependencies; i++) {
+        dependencyKinds[i] = i;
+        elementIndicesOfDependent[i] = i;
+        independents[i] = i;
+        elementIndicesOfIndependents[i] = i;
+    }
 
     return fmi3OK;
 }
@@ -860,6 +881,15 @@ fmi3Status fmi3GetIntervalDecimal(fmi3Instance instance,
                                   fmi3Float64 intervals[],
                                   fmi3IntervalQualifier qualifiers[]) {
 
+    if (valueReferences[0] == 9)
+        return fmi3Error;
+
+
+    for (int i = 0; i < nValueReferences; ++i) {
+        intervals[i] = i * 0.1;
+        qualifiers[i] = i;
+    }
+
     return fmi3OK;
 }
 
@@ -870,6 +900,17 @@ fmi3Status fmi3GetIntervalFraction(fmi3Instance instance,
                                    fmi3UInt64 resolutions[],
                                    fmi3IntervalQualifier qualifiers[]) {
 
+    if (valueReferences[0] == 9)
+        return fmi3Error;
+
+
+    for (int i = 0; i < nValueReferences; ++i) {
+        intervalCounters[i] = i;
+        resolutions[i] = i;
+        qualifiers[i] = i;
+    }
+
+
     return fmi3OK;
 }
 
@@ -877,6 +918,16 @@ fmi3Status fmi3GetShiftDecimal(fmi3Instance instance,
                                const fmi3ValueReference valueReferences[],
                                size_t nValueReferences,
                                fmi3Float64 shifts[]) {
+
+
+    if (valueReferences[0] == 9)
+        return fmi3Error;
+
+
+    for (int i = 0; i < nValueReferences; ++i) {
+        shifts[i] = i * 0.1;
+    }
+
 
     return fmi3OK;
 }
@@ -887,6 +938,16 @@ fmi3Status fmi3GetShiftFraction(fmi3Instance instance,
                                 fmi3UInt64 shiftCounters[],
                                 fmi3UInt64 resolutions[]) {
 
+
+    if (valueReferences[0] == 9)
+        return fmi3Error;
+
+
+    for (int i = 0; i < nValueReferences; ++i) {
+        shiftCounters[i] = i;
+        resolutions[i] = i;
+    }
+
     return fmi3OK;
 }
 
@@ -895,7 +956,9 @@ fmi3Status fmi3SetIntervalDecimal(fmi3Instance instance,
                                   size_t nValueReferences,
                                   const fmi3Float64 intervals[]) {
 
-    return fmi3OK;
+    if (intervals[0] == 1.1 && intervals[1] == 2.2)
+        return fmi3OK;
+    return fmi3Error;
 }
 
 fmi3Status fmi3SetIntervalFraction(fmi3Instance instance,
@@ -904,7 +967,9 @@ fmi3Status fmi3SetIntervalFraction(fmi3Instance instance,
                                    const fmi3UInt64 intervalCounters[],
                                    const fmi3UInt64 resolutions[]) {
 
-    return fmi3OK;
+    if (intervalCounters[0] == 1 && intervalCounters[1] == 2 && resolutions[0] == 3 && resolutions[1] == 4)
+        return fmi3OK;
+    return fmi3Error;
 }
 
 fmi3Status fmi3EvaluateDiscreteStates(fmi3Instance instance) {
@@ -919,8 +984,10 @@ fmi3Status fmi3UpdateDiscreteStates(fmi3Instance instance,
                                     fmi3Boolean *nextEventTimeDefined,
                                     fmi3Float64 *nextEventTime) {
 
-
+    *nextEventTimeDefined = true;
+    *nextEventTime = 99.99;
     return fmi3OK;
+
 }
 
 /***************************************************
@@ -945,8 +1012,9 @@ fmi3Status fmi3CompletedIntegratorStep(fmi3Instance instance,
 /* Providing independent variables and re-initialization of caching */
 fmi3Status fmi3SetTime(fmi3Instance instance, fmi3Float64 time) {
 
-
-    return fmi3OK;
+    if (time == 99.99)
+        return fmi3OK;
+    return fmi3Error;
 }
 
 fmi3Status fmi3SetContinuousStates(fmi3Instance instance,
@@ -962,6 +1030,8 @@ fmi3Status fmi3GetContinuousStateDerivatives(fmi3Instance instance,
                                              fmi3Float64 derivatives[],
                                              size_t nContinuousStates) {
 
+    derivatives[0] = 99.99;
+
 
     return fmi3OK;
 }
@@ -969,7 +1039,7 @@ fmi3Status fmi3GetContinuousStateDerivatives(fmi3Instance instance,
 fmi3Status fmi3GetEventIndicators(fmi3Instance instance,
                                   fmi3Float64 eventIndicators[],
                                   size_t nEventIndicators) {
-
+    eventIndicators[0] = 99.99;
 
     return fmi3OK;
 }
@@ -978,7 +1048,7 @@ fmi3Status fmi3GetContinuousStates(fmi3Instance instance,
                                    fmi3Float64 continuousStates[],
                                    size_t nContinuousStates) {
 
-
+    continuousStates[0] = 99.99;
     return fmi3OK;
 }
 
@@ -986,21 +1056,21 @@ fmi3Status fmi3GetNominalsOfContinuousStates(fmi3Instance instance,
                                              fmi3Float64 nominals[],
                                              size_t nContinuousStates) {
 
-
+    nominals[0] = 99.99;
     return fmi3OK;
 }
 
 fmi3Status fmi3GetNumberOfEventIndicators(fmi3Instance instance,
                                           size_t *nEventIndicators) {
 
-
+    *nEventIndicators = 99;
     return fmi3OK;
 }
 
 fmi3Status fmi3GetNumberOfContinuousStates(fmi3Instance instance,
                                            size_t *nContinuousStates) {
 
-
+    *nContinuousStates = 99;
     return fmi3OK;
 }
 
@@ -1021,6 +1091,9 @@ fmi3Status fmi3GetOutputDerivatives(fmi3Instance instance,
                                     fmi3Float64 values[],
                                     size_t nValues) {
 
+
+    values[0] = 99.99;
+    values[1] = 98.98;
 
     return fmi3OK;
 }

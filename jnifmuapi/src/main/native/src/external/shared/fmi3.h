@@ -90,8 +90,15 @@ typedef struct {
     fmi3SetClockTYPE *fmi3SetClock;
     fmi3GetIntervalDecimalTYPE *fmi3GetIntervalDecimal;
     fmi3GetIntervalFractionTYPE *fmi3GetIntervalFraction;
+
+    fmi3GetShiftDecimalTYPE * fmi3GetShiftDecimal;
+    fmi3GetShiftFractionTYPE * fmi3GetShiftFraction;
+
     fmi3SetIntervalDecimalTYPE *fmi3SetIntervalDecimal;
     fmi3SetIntervalFractionTYPE *fmi3SetIntervalFraction;
+
+    fmi3EvaluateDiscreteStatesTYPE  * fmi3EvaluateDiscreteStates;
+
     fmi3UpdateDiscreteStatesTYPE *fmi3UpdateDiscreteStates;
     fmi3EnterContinuousTimeModeTYPE *fmi3EnterContinuousTimeMode;
     fmi3CompletedIntegratorStepTYPE *fmi3CompletedIntegratorStep;

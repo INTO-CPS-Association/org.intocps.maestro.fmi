@@ -3,6 +3,25 @@ package org.intocps.fmi.jnifmuapi.fmi3;
 import org.intocps.fmi.FmiInvalidNativeStateException;
 
 public interface IFmi3Instance {
+
+
+    //    enum IntervalQualifier {
+    //        fmi3IntervalNotYetKnown(0),
+    //        fmi3IntervalUnchanged(1),
+    //        fmi3IntervalChanged(2);
+    //
+    //        private final int value;
+    //
+    //        IntervalQualifier(final int newValue) {
+    //            value = newValue;
+    //        }
+    //
+    //        public int getValue() {
+    //            return value;
+    //        }
+    //    }
+
+
     boolean isValid();
 
     Fmi3Status terminate() throws FmiInvalidNativeStateException;
@@ -25,9 +44,142 @@ public interface IFmi3Instance {
     FmuResult<DoStepResult> doStep(double currentCommunicationPoint, double communicationStepSize,
             boolean noSetFMUStatePriorToCurrentPoint) throws FmiInvalidNativeStateException;
 
+
     Fmi3Status doStep(double currentCommunicationPoint, double communicationStepSize, boolean noSetFMUStatePriorToCurrentPoint,
             boolean[] eventEncountered, boolean[] terminateSimulation, boolean[] earlyReturn,
             double[] lastSuccessfulTime) throws FmiInvalidNativeStateException;
+
+    Fmi3Status setDebugLogging(boolean loggingOn, String... categories) throws FmiInvalidNativeStateException;
+
+    FmuResult<Long> getNumberOfVariableDependencies(long valueReference) throws FmiInvalidNativeStateException;
+
+    class VariableDependency {
+        long[] elementIndicesOfDependent;
+        long[] independents;
+        long[] elementIndicesOfIndependents;
+        Fmi3DependencyKind[] dependencyKinds;
+
+        public VariableDependency(int size) {
+            this.dependencyKinds = new Fmi3DependencyKind[size];
+            this.elementIndicesOfDependent = new long[size];
+            this.elementIndicesOfIndependents = new long[size];
+            this.independents = new long[size];
+        }
+    }
+
+    FmuResult<VariableDependency> getVariableDependencies(long dependent, long nDependencies) throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getDirectionalDerivative(long unknowns[], long knowns[], double seed[]) throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getGetAdjointDerivative(long unknowns[], long knowns[], double seed[]) throws FmiInvalidNativeStateException;
+
+
+    class GetIntervalDecimalResponse {
+        double[] intervals;
+        Fmi3IntervalQualifier[] qualifiers;
+
+        public GetIntervalDecimalResponse(int size) {
+            this.intervals = new double[size];
+            this.qualifiers = new Fmi3IntervalQualifier[size];
+        }
+    }
+
+    FmuResult<GetIntervalDecimalResponse> getIntervalDecimal(long[] valueReferences) throws FmiInvalidNativeStateException;
+
+    class IntervalFractionResponse {
+        long[] intervalCounters;
+        long[] resolutions;
+        Fmi3IntervalQualifier[] qualifiers;
+
+        public IntervalFractionResponse(int size) {
+            this.intervalCounters = new long[size];
+            this.resolutions = new long[size];
+            this.qualifiers = new Fmi3IntervalQualifier[size];
+        }
+    }
+
+    FmuResult<IntervalFractionResponse> getIntervalFraction(long[] valueReferences) throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getShiftDecimal(long[] valueReferences) throws FmiInvalidNativeStateException;
+
+
+    class GetShiftFractionResponse {
+        long[] shiftCounters;
+        long[] resolutions;
+
+        public GetShiftFractionResponse(int size) {
+            this.shiftCounters = new long[size];
+            this.resolutions = new long[size];
+        }
+    }
+
+    FmuResult<GetShiftFractionResponse> getShiftFraction(long[] valueReferences) throws FmiInvalidNativeStateException;
+
+    Fmi3Status setIntervalDecimal(long[] valueReferences, double[] intervals) throws FmiInvalidNativeStateException;
+
+    Fmi3Status setIntervalFraction(long[] valueReferences, long[] intervalCounters, long[] resolutions) throws FmiInvalidNativeStateException;
+
+
+    Fmi3Status evaluateDiscreteStates() throws FmiInvalidNativeStateException;
+
+    class UpdateDiscreteStates {
+        boolean discreteStatesNeedUpdate;
+        boolean terminateSimulation;
+        boolean nominalsOfContinuousStatesChanged;
+        boolean valuesOfContinuousStatesChanged;
+        boolean nextEventTimeDefined;
+        double nextEventTime;
+
+        public UpdateDiscreteStates(boolean discreteStatesNeedUpdate, boolean terminateSimulation, boolean nominalsOfContinuousStatesChanged,
+                boolean valuesOfContinuousStatesChanged, boolean nextEventTimeDefined, double nextEventTime) {
+            this.discreteStatesNeedUpdate = discreteStatesNeedUpdate;
+            this.terminateSimulation = terminateSimulation;
+            this.nominalsOfContinuousStatesChanged = nominalsOfContinuousStatesChanged;
+            this.valuesOfContinuousStatesChanged = valuesOfContinuousStatesChanged;
+            this.nextEventTimeDefined = nextEventTimeDefined;
+            this.nextEventTime = nextEventTime;
+        }
+    }
+
+    FmuResult<UpdateDiscreteStates> updateDiscreteStates() throws FmiInvalidNativeStateException;
+
+    Fmi3Status enterContinuousTimeMode() throws FmiInvalidNativeStateException;
+
+    class CompletedIntegratorStepResponse {
+        boolean enterEventMode;
+        boolean terminateSimulation;
+
+        public CompletedIntegratorStepResponse(boolean enterEventMode, boolean terminateSimulation) {
+            this.enterEventMode = enterEventMode;
+            this.terminateSimulation = terminateSimulation;
+        }
+    }
+
+    FmuResult<CompletedIntegratorStepResponse> completedIntegratorStep(
+            boolean noSetFMUStatePriorToCurrentPoint) throws FmiInvalidNativeStateException;
+
+    Fmi3Status setTime(double time) throws FmiInvalidNativeStateException;
+
+    Fmi3Status setContinuousStates(double[] continuousStates) throws FmiInvalidNativeStateException;
+
+
+    FmuResult<double[]> getContinuousStateDerivatives() throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getGetEventIndicators(int nEventIndicators) throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getGetContinuousStates(int nContinuousStates) throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getGetNominalsOfContinuousStates(int nContinuousStates) throws FmiInvalidNativeStateException;
+
+
+    FmuResult<Long> getNumberOfEventIndicators() throws FmiInvalidNativeStateException;
+
+    FmuResult<Long> getNumberOfContinuousStates() throws FmiInvalidNativeStateException;
+
+    Fmi3Status enterStepMode() throws FmiInvalidNativeStateException;
+
+    FmuResult<double[]> getOutputDerivatives(long[] valueReferences, int[] orders) throws FmiInvalidNativeStateException;
+
 
     class DoStepResult {
         final boolean eventHandlingNeeded;
@@ -43,6 +195,8 @@ public interface IFmi3Instance {
 
         final double lastSuccessfulTime;
     }
+
+    Fmi3Status activateModelPartition(long clockReference, double activationTime) throws FmiInvalidNativeStateException;
 
 
     FmuResult<float[]> getFloat32(long[] valueReferences) throws FmiInvalidNativeStateException;

@@ -3,6 +3,7 @@ package org.intocps.fmi.jnifmuapi.fmi3;
 @SuppressWarnings({"unused", "CStyleArrayDeclaration"})
 public class NativeFmu3Instance {
 
+
     /**
      * size_t nCategories is ignored as it is calculated from categories[].
      *
@@ -11,33 +12,33 @@ public class NativeFmu3Instance {
      * @param categories
      * @return
      */
-    native Fmi3Status nSetDebugLogging(long fmu, long instance, boolean loggingOn, String categories[]);
+    native Fmi3Status nSetDebugLogging(long instance, boolean loggingOn, String categories[]);
 
     /* tag::FreeInstance[] */
-    native void nFreeInstance(long fmu, long instance);
+    native void nFreeInstance(long instance);
     /* end::FreeInstance[] */
 
     /* Enter and exit initialization mode, enter event mode, terminate and reset */
     /* tag::EnterInitializationMode[] */
-    native Fmi3Status nEnterInitializationMode(long fmu, long instance, boolean toleranceDefined, double tolerance, double startTime,
-            boolean stopTimeDefined, double stopTime);
+    native Fmi3Status nEnterInitializationMode(long instance, boolean toleranceDefined, double tolerance, double startTime, boolean stopTimeDefined,
+            double stopTime);
     /* end::EnterInitializationMode[] */
 
     /* tag::ExitInitializationMode[] */
-    native Fmi3Status nExitInitializationMode(long fmu, long instance);
+    native Fmi3Status nExitInitializationMode(long instance);
     /* end::ExitInitializationMode[] */
 
     /* tag::EnterEventMode[] */
-    native Fmi3Status nEnterEventMode(long fmu, long instance, boolean stepEvent, boolean stateEvent, int rootsFound[], int nEventIndicators,
+    native Fmi3Status nEnterEventMode(long instance, boolean stepEvent, boolean stateEvent, int rootsFound[], int nEventIndicators,
             boolean timeEvent);
     /* end::EnterEventMode[] */
 
     /* tag::Terminate[] */
-    native Fmi3Status nTerminate(long fmu, long instance);
+    native Fmi3Status nTerminate(long instance);
     /* end::Terminate[] */
 
     /* tag::Reset[] */
-    native Fmi3Status nReset(long fmu, long instance);
+    native Fmi3Status nReset(long instance);
     /* end::Reset[] */
 
     /* Getting and setting variable values */
@@ -103,13 +104,13 @@ public class NativeFmu3Instance {
     /* end::GetNumberOfVariableDependencies[] */
 
     /* tag::GetVariableDependencies[] */
-    native Fmi3Status nGetVariableDependencies(long fmu, long instance, long dependent, long elementIndicesOfDependent[], long independents[],
-            long elementIndicesOfIndependents[], Fmi3DependencyKind dependencyKinds[], int nDependencies);
+    native Fmi3Status nGetVariableDependencies(long instance, long dependent, long elementIndicesOfDependent[], long independents[],
+            long elementIndicesOfIndependents[], Fmi3DependencyKind dependencyKinds[], long nDependencies);
     /* end::GetVariableDependencies[] */
 
     /* Getting and setting the internal FMU state */
     /* tag::GetFMUState[] */
-    native Fmi3Status nGetFMUState(long fmu, long instance, long[] FMUState);
+    native Fmi3Status nGetFMUState(long instance, long[] FMUState);
     /* end::GetFMUState[] */
 
     /* tag::SetFMUState[] */
@@ -121,7 +122,7 @@ public class NativeFmu3Instance {
     /* end::FreeFMUState[] */
 
     /* tag::SerializedFMUStateSize[] */
-    native Fmi3Status nSerializedFMUStateSize(long fmu, long instance, long FMUState, long[] size);
+    native Fmi3Status nSerializedFMUStateSize(long instance, long FMUState, long[] size);
     /* end::SerializedFMUStateSize[] */
 
     //    /* tag::SerializeFMUState[] */
@@ -140,64 +141,66 @@ public class NativeFmu3Instance {
 
     /* Getting partial derivatives */
     /* tag::GetDirectionalDerivative[] */
-    native Fmi3Status nGetDirectionalDerivative(long fmu, long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[],
-            int nSeed, double sensitivity[], int nSensitivity);
+    native Fmi3Status nGetDirectionalDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
+            double sensitivity[], int nSensitivity);
     /* end::GetDirectionalDerivative[] */
 
     /* tag::GetAdjointDerivative[] */
-    native Fmi3Status nGetAdjointDerivative(long fmu, long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[],
-            int nSeed, double sensitivity[], int nSensitivity);
+    native Fmi3Status nGetAdjointDerivative(long instance, long unknowns[], int nUnknowns, long knowns[], int nKnowns, double seed[], int nSeed,
+            double sensitivity[], int nSensitivity);
     /* end::GetAdjointDerivative[] */
 
 
     /* Entering and exiting the Configuration or Reconfiguration Mode */
     /* tag::EnterConfigurationMode[] */
-    native Fmi3Status nEnterConfigurationMode(long fmu, long instance);
+    native Fmi3Status nEnterConfigurationMode(long instance);
     /* end::EnterConfigurationMode[] */
 
     /* tag::ExitConfigurationMode[] */
-    native Fmi3Status nExitConfigurationMode(long fmu, long instance);
+    native Fmi3Status nExitConfigurationMode(long instance);
     /* end::ExitConfigurationMode[] */
 
     /* Clock related functions */
     /* tag::GetClock[] */
-    native Fmi3Status nGetClock(long fmu, long instance, long valueReferences[], int nValueReferences, boolean values[]);
+    native Fmi3Status nGetClock(long instance, long valueReferences[], int nValueReferences, boolean values[]);
     /* end::GetClock[] */
 
     /* tag::SetClock[] */
-    native Fmi3Status nSetClock(long fmu, long instance, long valueReferences[], int nValueReferences, boolean values[]);
+    native Fmi3Status nSetClock(long instance, long valueReferences[], int nValueReferences, boolean values[]);
     /* end::SetClock[] */
 
     /* tag::GetIntervalDecimal[] */
-    native Fmi3Status nGetIntervalDecimal(long fmu, long instance, long valueReferences[], int nValueReferences, double intervals[],
+    native Fmi3Status nGetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double intervals[],
             Fmi3IntervalQualifier qualifiers[]);
     /* end::GetIntervalDecimal[] */
 
     /* tag::GetIntervalFraction[] */
-    native Fmi3Status nGetIntervalFraction(long fmu, long instance, long valueReferences[], int nValueReferences, long intervalCounters[],
-            long resolutions[]);
+    native Fmi3Status nGetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounters[], long resolutions[],
+            Fmi3IntervalQualifier qualifiers[]);
     /* end::GetIntervalFraction[] */
 
     /* tag::GetShiftDecimal[] */
-    native Fmi3Status nGetShiftDecimal(long fmu, long instance, long valueReferences[], int nValueReferences, double shifts[]);
+    native Fmi3Status nGetShiftDecimal(long instance, long valueReferences[], int nValueReferences, double shifts[]);
     /* end::GetShiftDecimal[] */
 
     /* tag::GetShiftFraction[] */
-    native Fmi3Status nGetShiftFraction(long fmu, long instance, int valueReferences[], int nValueReferences, double shiftCounters[],
-            double resolutions[]);
+    native Fmi3Status nGetShiftFraction(long instance, long valueReferences[], int nValueReferences, long shiftCounters[], long resolutions[]);
     /* end::GetShiftFraction[] */
 
     /* tag::SetIntervalDecimal[] */
-    native Fmi3Status nSetIntervalDecimal(long fmu, long instance, long valueReferences[], int nValueReferences, double interval[]);
+    native Fmi3Status nSetIntervalDecimal(long instance, long valueReferences[], int nValueReferences, double interval[]);
     /* end::SetIntervalDecimal[] */
 
     /* tag::SetIntervalFraction[] */
-    native Fmi3Status nSetIntervalFraction(long fmu, long instance, long valueReferences[], int nValueReferences, long intervalCounter[],
-            long resolution[]);
+    native Fmi3Status nSetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[]);
     /* end::SetIntervalFraction[] */
 
+    /* tag::EvaluateDiscreteStates[] */
+    native Fmi3Status nEvaluateDiscreteStates(long instance);
+    /* end::EvaluateDiscreteStates[] */
+
     /* tag::UpdateDiscreteStates[] */
-    native Fmi3Status nUpdateDiscreteStates(long fmu, long instance, boolean[] discreteStatesNeedUpdate, boolean[] terminateSimulation,
+    native Fmi3Status nUpdateDiscreteStates(long instance, boolean[] discreteStatesNeedUpdate, boolean[] terminateSimulation,
             boolean[] nominalsOfContinuousStatesChanged, boolean[] valuesOfContinuousStatesChanged, boolean[] nextEventTimeDefined,
             double[] nextEventTime);
     /* end::UpdateDiscreteStates[] */
@@ -207,21 +210,21 @@ public class NativeFmu3Instance {
      ****************************************************/
 
     /* tag::EnterContinuousTimeMode[] */
-    native Fmi3Status nEnterContinuousTimeMode(long fmu, long instance);
+    native Fmi3Status nEnterContinuousTimeMode(long instance);
     /* end::EnterContinuousTimeMode[] */
 
     /* tag::CompletedIntegratorStep[] */
-    native Fmi3Status nCompletedIntegratorStep(long fmu, long instance, boolean noSetFMUStatePriorToCurrentPoint, boolean[] enterEventMode,
+    native Fmi3Status nCompletedIntegratorStep(long instance, boolean noSetFMUStatePriorToCurrentPoint, boolean[] enterEventMode,
             boolean[] terminateSimulation);
     /* end::CompletedIntegratorStep[] */
 
     /* Providing independent variables and re-initialization of caching */
     /* tag::SetTime[] */
-    native Fmi3Status nSetTime(long fmu, long instance, double time);
+    native Fmi3Status nSetTime(long instance, double time);
     /* end::SetTime[] */
 
     /* tag::SetContinuousStates[] */
-    native Fmi3Status nSetContinuousStates(long fmu, long instance, double continuousStates[], int nContinuousStates);
+    native Fmi3Status nSetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
     /* end::SetContinuousStates[] */
 
     /* Evaluation of the model equations */
@@ -230,23 +233,23 @@ public class NativeFmu3Instance {
     /* end::GetDerivatives[] */
 
     /* tag::GetEventIndicators[] */
-    native Fmi3Status nGetEventIndicators(long fmu, long instance, double eventIndicators[], int nEventIndicators);
+    native Fmi3Status nGetEventIndicators(long instance, double eventIndicators[], int nEventIndicators);
     /* end::GetEventIndicators[] */
 
     /* tag::GetContinuousStates[] */
-    native Fmi3Status nGetContinuousStates(long fmu, long instance, double continuousStates[], int nContinuousStates);
+    native Fmi3Status nGetContinuousStates(long instance, double continuousStates[], int nContinuousStates);
     /* end::GetContinuousStates[] */
 
     /* tag::GetNominalsOfContinuousStates[] */
-    native Fmi3Status nGetNominalsOfContinuousStates(long fmu, long instance, double nominals[], int nContinuousStates);
+    native Fmi3Status nGetNominalsOfContinuousStates(long instance, double nominals[], int nContinuousStates);
     /* end::GetNominalsOfContinuousStates[] */
 
     /* tag::GetNumberOfEventIndicators[] */
-    native Fmi3Status nGetNumberOfEventIndicators(long fmu, long instance, long[] nEventIndicators);
+    native Fmi3Status nGetNumberOfEventIndicators(long instance, long[] nEventIndicators);
     /* end::GetNumberOfEventIndicators[] */
 
     /* tag::GetNumberOfContinuousStates[] */
-    native Fmi3Status nGetNumberOfContinuousStates(long fmu, long instance, long[] nContinuousStates);
+    native Fmi3Status nGetNumberOfContinuousStates(long instance, long[] nContinuousStates);
     /* end::GetNumberOfContinuousStates[] */
 
     /***************************************************
@@ -256,24 +259,22 @@ public class NativeFmu3Instance {
     /* Simulating the FMU */
 
     /* tag::EnterStepMode[] */
-    native Fmi3Status nEnterStepMode(long fmu, long instance);
+    native Fmi3Status nEnterStepMode(long instance);
     /* end::EnterStepMode[] */
 
     /* tag::GetOutputDerivatives[] */
-    native Fmi3Status nGetOutputDerivatives(long fmu, long instance, long valueReferences[], int nValueReferences, int orders[], double values[],
-            int nValues);
+    native Fmi3Status nGetOutputDerivatives(long instance, long valueReferences[], int nValueReferences, int orders[], double values[], int nValues);
     /* end::GetOutputDerivatives[] */
 
     /* tag::DoStep[] */
-    native Fmi3Status nDoStep(long fmu, long instance, double currentCommunicationPoint, double communicationStepSize,
-            boolean noSetFMUStatePriorToCurrentPoint, boolean[] eventHandlingNeeded, boolean[] terminateSimulation, boolean[] earlyReturn,
-            double[] lastSuccessfulTime);
+    native Fmi3Status nDoStep(long instance, double currentCommunicationPoint, double communicationStepSize, boolean noSetFMUStatePriorToCurrentPoint,
+            boolean[] eventHandlingNeeded, boolean[] terminateSimulation, boolean[] earlyReturn, double[] lastSuccessfulTime);
     /* end::DoStep[] */
 
     /***************************************************
      Types for Functions for Scheduled Execution
      ****************************************************/
     /* tag::ActivateModelPartition[] */
-    native Fmi3Status nActivateModelPartition(long fmu, long instance, long clockReference, double activationTime);
+    native Fmi3Status nActivateModelPartition(long instance, long clockReference, double activationTime);
 
 }
