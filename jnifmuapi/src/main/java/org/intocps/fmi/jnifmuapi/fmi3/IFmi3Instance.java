@@ -70,6 +70,20 @@ public interface IFmi3Instance {
 
     FmuResult<VariableDependency> getVariableDependencies(long dependent, long nDependencies) throws FmiInvalidNativeStateException;
 
+
+    FmuResult<Fmi3State> getState() throws FmiInvalidNativeStateException;
+
+    Fmi3Status setState(Fmi3State state) throws FmiInvalidNativeStateException;
+
+    Fmi3Status freeState(Fmi3State state) throws FmiInvalidNativeStateException;
+
+    FmuResult<Long> getSerializedStateSize(Fmi3State state) throws FmiInvalidNativeStateException;
+
+    FmuResult<byte[]> serializedState(Fmi3State state, long size) throws FmiInvalidNativeStateException;
+
+    FmuResult<Fmi3State> deSerializedState(byte[] serializedState) throws FmiInvalidNativeStateException;
+
+
     FmuResult<double[]> getDirectionalDerivative(long unknowns[], long knowns[], double seed[]) throws FmiInvalidNativeStateException;
 
     FmuResult<double[]> getGetAdjointDerivative(long unknowns[], long knowns[], double seed[],
@@ -121,6 +135,10 @@ public interface IFmi3Instance {
 
     Fmi3Status setIntervalFraction(long[] valueReferences, long[] intervalCounters, long[] resolutions) throws FmiInvalidNativeStateException;
 
+    Fmi3Status setShiftDecimal(long[] valueReferences, double[] shifts);
+
+    Fmi3Status setShiftFraction(long[] valueReferences, long[] counters, long[] resolutions);
+
 
     Fmi3Status evaluateDiscreteStates() throws FmiInvalidNativeStateException;
 
@@ -165,7 +183,7 @@ public interface IFmi3Instance {
     Fmi3Status setContinuousStates(double[] continuousStates) throws FmiInvalidNativeStateException;
 
 
-    FmuResult<double[]> getContinuousStateDerivatives() throws FmiInvalidNativeStateException;
+    FmuResult<double[]> getContinuousStateDerivatives(int nContinuousStates) throws FmiInvalidNativeStateException;
 
     FmuResult<double[]> getGetEventIndicators(int nEventIndicators) throws FmiInvalidNativeStateException;
 

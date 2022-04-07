@@ -10,9 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
@@ -489,31 +488,69 @@ public class Fmi3ApiTest {
 
 
     @Test
-    public void testState() {
-        Assume.assumeTrue(true);
-        //        typedef fmi3Status fmi3GetFMUStateTYPE (fmi3Instance instance, fmi3FMUState* FMUState);
-        //        typedef fmi3Status fmi3SetFMUStateTYPE (fmi3Instance instance, fmi3FMUState  FMUState);
-        //
-        //        typedef fmi3Status fmi3FreeFMUStateTYPE(fmi3Instance instance, fmi3FMUState* FMUState);
-        //TODO missing state implementation
+    public void testState() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, new byte[]{0, 0, 0}));
+        FmuResult<byte[]> baseInt = instance.getInt8(VREFS);
+        Assert.assertEquals(Fmi3Status.OK, baseInt.status);
+
+        FmuResult<Fmi3State> resBase = instance.getState();
+        Assert.assertEquals(Fmi3Status.OK, resBase.status);
+        Fmi3State state1 = resBase.result;
+
+
+        Consumer<Map.Entry<Fmi3State, byte[]>> checker = pair -> {
+            try {
+                Assert.assertEquals(Fmi3Status.OK, instance.setState(pair.getKey()));
+                FmuResult<byte[]> tmp = instance.getInt8(VREFS);
+                Assert.assertEquals(Fmi3Status.OK, tmp.status);
+                Assert.assertArrayEquals(pair.getValue(), tmp.result);
+            } catch (FmiInvalidNativeStateException e) {
+                Assert.fail(e.getMessage());
+            }
+        };
+        //check our initial state can be set and is consistent
+        checker.accept(new AbstractMap.SimpleEntry<>(state1, baseInt.result));
+
+        //make state dirty and then override it
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        checker.accept(new AbstractMap.SimpleEntry<>(state1, baseInt.result));
+
+        //make a new state
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        FmuResult<byte[]> tmp = instance.getInt8(VREFS);
+        Assert.assertEquals(Fmi3Status.OK, tmp.status);
+        Assert.assertArrayEquals(int8, tmp.result);
+        FmuResult<Fmi3State> res = instance.getState();
+        Assert.assertEquals(Fmi3Status.OK, res.status);
+        Fmi3State state2 = res.result;
+
+        checker.accept(new AbstractMap.SimpleEntry<>(state2, int8));
+        checker.accept(new AbstractMap.SimpleEntry<>(state1, baseInt.result));
+        checker.accept(new AbstractMap.SimpleEntry<>(state2, int8));
+
+        Assert.assertEquals(Fmi3Status.OK, res.result.free());
+        Assert.assertEquals(Fmi3Status.OK, state1.free());
+
     }
 
     @Test
-    public void testSerializeState() {
-        Assume.assumeTrue(true);
-        //TODO missing state implementation
+    public void testSerializeState() throws FmiInvalidNativeStateException {
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        FmuResult<Fmi3State> res = instance.getState();
+        Assert.assertEquals(Fmi3Status.OK, res.status);
 
-        //        typedef fmi3Status fmi3SerializedFMUStateSizeTYPE(fmi3Instance instance,
-        //                fmi3FMUState FMUState,
-        //                size_t* size);
-        //        typedef fmi3Status fmi3SerializeFMUStateTYPE     (fmi3Instance instance,
-        //                fmi3FMUState FMUState,
-        //                fmi3Byte serializedState[],
-        //        size_t size);
-        //        typedef fmi3Status fmi3DeSerializeFMUStateTYPE   (fmi3Instance instance,
-        //                                                  const fmi3Byte serializedState[],
-        //        size_t size,
-        //        fmi3FMUState* FMUState);
+        FmuResult<Long> sizeRes = instance.getSerializedStateSize(res.result);
+        Assert.assertEquals(Fmi3Status.OK, sizeRes.status);
+
+        FmuResult<byte[]> serializedStateRes = instance.serializedState(res.result, sizeRes.result);
+        Assert.assertEquals(Fmi3Status.OK, serializedStateRes.status);
+
+        Assert.assertEquals(Fmi3Status.OK, res.result.free());
+
+        FmuResult<Fmi3State> deserializedState = instance.deSerializedState(serializedStateRes.result);
+        Assert.assertEquals(Fmi3Status.OK, deserializedState.status);
+
+        Assert.assertEquals(Fmi3Status.OK, deserializedState.result.free());
 
     }
 
@@ -638,12 +675,12 @@ public class Fmi3ApiTest {
 
     @Test
     public void testSetShiftDecimal() {
-        //TODO missing
+        Assert.assertEquals(Fmi3Status.OK, instance.setShiftDecimal(new long[]{1L, 2L}, new double[]{1.1, 2.2}));
     }
 
     @Test
     public void testSetShiftFraction() {
-        //TODO missing
+        Assert.assertEquals(Fmi3Status.OK, instance.setShiftFraction(new long[]{1L, 2L}, new long[]{1L, 2L}, new long[]{3L, 4L}));
     }
 
     @Test
@@ -687,10 +724,7 @@ public class Fmi3ApiTest {
 
     @Test
     public void testGetContinuousStateDerivatives() throws FmiInvalidNativeStateException {
-        //        FmuResult<double[]> res = instance.getContinuousStateDerivatives();
-        //        Assert.assertEquals(Fmi3Status.OK, res.status);
-        //        Assert.assertEquals(99.99, res.result[0], 0.0);
-        //FIXME not implemented
+        Assert.assertEquals(Fmi3Status.OK, instance.getContinuousStateDerivatives(3).status);
     }
 
     @Test

@@ -137,6 +137,91 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
         return new FmuResult<>(status, dependency);
     }
 
+    abstract class Fmu3StateImpl implements Fmi3State {
+        final long ptr;
+
+        public Fmu3StateImpl(long ptr) {
+            this.ptr = ptr;
+        }
+    }
+
+    @Override
+    public FmuResult<Fmi3State> getState() throws FmiInvalidNativeStateException {
+        checkState();
+
+        long[] s = new long[1];
+        Fmi3Status status = nGetFMUState(instancePtr, s);
+        return new FmuResult<>(status, new Fmu3StateImpl(s[0]) {
+            @Override
+            public Fmi3Status free() throws FmiInvalidNativeStateException {
+                return freeState(this);
+            }
+        });
+    }
+
+    @Override
+    public Fmi3Status setState(Fmi3State state) throws FmiInvalidNativeStateException {
+        checkState();
+
+        if (state instanceof Fmu3StateImpl) {
+
+            return nSetFMUState(instancePtr, ((Fmu3StateImpl) state).ptr);
+        }
+        return Fmi3Status.Error;
+    }
+
+    @Override
+    public Fmi3Status freeState(Fmi3State state) throws FmiInvalidNativeStateException {
+        checkState();
+        if (state instanceof Fmu3StateImpl) {
+
+            return nFreeFMUState(instancePtr, ((Fmu3StateImpl) state).ptr);
+        }
+        return Fmi3Status.Error;
+    }
+
+    @Override
+    public FmuResult<Long> getSerializedStateSize(Fmi3State state) throws FmiInvalidNativeStateException {
+        checkState();
+        if (state instanceof Fmu3StateImpl) {
+
+            long[] size = new long[1];
+            Fmi3Status status = nSerializedFMUStateSize(instancePtr, ((Fmu3StateImpl) state).ptr, size);
+            return new FmuResult<>(status, size[0]);
+        }
+        return new FmuResult<>(Fmi3Status.Error, null);
+    }
+
+    @Override
+    public FmuResult<byte[]> serializedState(Fmi3State state, long size) throws FmiInvalidNativeStateException {
+        checkState();
+        if (state instanceof Fmu3StateImpl) {
+
+            byte[] data = new byte[(int) size];
+            Fmi3Status status = nSerializeFMUState(instancePtr, ((Fmu3StateImpl) state).ptr, data, size);
+            return new FmuResult<>(status, data);
+        }
+        return new FmuResult<>(Fmi3Status.Error, null);
+    }
+
+    @Override
+    public FmuResult<Fmi3State> deSerializedState(byte[] serializedState) throws FmiInvalidNativeStateException {
+        checkState();
+
+        if (serializedState == null) {
+            return new FmuResult<>(Fmi3Status.Error, null);
+        }
+
+        long[] ptr = new long[1];
+        Fmi3Status status = nDeserializeFMUState(instancePtr, serializedState, serializedState.length, ptr);
+        return new FmuResult<>(status, new Fmu3StateImpl(ptr[0]) {
+            @Override
+            public Fmi3Status free() throws FmiInvalidNativeStateException {
+                return freeState(this);
+            }
+        });
+    }
+
     @Override
     public FmuResult<double[]> getDirectionalDerivative(long[] unknowns, long[] knowns, double[] seed) throws FmiInvalidNativeStateException {
         checkState();
@@ -275,6 +360,36 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
+    public Fmi3Status setShiftDecimal(long[] valueReferences, double[] shifts) {
+        if (valueReferences == null) {
+            valueReferences = new long[0];
+        }
+
+        if (shifts == null) {
+            shifts = new double[0];
+        }
+
+
+        return nSetShiftDecimal(instancePtr, valueReferences, valueReferences.length, shifts);
+    }
+
+    @Override
+    public Fmi3Status setShiftFraction(long[] valueReferences, long[] counters, long[] resolutions) {
+        if (valueReferences == null) {
+            valueReferences = new long[0];
+        }
+
+        if (counters == null) {
+            counters = new long[0];
+        }
+        if (resolutions == null) {
+            resolutions = new long[0];
+        }
+
+        return nSetShiftFraction(instancePtr, valueReferences, valueReferences.length, counters, resolutions);
+    }
+
+    @Override
     public Fmi3Status evaluateDiscreteStates() throws FmiInvalidNativeStateException {
         checkState();
         return nEvaluateDiscreteStates(instancePtr);
@@ -332,11 +447,12 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public FmuResult<double[]> getContinuousStateDerivatives() throws FmiInvalidNativeStateException {
+    public FmuResult<double[]> getContinuousStateDerivatives(int nContinuousStates) throws FmiInvalidNativeStateException {
         checkState();
 
-        //TODO missing function cannot find c
-        return null;
+        double[] derivatives = new double[nContinuousStates];
+        Fmi3Status status = nGetContinuousStateDerivatives(instancePtr, derivatives, derivatives.length);
+        return new FmuResult<>(status, derivatives);
     }
 
     @Override

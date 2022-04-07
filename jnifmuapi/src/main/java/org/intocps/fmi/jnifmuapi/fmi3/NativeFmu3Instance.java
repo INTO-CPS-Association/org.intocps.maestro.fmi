@@ -124,19 +124,13 @@ public class NativeFmu3Instance {
     native Fmi3Status nSerializedFMUStateSize(long instance, long FMUState, long[] size);
     /* end::SerializedFMUStateSize[] */
 
-    //    /* tag::SerializeFMUState[] */
-    //    native Fmi3Status nSerializeFMUState     (long instance,
-    //            fmi3FMUState  FMUState,
-    //            fmi3Byte serializedState[],
-    //            int size);
-    //    /* end::SerializeFMUState[] */
-    //
-    //    /* tag::DeSerializeFMUState[] */
-    //    native Fmi3Status nDeSerializeFMUState   (long instance,
-    //            fmi3Byte serializedState[],
-    //            int size,
-    //            fmi3FMUState* FMUState);
-    //    /* end::DeSerializeFMUState[] */
+    /* tag::SerializeFMUState[] */
+    native Fmi3Status nSerializeFMUState(long instance, long FMUState, byte serializedState[], long size);
+    /* end::SerializeFMUState[] */
+
+    /* tag::DeserializeFMUState[] */
+    native Fmi3Status nDeserializeFMUState(long instance, byte serializedState[], long size, long[] FMUState);
+    /* end::DeserializeFMUState[] */
 
     /* Getting partial derivatives */
     /* tag::GetDirectionalDerivative[] */
@@ -194,6 +188,15 @@ public class NativeFmu3Instance {
     native Fmi3Status nSetIntervalFraction(long instance, long valueReferences[], int nValueReferences, long intervalCounter[], long resolution[]);
     /* end::SetIntervalFraction[] */
 
+    /* tag::SetShiftDecimal[] */
+    native Fmi3Status nSetShiftDecimal(long instance, long valueReferences[], int nValueReferences, double shifts[]);
+    /* end::SetShiftDecimal[] */
+
+    /* tag::SetShiftFraction[] */
+    native Fmi3Status nSetShiftFraction(long instance, long valueReferences[], int nValueReferences, long counters[], long resolutions[]);
+    /* end::SetShiftFraction[] */
+
+
     /* tag::EvaluateDiscreteStates[] */
     native Fmi3Status nEvaluateDiscreteStates(long instance);
     /* end::EvaluateDiscreteStates[] */
@@ -228,7 +231,7 @@ public class NativeFmu3Instance {
 
     /* Evaluation of the model equations */
     /* tag::GetDerivatives[] */
-    native Fmi3Status nGetDerivatives(long instance, double derivatives[], int nContinuousStates); //TODO: Is this a FMI3 method?
+    native Fmi3Status nGetContinuousStateDerivatives(long instance, double derivatives[], int nContinuousStates);
     /* end::GetDerivatives[] */
 
     /* tag::GetEventIndicators[] */

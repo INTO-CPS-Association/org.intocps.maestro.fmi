@@ -791,21 +791,39 @@ fmi3Status fmi3GetVariableDependencies(fmi3Instance instance,
     return fmi3OK;
 }
 
+void showState(struct Model* ptr){
+    printf("State pointer %p -> \n",ptr);
+    int i;
+    for (i = 0; i < sizeof(struct Model); i++)
+    {
+        if (i > 0) printf(":");
+        printf("%02X", ptr[i]);
+    }
+    printf("\n");
+}
+
 fmi3Status fmi3GetFMUState(fmi3Instance instance, fmi3FMUState *FMUState) {
 
-    memcpy(FMUState, instance, sizeof(struct Model));
+    struct Model *ptr = (struct Model *) malloc(sizeof(struct Model));
+    struct Model *m = instance;
+    *ptr = *m;
+    *FMUState = ptr;
+   // printf("get state %p\n",ptr);
+   // showState(instance);
+   // showState(ptr);
     return fmi3OK;
 }
 
 fmi3Status fmi3SetFMUState(fmi3Instance instance, fmi3FMUState FMUState) {
-
-    memcpy(instance, FMUState, sizeof(struct Model));
+    //showState(instance);
+    *((struct Model*)instance)= *((struct Model *) FMUState);
+    //showState(instance);
     return fmi3OK;
 }
 
 fmi3Status fmi3FreeFMUState(fmi3Instance instance, fmi3FMUState *FMUState) {
 
-    free(FMUState);
+    free(*FMUState);
     return fmi3OK;
 }
 
@@ -813,8 +831,10 @@ fmi3Status fmi3SerializedFMUStateSize(fmi3Instance instance,
                                       fmi3FMUState FMUState,
                                       size_t *size) {
 
+    *size = sizeof (struct Model);
 
-    return fmi3Discard;
+
+    return fmi3OK;
 }
 
 fmi3Status fmi3SerializeFMUState(fmi3Instance instance,
@@ -822,17 +842,19 @@ fmi3Status fmi3SerializeFMUState(fmi3Instance instance,
                                  fmi3Byte serializedState[],
                                  size_t size) {
 
+    memcpy(serializedState,FMUState,size);
 
-    return fmi3Discard;
+
+    return fmi3OK;
 }
 
 fmi3Status fmi3DeserializeFMUState(fmi3Instance instance,
                                    const fmi3Byte serializedState[],
                                    size_t size,
                                    fmi3FMUState *FMUState) {
+    memcpy(FMUState,serializedState,size);
 
-
-    return fmi3Discard;
+    return fmi3OK;
 }
 
 fmi3Status fmi3GetDirectionalDerivative(fmi3Instance instance,
