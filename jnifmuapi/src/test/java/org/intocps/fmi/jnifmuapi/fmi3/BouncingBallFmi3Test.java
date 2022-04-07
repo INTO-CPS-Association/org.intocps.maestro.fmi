@@ -34,14 +34,22 @@
 
 package org.intocps.fmi.jnifmuapi.fmi3;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
+
 public class BouncingBallFmi3Test {
     static final String FMU_UNPACKED_PATH = "target/fmus/fmi3/bounchingball".replace('/', File.separatorChar);
     static final String FMU_GUID = "{8c4e810f-3df3-4a00-8276-176fa3c9f003}";
+
+    @Before
+    public void notWindows() {
+        org.junit.Assume.assumeTrue(!SystemUtils.IS_OS_WINDOWS);
+    }
 
     @Test
     public void LoadFmuTempDir() throws Exception {

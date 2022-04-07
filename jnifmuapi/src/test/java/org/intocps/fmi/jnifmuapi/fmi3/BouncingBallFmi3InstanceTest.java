@@ -34,6 +34,7 @@
 
 package org.intocps.fmi.jnifmuapi.fmi3;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.intocps.fmi.FmiInvalidNativeStateException;
 import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
@@ -56,6 +57,8 @@ public class BouncingBallFmi3InstanceTest {
 
     @Before
     public void before() throws FmuInvocationException, FmuMissingLibraryException {
+        org.junit.Assume.assumeTrue(!SystemUtils.IS_OS_WINDOWS);
+        
         fmu = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "bouncingball");
         fmu.load();
         ILogMessageCallback lm = (instanceName, status, category, message) -> {
