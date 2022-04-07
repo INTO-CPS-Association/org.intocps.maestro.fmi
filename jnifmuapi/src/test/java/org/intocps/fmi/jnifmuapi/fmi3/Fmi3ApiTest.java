@@ -49,6 +49,11 @@ public class Fmi3ApiTest {
 
         Assert.assertNotNull("Instantiate returned null", instance);
         Assert.assertTrue(instance.isValid());
+        Object[] msg = logData.get(logData.size() - 1);
+        Assert.assertEquals("fmi3functiontest", msg[0]);
+        Assert.assertEquals(Fmi3Status.OK, msg[1]);
+        Assert.assertEquals("som category", msg[2]);
+        Assert.assertEquals("some message", msg[3]);
     }
 
     @After
