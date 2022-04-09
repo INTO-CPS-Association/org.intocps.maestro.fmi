@@ -4,6 +4,7 @@ import org.intocps.fmi.FmiInvalidNativeStateException;
 import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
 import org.junit.*;
+import org.junit.rules.TestName;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,6 +37,7 @@ public class Fmi3ApiTest {
 
     @Before
     public void before() throws FmuInvocationException, FmuMissingLibraryException {
+        System.out.println("Running ==> " + testName.getMethodName());
         fmu = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "fmi3functiontest");
         fmu.load();
         Assert.assertEquals(FMI_VERSION, fmu.getVersion());
@@ -64,7 +66,11 @@ public class Fmi3ApiTest {
         if (fmu != null) {
             fmu.unLoad();
         }
+        System.out.println("Stopping ==> " + testName.getMethodName());
     }
+
+    @Rule
+    public TestName testName = new TestName();
 
     @Test
     public void instantiateModelExchangeNoCallback() throws FmiInvalidNativeStateException {
