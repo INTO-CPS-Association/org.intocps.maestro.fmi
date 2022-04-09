@@ -97,6 +97,15 @@ jobs:
             jnifmuapi/target/fmus/**/*.dll
           retention-days: 1
 
+      - name: artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: jvm_crash_logs
+          path: |
+            **/hs_err*
+          retention-days: 1
+
   #      - name: artifact
   #        if: always() && matrix.os == 'windows-latest'
   #        uses: actions/upload-artifact@v2
