@@ -573,7 +573,6 @@ public class Fmi3ApiTest {
 
 
     @Test
-    @Ignore
     public void testState() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, new byte[]{0, 0, 0}));
         FmuResult<byte[]> baseInt = instance.getInt8(VREFS);
@@ -682,7 +681,6 @@ public class Fmi3ApiTest {
     }
 
     @Test
-    @Ignore
     public void testGetIntervalDecimal() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getIntervalDecimal(new long[]{9L}).status);
 
@@ -748,7 +746,6 @@ public class Fmi3ApiTest {
     }
 
     @Test
-    @Ignore
     public void testSetIntervalDecimal() throws FmiInvalidNativeStateException {
 
         Assert.assertEquals(Fmi3Status.OK, instance.setIntervalDecimal(new long[]{1L, 2L}, new double[]{1.1, 2.2}));
