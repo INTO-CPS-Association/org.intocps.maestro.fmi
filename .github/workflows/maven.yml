@@ -123,6 +123,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - id: install-secret-key
+        name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
       - name: Environment variables
         run: echo ${{ env.SERVER_ID }}
 
@@ -158,7 +164,7 @@ jobs:
         run: mvn validate dependency:resolve-plugins -B --quiet
 
       - name: Maven Build Final
-        run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+        run: mvn -B verifi --file pom.xml -Dmaven.test.skip=true -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
       - name: Maven Deploy
         if: github.event_name == 'push' && (github.ref != 'refs/heads/development' || github.ref != 'refs/heads/master' )
