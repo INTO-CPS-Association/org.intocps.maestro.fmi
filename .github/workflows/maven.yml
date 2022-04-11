@@ -164,25 +164,25 @@ jobs:
         run: mvn validate dependency:resolve-plugins -B --quiet
 
       - name: Maven Build Final
-        run: mvn -B verify --file pom.xml -Dmaven.test.skip=true -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
+        run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
       - name: Maven Deploy
         if: github.event_name == 'push' && (github.ref != 'refs/heads/development' || github.ref != 'refs/heads/master' )
-        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: Maven Deploy SNAPSHOT
         if: github.event_name == 'push' && (github.ref == 'refs/heads/development' )
-        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1= -Dmaven.test.skip=true -DskipITs -fae
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: Maven Deploy RELEASE
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' )
-        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae
+        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
