@@ -58,8 +58,8 @@ jobs:
           NEW_RELEASE_VERSION=${{ github.event.inputs.releaseversion }}
           echo "Input version is $NEW_RELEASE_VERSION"
           # remove all but the release version
-          mvn versions:set-property -Dproperty=changelist "-DnewVersion="
-          mvn versions:set-property -Dproperty=sha1 "-DnewVersion="
+          mvn -B --quiet versions:set-property -Dproperty=changelist "-DnewVersion="
+          mvn -B --quiet versions:set-property -Dproperty=sha1 "-DnewVersion="
           # detect if a override version is given
           if [ "$NEW_RELEASE_VERSION" == "" ]; then
             echo "Input version not set. Use current version"
@@ -86,9 +86,9 @@ jobs:
           # prepare next snapshot for development
           mvn ci-friendly-flatten:version -Dprefix.regex="Release/*"
           SNAPSHOTVERSION=$(cat revision.txt)
-          mvn versions:set-property -Dproperty=revision "-DnewVersion=$SNAPSHOTVERSION"
-          mvn versions:set-property -Dproperty=changelist "-DnewVersion=-SNAPSHOT"
-          mvn versions:set-property -Dproperty=sha1 "-DnewVersion="
+          mvn -B --quiet versions:set-property -Dproperty=revision "-DnewVersion=$SNAPSHOTVERSION"
+          mvn -B --quiet versions:set-property -Dproperty=changelist "-DnewVersion=-SNAPSHOT"
+          mvn -B --quiet versions:set-property -Dproperty=sha1 "-DnewVersion="
           git add pom.xml
           git commit -m "Next snapshot version $SNAPSHOTVERSION"
           git push
@@ -232,7 +232,7 @@ jobs:
 
       - name: Generate changelog
         id: changelog
-        uses: mikepenz/release-changelog-builder-action@{latest-release}
+        uses: mikepenz/release-changelog-builder-action@v2.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
