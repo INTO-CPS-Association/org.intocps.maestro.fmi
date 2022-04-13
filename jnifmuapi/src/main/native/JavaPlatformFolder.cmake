@@ -1,0 +1,27 @@
+#Author Kenneth Lausdahl
+include(TargetArch.cmake)
+
+
+function(get_java_osarch_folder output_var)
+    target_architecture(arch)
+    if (UNIX AND NOT APPLE)
+        set(OS_NAME "Linux")
+        if ("${arch}" STREQUAL "amd64" OR "${arch}" STREQUAL "x86_64")
+            set(${output_var} "${OS_NAME}-amd64" "${OS_NAME}-x86_64" PARENT_SCOPE)
+        else ()
+            set(${output_var} "${OS_NAME}-${arch}" PARENT_SCOPE)
+        endif ()
+    elseif (APPLE)
+        set(OS_NAME "Mac")
+        set(${output_var} "${OS_NAME}-${arch}" PARENT_SCOPE)
+    elseif (WIN32)
+        set(OS_NAME "Win")
+        if ("${arch}" STREQUAL "amd64" OR "${arch}" STREQUAL "x86_64")
+            set(${output_var} "Windows-amd64" "Windows-x86_64" PARENT_SCOPE)
+        else ()
+            set(${output_var} "Windows-${arch}" PARENT_SCOPE)
+        endif ()
+    endif ()
+
+   # set(${output_var} "${OS_NAME}-${arch}" PARENT_SCOPE)
+endfunction()

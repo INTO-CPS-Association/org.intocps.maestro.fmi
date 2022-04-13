@@ -50,6 +50,7 @@ public class NativeFmuExceptionTest
 			{
 				try
 				{
+					NativeFmuLibraryLoader.loadNativeApi();
 					this.throwExceptionTest();
 				} catch (Exception e)
 				{

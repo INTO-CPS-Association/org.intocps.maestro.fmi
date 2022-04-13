@@ -1,6 +1,6 @@
-[submodule "toolchains/cmake-toolchains"]
-	path = toolchains/cmake-toolchains
-	url = https://github.com/zyga/cmake-toolchains.git
-[submodule "jnifmuapi/src/main/native/src/external/shared/fmi"]
-	path = jnifmuapi/src/main/native/src/external/shared/fmi
-	url = https://github.com/into-cps-association/fmi
+[submodule "jnifmuapi/src/main/native/src/external/shared/fmi2"]
+	path = jnifmuapi/src/main/native/src/external/shared/fmi2
+	url = https://github.com/modelica/fmi-standard.git
+[submodule "jnifmuapi/src/main/native/src/external/shared/fmi3"]
+	path = jnifmuapi/src/main/native/src/external/shared/fmi3
+	url = https://github.com/modelica/fmi-standard.git

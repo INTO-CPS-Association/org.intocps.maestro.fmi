@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiBuildDescription fmiVersion="3.0-alpha.2">
+
+    <BuildConfiguration modelIdentifier="fmi2functiontest">
+        <SourceFileSet language="C11">
+            <SourceFile name="fmu2test1.c"/>
+            <SourceFile name="fmuTemplate.h"/>
+            <PreprocessorDefinition name="FMI_VERSION" value="2"/>
+            <PreprocessorDefinition name="MODEL_GUID" value="&quot;{12345678-9999-9999-9999-000000000000}&quot;"/>
+            <PreprocessorDefinition name="MODEL_IDENTIFIER" value="fmi2functiontest"/>
+            <PreprocessorDefinition name="FMI_COSIMULATION"/>
+
+        </SourceFileSet>
+    </BuildConfiguration>
+
+</fmiBuildDescription>

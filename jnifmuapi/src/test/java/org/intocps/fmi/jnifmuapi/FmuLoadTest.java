@@ -34,10 +34,9 @@
 
 package org.intocps.fmi.jnifmuapi;
 
-import java.io.File;
-
-import org.intocps.fmi.jnifmuapi.Fmu;
 import org.junit.Test;
+
+import java.io.File;
 
 public class FmuLoadTest
 {

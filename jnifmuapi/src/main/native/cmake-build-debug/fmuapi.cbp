@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="fmuapi"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\cmake-build-debug\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="clangformat">
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clangformat"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="fmuapi">
+				<Option output="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/fmuapi.dll" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DSTANDALONE_XML_PARSER"/>
+					<Add option="-DLIBXML_STATIC"/>
+					<Add option="-DFMI_COSIMULATION"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+					<Add directory="C:/Program Files/Java/jdk-11.0.10/include"/>
+					<Add directory="C:/Program Files/Java/jdk-11.0.10/include/win32"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/include"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared/fmi2/headers"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared/fmi3/headers"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 fmuapi"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="fmuapi/fast">
+				<Option output="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/fmuapi.dll" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DSTANDALONE_XML_PARSER"/>
+					<Add option="-DLIBXML_STATIC"/>
+					<Add option="-DFMI_COSIMULATION"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+					<Add directory="C:/Program Files/Java/jdk-11.0.10/include"/>
+					<Add directory="C:/Program Files/Java/jdk-11.0.10/include/win32"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/include"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared/fmi2/headers"/>
+					<Add directory="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/external/shared/fmi3/headers"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 fmuapi/fast"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/comp_api.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/comp_api.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/comp_data.cpp">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/comp_data.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/Fmi3Manager.cpp">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/Fmi3Manager.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/NativeFmu3.cpp">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/NativeFmuInstance.cpp">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/sim_support3.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmi3/sim_support3.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmu_api.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmu_api.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/fmu_test.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/jni_util.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/jni_util.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/sim_support.c">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/sim_support.h">
+			<Option target="fmuapi"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/JavaPlatformFolder.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/TargetArch.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/clang-format.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/src/config.h.in">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="C:/Users/frdrk/Desktop/Repos/org.intocps.maestro.fmi/jnifmuapi/src/main/native/cmake-build-debug/arch.c">
+			<Option virtualFolder="CMake Files\cmake-build-debug\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

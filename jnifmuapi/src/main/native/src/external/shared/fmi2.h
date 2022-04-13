@@ -4,8 +4,8 @@
  * Copyright QTronic GmbH. All rights reserved.
  * -------------------------------------------------------------------------*/
 
-#ifndef FMI_H
-#define FMI_H
+#ifndef FMI2_H
+#define FMI2_H
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -28,6 +28,14 @@
 
 
 #include "fmi2Functions.h"
+
+
+
+/* into-cps specific*/
+typedef fmi2Status fmi2GetMaxStepsizeTYPE(fmi2Component, fmi2Real*);
+
+/* custom INTO-CPS*/
+FMI2_Export fmi2GetMaxStepsizeTYPE    fmi2GetMaxStepsize;
 
 //#include "XmlParserCApi.h"
 

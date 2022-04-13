@@ -62,7 +62,6 @@ target/
 .metadata/
 .classpath
 .settings/
-.metadata/
 .project
 .cproject
 bin
@@ -105,3 +104,8 @@ Makefile
 *.dylib
 .idea
 .csettings/
+
+
+jnifmuapi/src/main/native/include/*.h
+/.java-version
+*.ci-friendly-pom.xml

@@ -2,9 +2,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.into-cps.fmi</groupId>
+        <groupId>org.intocps.fmi</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.13-SNAPSHOT</version>
+        <version>${revision}${sha1}${changelist}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -16,91 +16,68 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-h</arg>
+                        <arg>${project.basedir}/src/main/native/include</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources-fmi2-schema</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi2/schemas</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/native/src/external/shared/fmi2/schema</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-fmi3-schema</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi3/schemas</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/native/src/external/shared/fmi3/schema/</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
 
                 <configuration>
                     <skipTests>false</skipTests>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                    <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-
-                    <execution>
-                        <id>javah</id>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <tasks>
-
-                                <exec dir="${project.basedir}/src/main/native/include" executable="javah" failonerror="true">
-
-
-                                    <arg value="-classpath" />
-                                    <arg value="../../../../target/classes" />
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmu" />
-                                    <arg value="org.intocps.fmi.jnifmuapi.NativeFmuComponent" />
-
-
-                                    <redirector outputproperty="redirector.out" errorproperty="redirector.err">
-                                        <inputfilterchain>
-                                            <replacestring from="before" to="after" />
-                                        </inputfilterchain>
-                                        <outputmapper type="merge" to="target/redirector.out" />
-                                        <errormapper type="merge" to="target/redirector.err" />
-                                    </redirector>
-
-                                </exec>
-
-
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-                </executions>
             </plugin>
         </plugins>
 
 
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings
-                    only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.apache.maven.plugins
-                                        </groupId>
-                                        <artifactId>
-                                            maven-antrun-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.8,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>run</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
 
@@ -116,38 +93,101 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.19</version>
+            <version>1.21</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>2.0.0-alpha7</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
+            <version>2.0.0-alpha7</version>
         </dependency>
 
         <dependency>
-            <groupId>org.into-cps.fmi</groupId>
+            <groupId>org.intocps.fmi</groupId>
             <artifactId>fmi2</artifactId>
-            <version>1.0.13-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
 
     <profiles>
+
+        <profile>
+            <id>native_release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <properties>
+                <CMAKE_BUILD_TYPE>Release</CMAKE_BUILD_TYPE>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>native_debug</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <properties>
+                <CMAKE_BUILD_TYPE>Debug</CMAKE_BUILD_TYPE>
+            </properties>
+        </profile>
+
+
         <profile>
             <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>javac</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <target>
+                                        <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
+                                            <fileset dir="${fmi.native.lib}" includes="**/*">
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>make</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -157,19 +197,207 @@
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
+
                             <execution>
-                                <id>javah</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <phase>generate-resources</phase>
+                                <id>cmake</id>
+                                <phase>process-classes</phase>
                                 <configuration>
-                                    <tasks>
-                                        <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
-                                            <fileset dir="${fmi.native.lib}" includes="**/*">
-                                            </fileset>
-                                        </copy>
-                                    </tasks>
+                                    <target>
+                                        <exec executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="-S"/>
+                                            <arg value="${project.basedir}/src/main/native"/>
+                                            <arg value="-B"/>
+                                            <arg value="${project.build.directory}/native"/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/native" executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+
+                            <execution>
+                                <id>cmake-bounchingball</id>
+                                <phase>process-test-classes</phase>
+                                <configuration>
+                                    <target>
+                                        <!-- FMI2 API FUNCTION TEST -->
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi2/fmi2functiontest/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi2/fmi2functiontest/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi2/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi2/fmi2functiontest"/>
+                                            <arg value="--fmi-bin-platform-version"/>
+                                            <arg value="2"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                              executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="."/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                              executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi2/fmi2functiontest.fmu"
+                                             basedir="${project.build.directory}/fmus/fmi2/fmi2functiontest"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
+
+
+                                        <!-- Bouncing ball -->
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/bouncingball/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/bouncingball/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi3/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi3/bounchingball"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                              executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="."/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                              executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/bounchingball.fmu"
+                                             basedir="${project.build.directory}/fmus/fmi3/bounchingball"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
+
+
+                                        <!-- FMI3 API FUNCTION TEST -->
+                                        <exec executable="python3"
+                                              failonerror="true">
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util/prepare_cmake.py"/>
+                                            <arg value="--build-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/fmi3functiontest/sources/buildDescription.xml"/>
+                                            <arg value="--model-description"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmus/fmi3/fmi3functiontest/modelDescription.xml"/>
+                                            <arg value="--template-dir"/>
+                                            <arg value="${project.basedir}/src/test/resources/fmu_compiler_util"/>
+                                            <arg value="--fmi-headers"/>
+                                            <arg value="${project.basedir}/src/main/native/src/external/shared/fmi3/headers"/>
+                                            <arg value="--output-dir"/>
+                                            <arg value="${project.build.directory}/fmus/fmi3/fmi3functiontest"/>
+
+                                        </exec>
+
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                              executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="."/>
+
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                              executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+
+                                        <zip destfile="${project.build.directory}/fmus/fmi3/fmi3functiontest.fmu"
+                                             basedir="${project.build.directory}/fmus/fmi3/fmi3functiontest"
+                                             excludes="CMakeFiles/**, *.cmake, *.dylib, Makefile, *.txt, *.c"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>make32</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+
+                            <execution>
+                                <id>cmake</id>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <target>
+                                        <exec executable="cmake"
+                                              failonerror="true">
+                                            <arg value="-DCMAKE_GENERATOR_PLATFORM=x86"/>
+                                            <arg value="-G"/>
+                                            <arg value="Unix Makefiles"/>
+                                            <arg value="-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"/>
+                                            <arg value="-S"/>
+                                            <arg value="${project.basedir}/src/main/native"/>
+                                            <arg value="-B"/>
+                                            <arg value="${project.build.directory}/native"/>
+                                        </exec>
+
+                                        <exec dir="${project.build.directory}/native" executable="make"
+                                              failonerror="true">
+                                            <arg value="-j12"/>
+                                            <arg value="--always-make"/>
+                                        </exec>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>

@@ -1,71 +1,96 @@
 # org.intocps.fmi
+
 Java FMI support.
 
 Build server builds are available at: https://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/
 
 ## JNIFMUAPI project
+
 root is referring to org.intocps.fmi/jnifmuapi/src/main/native/
 
 ### To build the JNIFMUAPI do the following:
+
 To generate a shared library for the platform you are working on do the following:
+
 1. Get submodules: FIRST CHECKOUT: `git submodule update --init --recursive`
    otherwise: `git submodule update --recursive`
-2. Navigate to org.intocps.maestro.fmi/jnifmuapi/src/main/native 
-3. run cmake .
+2. Navigate to org.intocps.maestro.fmi/jnifmuapi/src/main/native
+3. run cmake . (You might need a generator here. I.e. "-GMsys Makefiles" for Windows. Environment setup is described
+   here: https://github.com/INTO-CPS-Association/maestro#windows)
 4. run make
-5. This generates libfmuapi.dylib (for mac), which can be placed within the lib/Mac-x86_64 directory of jnifmuapi-*.jar
+5. This generates libfmuapi.dylib (for mac), which can be placed within the lib/Mac-x86_64 directory of jnifmuapi-.jar (
+   see * below)
 
-*OR:* Push the branch, run it at build.overture.au and download the jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/ 
+*For the development it can be useful to place this file within `jnifmuapi/src/test/resources/lib/<platform>/<library>`
+and `jnifmuapi/target/lib/<platform>/<library>`
+
+*OR:* Push the branch, run it at build.overture.au and download the
+jar: http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/
 
 ### To Use this library do the following:
 
-1. Download the jar of [`jnifmuapi`](https://mvnrepository.com/artifact/org.into-cps.fmi/jnifmuapi) or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
-1. Download [`fmi2.jar`](https://mvnrepository.com/artifact/org.into-cps.fmi/fmi2) or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/fmi2/)
+1. Download the jar of [`jnifmuapi`](https://mvnrepository.com/artifact/org.into-cps.fmi/jnifmuapi)
+   or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
+1. Download [`fmi2.jar`](https://mvnrepository.com/artifact/org.into-cps.fmi/fmi2)
+   or [snapshot](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/fmi2/)
 1. Add both previous jars to your project.
-1. Extract the `lib` folder that is locate inside the jar obtained in step 1. Place that folder somewhere in your java library path, so that, for example, the entry `lib/Windows-amd64/fmuapi.dll` will be found in one of the folders in the java library path.
-1. Test the link by running 
-`org.intocps.fmi.jnifmuapi.Factory.checkApi()`
+1. Extract the `lib` folder that is locate inside the jar obtained in step 1. Place that folder somewhere in your java
+   library path, so that, for example, the entry `lib/Windows-amd64/fmuapi.dll` will be found in one of the folders in
+   the java library path.
+1. Test the link by running
+   `org.intocps.fmi.jnifmuapi.Factory.checkApi()`
 
-### To set up a dev environment using eclipse. 
-If your system variables are not detected in eclipse, then open it via the
-terminal. I.e. on MAC: `open /Applications/eclipse.app/contents/mac/eclipse` and **not**
+### To set up a dev environment using eclipse.
+
+If your system variables are not detected in eclipse, then open it via the terminal. I.e. on
+MAC: `open /Applications/eclipse.app/contents/mac/eclipse` and **not**
 `open /Applications/eclipse.app`. See https://superuser.com/questions/28344/path-env-variable-on-mac-os-x-and-or-eclipse
+
 1. Perform submodule step from above
 2. Download the plugin cmake4eclipse
 3. Follow this to import a cmake project: https://stackoverflow.com/a/38716337/1308616
-   (https://github.com/15knots/cmake4eclipse#quick-start might describe how to
-   access more up-to-date instructions)
- 4. It should now be possible to build.
- 
-To get proper IDE features it might be necessary to add includes for both C and
-C++ at: project properties -> C/C++ General -> Preprocesser Include Paths,
-Macros etc -> CDT User Settings Entires -> Add -> ... The following might need
-to be added:
+   (https://github.com/15knots/cmake4eclipse#quick-start might describe how to access more up-to-date instructions)
+4. It should now be possible to build.
+
+To get proper IDE features it might be necessary to add includes for both C and C++ at: project properties -> C/C++
+General -> Preprocesser Include Paths, Macros etc -> CDT User Settings Entires -> Add -> ... The following might need to
+be added:
+
 - root/include
-- path to jdk include
-i.e.`/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include`
-check contains system headers
+- path to jdk include i.e.`/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include`
+  check contains system headers
 - specific jni_md for the platform, i.e.
-`/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include/darwin`
-check contains system headers.
+  `/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/include/darwin`
+  check contains system headers.
+
+### Debug JNI
+
+Compile the native with: `-DCMAKE_BUILD_TYPE=Debug`.  
+For example (MAC) run the following at location `<root>/jnifmuapi/src/main/native`
+
+```
+cmake -DCMAKE_BUILD_TYPE=Debug  . && make && cp libfmuapi.dylib ../../../src/test/resources/lib/Mac-x86_64
+```
+
+Run the test in Intellij with breakpoint somewhere When the breakpoint is hit, then in CLion attach to process and
+choose the latest Java Process. The continue the test in Intellij, and see it hit a breakpoint in CLion.
 
 ## FMI2 project
-This contains the JAVA types and interfaces representing the FMI standard.
-Furthermore, the project contains XSD files from the FMI standard that are used for verifying model description files.
+
+This contains the JAVA types and interfaces representing the FMI standard. Furthermore, the project contains XSD files
+from the FMI standard that are used for verifying model description files.
 
 ## Environment
 
 * java 7 jdk
 * gcc
 
-
 The location of JAVA_HOME properties must be set for the desired platform which should be compiled.
-
-
 
 The project is released to:
 
 ```XML
+
 <distributionManagement>
     <repository>
         <id>overture.au.dk</id>
@@ -82,15 +107,17 @@ The project is released to:
 
 # Release Procedure
 
-**Since the binaries are not compilled locally, you have to download the ones from last snapshot before the release** 
+**Since the binaries are not compilled locally, you have to download the ones from last snapshot before the release**
 
-1. Download last `-SNAPSHOT` of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/) and extract the `lib` folder
-2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted. Make sure you have the pre-build natives e.g. from last snapshot and that these are avaliable as:
+1. Download last `-SNAPSHOT` of [`jnifmuapi`](http://overture.au.dk/artifactory/into-cps/org/into-cps/fmi/jnifmuapi/)
+   and extract the `lib` folder
+2. Set the `fmi.native.lib` property as described below to point to the `lib` folder just extracted. Make sure you have
+   the pre-build natives e.g. from last snapshot and that these are avaliable as:
 
     ```bash
     -Dfmi.native.lib=/path/to/lib
     ```
-    or in your local maven settings file
+   or in your local maven settings file
 
     ```xml
     <profiles>
@@ -116,9 +143,62 @@ The project is released to:
     mvn -Dmaven.repo.local=repository release:perform
     ```
 
-1. Afterwards, go to http://oss.sonatype.org -> staging repositories -> select the release.
-Then click `close`, and once available, `release`.
+1. Afterwards, go to http://oss.sonatype.org -> staging repositories -> select the release. Then click `close`, and once
+   available, `release`.
 
-1. Go to master branch and merge with the newly created tag. 
+1. Go to master branch and merge with the newly created tag.
 
 1. **Remember to switch back to the development branch!!!**
+
+# New setup
+
+# Development Environment
+
+## Linux
+
+* `apt install build-essential git cmake`
+
+## Mac
+
+* `brew install cmake`
+
+## Windows
+
+The API can be build using the following tools:
+
+* Java 1.8
+* Maven 3.6 >
+* https://www.msys2.org/
+    * With package:
+        * `pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
+        * `pacman -S mingw64/mingw-w64-x86_64-cmake`
+    * Remember to add Java and Maven to `~/.bash_profile`
+        * `PATH="$PATH:/c/Program Files/OpenJDK/jdk-8.0.262.10-hotspot/bin"`
+        * `PATH="$PATH:/c/msys64/home/apache-maven-3.8.4/bin"`
+        * `export PATH`
+
+Build using `c:\msys64\mingw64.exe` terminal
+
+## Checkout
+
+```bash
+git clone git@github.com:INTO-CPS-Association/org.intocps.maestro.fmi.git 
+cd org.intocps.maestro.fmi
+# The FMI headers and schemas are submodules
+git submodules update --init
+```
+
+## Build
+
+To build the project simply run maven `package` with the profile `make` to generate the native library for your
+platform. If you dont have `JAVA_HOME` and the includes required there set correctly you can set the environment
+variable `CI=1` (`export CI=1`) to use the embedded headers.
+
+```bash
+mvn clean package -Pmake
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+
+```

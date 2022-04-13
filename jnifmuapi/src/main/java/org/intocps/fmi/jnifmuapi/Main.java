@@ -49,6 +49,8 @@ import org.intocps.fmi.FmuResult;
 import org.intocps.fmi.IFmiComponent;
 import org.intocps.fmi.IFmuCallback;
 import org.intocps.fmi.InvalidParameterException;
+import org.intocps.fmi.jnifmuapi.shared.NativeFmuApi;
+import org.intocps.fmi.jnifmuapi.shared.NativeLibraryLoader;
 import org.xml.sax.SAXException;
 
 public class Main
@@ -57,7 +59,7 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 
-		String libPath = NativeFmuApi.getPlatformSpecificLibaryPath("fmuapi");
+		String libPath = NativeFmuApi.getPlatformSpecificLibraryPath("fmuapi");
 		System.out.println("Loading library: " + libPath);
 		File lib = new NativeLibraryLoader().loadLibrary(libPath);
 		System.out.println("Loaded Library file: " + lib);
