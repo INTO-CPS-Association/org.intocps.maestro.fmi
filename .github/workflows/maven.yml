@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: jnifmuapi
+name: Build SNAPSHOT
 
 on: [ workflow_dispatch, push, pull_request ]
 env:
@@ -179,14 +179,6 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-      - name: Maven Deploy RELEASE
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' )
-        run: mvn -P au -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
-        env:
-          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
 
       - name: upload jnifmuapi
         uses: actions/upload-artifact@v2
