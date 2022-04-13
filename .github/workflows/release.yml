@@ -32,6 +32,7 @@ jobs:
       build_tag_created: ${{ steps.tagging.outputs.build_tag_created }}
       build_version: ${{ steps.tagging.outputs.build_version }} # map step output to job output
       build_branch: ${{ steps.tagging.outputs.build_branch }}
+      previous_release_tag: ${{ steps.tagging.outputs.previous_release_tag }}
     steps:
       - name: Set up Java
         uses: actions/setup-java@v1
@@ -72,10 +73,13 @@ jobs:
           echo "::set-output name=build_tag::${NEW_RELEASE_TAG}"
           echo "::set-output name=build_version::${NEW_RELEASE_VERSION}"
           echo "::set-output name=build_branch::${NEW_RELEASE_BRANCH}"
+          PREVIOUS_RELEASE_TAG=$(git tag | sort -V | tail -1)
+          echo "::set-output name=previous_release_tag::${PREVIOUS_RELEASE_TAG}"
+          
           
           echo "release version is $NEW_RELEASE_VERSION"
           echo "Tag release version is now $NEW_RELEASE_TAG"
-          mvn versions:set-property -Dproperty=revision "-DnewVersion=${NEW_RELEASE_VERSION}"
+          mvn -B --quiet versions:set-property -Dproperty=revision "-DnewVersion=${NEW_RELEASE_VERSION}"
           git checkout -b $NEW_RELEASE_BRANCH
           git push --set-upstream origin $NEW_RELEASE_BRANCH
           git add pom.xml
@@ -84,7 +88,7 @@ jobs:
           git push origin "${NEW_RELEASE_TAG}"
           echo "::set-output name=build_tag_created::YES"
           # prepare next snapshot for development
-          mvn ci-friendly-flatten:version -Dprefix.regex="Release/*"
+          mvn  -B --quiet ci-friendly-flatten:version -Dprefix.regex="Release/*"
           SNAPSHOTVERSION=$(cat revision.txt)
           mvn -B --quiet versions:set-property -Dproperty=revision "-DnewVersion=$SNAPSHOTVERSION"
           mvn -B --quiet versions:set-property -Dproperty=changelist "-DnewVersion=-SNAPSHOT"
@@ -233,6 +237,9 @@ jobs:
       - name: Generate changelog
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v2.9.0
+        with:
+          toTag: ${{ needs.version_change.outputs.build_tag }}
+          fromTag: ${{ needs.version_change.outputs.previous_release_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -284,16 +291,17 @@ jobs:
     name: Update development and master with new release
     runs-on: ubuntu-latest
 
-    needs: [ final ]
+    needs: [ final,version_change ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Merging release
-        run: |
-          git merge ${{ needs.version_change.outputs.build_branch }}
-          git push
-          git checkout master
-          git merge ${{ needs.version_change.outputs.build_tag }}
-          git push
+#      - name: Merging release
+#        run: |
+#          git checkout development
+#          git merge ${{ needs.version_change.outputs.build_branch }}
+#          git push
+#          git checkout master
+#          git merge ${{ needs.version_change.outputs.build_tag }}
+#          git push
