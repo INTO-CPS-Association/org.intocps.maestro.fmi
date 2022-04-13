@@ -53,20 +53,24 @@ jobs:
         run: |
           NEW_RELEASE_VERSION=${{ github.event.inputs.releaseversion }}
           echo "Input version is $NEW_RELEASE_VERSION"
+          # remove all but the release version
+          mvn versions:set-property -Dproperty=changelist "-DnewVersion="
+          mvn versions:set-property -Dproperty=sha1 "-DnewVersion="
+          # detect if a override version is given
           if [ "$NEW_RELEASE_VERSION" == "" ]; then
             echo "Input version not set. Use current version"
             NEW_RELEASE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           fi
+          # set the version to be released
           NEW_RELEASE_TAG="Release/${NEW_RELEASE_VERSION}"
           echo "release version is $NEW_RELEASE_VERSION"
           echo "Tag release version is now $NEW_RELEASE_TAG"
           mvn versions:set-property -Dproperty=revision "-DnewVersion=${NEW_RELEASE_VERSION}"
-          mvn versions:set-property -Dproperty=changelist "-DnewVersion="
-          mvn versions:set-property -Dproperty=sha1 "-DnewVersion="
           git add pom.xml
           git commit -m "New release version ${NEW_RELEASE_VERSION}"
           git tag -a "${NEW_RELEASE_TAG}" -m "Release version ${NEW_RELEASE_VERSION}"
           git push origin "${NEW_RELEASE_TAG}"
+          # prepare next snapshot for development
           mvn ci-friendly-flatten:version -Dprefix.regex="Release/*"
           SNAPSHOTVERSION=$(cat revision.txt)
           mvn versions:set-property -Dproperty=revision "-DnewVersion=$SNAPSHOTVERSION"
