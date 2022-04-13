@@ -17,7 +17,7 @@ on:
 
 env:
   JAVA_VERSION: 1.8
-  SERVER_ID: au-artifactory-snapshots
+  SERVER_ID: ossrh
   PYTHON_VERSION: '3.9.9'
 
 
@@ -196,6 +196,7 @@ jobs:
           server-id: ${{ env.SERVER_ID }}
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
 
       - name: Maven download
@@ -204,40 +205,42 @@ jobs:
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
-      - name: Maven Deploy
-        #        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' || github.ref != 'refs/heads/master' )
-        run: mvn -B package -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
+      - name: Maven Deploy RELEASE
+        run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease-sign-artifacts
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
 
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v0.4.4
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.version_change.outputs.build_tag }}
+          release_name: ${{ needs.version_change.outputs.build_tag }}
+          body: |
+            Grab the new version from Maven central https://search.maven.org/artifact/org.into-cps.fmi/jnifmuapi/${{ needs.version_change.outputs.build_version }}/jar:
 
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+            ```
+            <dependency>
+              <groupId>org.into-cps.fmi</groupId>
+              <artifactId>jnifmuapi</artifactId>
+              <version>${{ needs.version_change.outputs.build_version }}</version>
+            </dependency>
+            ```
 
-#      - name: Maven Deploy SNAPSHOT
-#        if: github.event_name == 'push' && (github.ref == 'refs/heads/development' )
-#        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-#
-#      - name: Maven Deploy RELEASE
-#        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' )
-#        run: mvn "-Dhttp.keepAlive=false" "-Dmaven.wagon.http.pool=false" "-Dmaven.wagon.httpconnectionManager.ttlSeconds=120" -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease-sign-artifacts
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-
-#      - name: upload jnifmuapi
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: jnifmuapi
-#          path: |
-#            jnifmuapi/target/jnifmuapi-*-SNAPSHOT.jar
-#            fmi2/target/fmi2-*-SNAPSHOT.jar
-#          retention-days: 5
-
+            ### Things that changed in this release
+            ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
 
 
