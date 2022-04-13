@@ -149,44 +149,6 @@
             </properties>
         </profile>
 
-
-        <profile>
-            <id>release</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <executions>
-                            <execution>
-                                <id>javac</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <phase>generate-resources</phase>
-                                <configuration>
-                                    <target>
-                                        <copy todir="${project.build.outputDirectory}/lib" overwrite="true">
-                                            <fileset dir="${fmi.native.lib}" includes="**/*">
-                                            </fileset>
-                                        </copy>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>make</id>
             <activation>
