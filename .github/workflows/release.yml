@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       build_tag: ${{ steps.tagging.outputs.build_tag }} # map step output to job output
+      build_tag_created: ${{ steps.tagging.outputs.build_tag_created }}
       build_version: ${{ steps.tagging.outputs.build_version }} # map step output to job output
       build_branch: ${{ steps.tagging.outputs.build_branch }}
     steps:
@@ -81,6 +82,7 @@ jobs:
           git commit -m "New release version ${NEW_RELEASE_VERSION}"
           git tag -a "${NEW_RELEASE_TAG}" -m "Release version ${NEW_RELEASE_VERSION}"
           git push origin "${NEW_RELEASE_TAG}"
+          echo "::set-output name=build_tag_created::YES"
           # prepare next snapshot for development
           mvn ci-friendly-flatten:version -Dprefix.regex="Release/*"
           SNAPSHOTVERSION=$(cat revision.txt)
@@ -270,6 +272,8 @@ jobs:
 
       - name: Rolling back tag
         continue-on-error: true
+        if: needs.version_change.outputs.build_tag_created == 'YES'
+        # we don't want to accidentally delete an existing tag from an existing release
         run: git push --delete origin ${{ needs.version_change.outputs.build_tag }}
 
       - name: Rolling back branch
