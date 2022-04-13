@@ -8,6 +8,8 @@
 
     <name>The FMI interface and implementations</name>
     <packaging>pom</packaging>
+    <description>Library implementing a Java API for the FMI Standard</description>
+    <url>https://github.com/INTO-CPS-Association/org.intocps.maestro.fmi/</url>
 
     <modules>
         <module>fmi2</module>
