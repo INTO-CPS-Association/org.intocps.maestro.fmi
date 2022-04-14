@@ -81,7 +81,7 @@ jobs:
           echo "Tag release version is now $NEW_RELEASE_TAG"
           mvn -B --quiet versions:set-property -Dproperty=revision "-DnewVersion=${NEW_RELEASE_VERSION}"
           git checkout -b $NEW_RELEASE_BRANCH
-          git push --set-upstream origin $NEW_RELEASE_BRANCH
+          git push -f --set-upstream origin $NEW_RELEASE_BRANCH
           git add pom.xml
           git commit -m "New release version ${NEW_RELEASE_VERSION}"
           git tag -a "${NEW_RELEASE_TAG}" -m "Release version ${NEW_RELEASE_VERSION}"
@@ -233,11 +233,14 @@ jobs:
       #          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
 
+      - name: Create changelog config
+        run: echo '{"max_back_track_time_days":1095}' > configuration.json
 
       - name: Generate changelog
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v2.9.0
         with:
+          configuration: "configuration.json"
           toTag: ${{ needs.version_change.outputs.build_tag }}
           fromTag: ${{ needs.version_change.outputs.previous_release_tag }}
         env:
