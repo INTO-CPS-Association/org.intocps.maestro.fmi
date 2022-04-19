@@ -1,9 +1,3 @@
 package org.intocps.fmi.jnifmuapi.schemas;
 
-import java.io.InputStream;
-
-public class Fmi2Schema {
-    public static InputStream getSchema(){
-        return Fmi2Schema.class.getResourceAsStream("fmi2ModelDescription.xsd");
-    }
-}
+public class Fmi2Schema extends org.intocps.fmi.jnifmuapi.fmi2.schemas.Fmi2Schema {}
