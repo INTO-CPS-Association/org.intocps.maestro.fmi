@@ -224,13 +224,13 @@ jobs:
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
-      #      - name: Maven Deploy RELEASE
-      #        # If autorelease is false then it must be released from here: https://oss.sonatype.org/#stagingRepositories
-      #        run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease
-      #        env:
-      #          MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
-      #          MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
-      #          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+      - name: Maven Deploy RELEASE
+        # If autorelease is false then it must be released from here: https://oss.sonatype.org/#stagingRepositories
+        run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
 
       - name: Create changelog config
@@ -300,11 +300,11 @@ jobs:
         with:
           fetch-depth: 0
 
-#      - name: Merging release
-#        run: |
-#          git checkout development
-#          git merge ${{ needs.version_change.outputs.build_branch }}
-#          git push
-#          git checkout master
-#          git merge ${{ needs.version_change.outputs.build_tag }}
-#          git push
+      - name: Merging release
+        run: |
+          git checkout development
+          git merge ${{ needs.version_change.outputs.build_branch }}
+          git push
+          git checkout master
+          git merge ${{ needs.version_change.outputs.build_tag }}
+          git push
