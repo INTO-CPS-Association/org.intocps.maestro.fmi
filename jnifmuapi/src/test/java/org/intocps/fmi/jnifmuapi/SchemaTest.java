@@ -8,11 +8,11 @@ import org.junit.Test;
 public class SchemaTest {
     @Test
     public void testFmi2ModelDescriptionSchema() {
-        Assert.assertNotNull(Fmi2Schema.getSchema());
+        Assert.assertNotNull(new Fmi2Schema().getSchema());
     }
 
     @Test
     public void testFmi3ModelDescriptionSchema() {
-        Assert.assertNotNull(Fmi3Schema.getSchema());
+        Assert.assertNotNull(new Fmi3Schema().getSchema());
     }
 }
