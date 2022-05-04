@@ -167,7 +167,7 @@ jobs:
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
       - name: Maven Deploy
-        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' || github.ref != 'refs/heads/master' )
+        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' && github.ref != 'refs/heads/master' )
         run: mvn -P au -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
