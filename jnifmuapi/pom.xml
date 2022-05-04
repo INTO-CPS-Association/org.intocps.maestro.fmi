@@ -35,7 +35,8 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi2/schemas</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi/jnifmuapi/fmi2/schemas
+                            </outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/native/src/external/shared/fmi2/schema</directory>
@@ -51,7 +52,8 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi3/schemas</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/org/intocps/fmi/jnifmuapi/fmi3/schemas
+                            </outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/native/src/external/shared/fmi3/schema/</directory>
