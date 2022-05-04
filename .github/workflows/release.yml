@@ -226,7 +226,7 @@ jobs:
 
       - name: Maven Deploy RELEASE
         # If autorelease is false then it must be released from here: https://oss.sonatype.org/#stagingRepositories
-        run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease
+        run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease -DautoReleaseAfterClose=true
         env:
           MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
@@ -267,8 +267,8 @@ jobs:
 
             ### Things that changed in this release
             ${{ steps.changelog.outputs.changelog }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
 
 
   rollback:
@@ -306,5 +306,5 @@ jobs:
           git merge ${{ needs.version_change.outputs.build_branch }}
           git push
           git checkout master
-          git merge ${{ needs.version_change.outputs.build_tag }}
-          git push
+          git reset --hard ${{ needs.version_change.outputs.build_tag }}
+          git push -f origin master
