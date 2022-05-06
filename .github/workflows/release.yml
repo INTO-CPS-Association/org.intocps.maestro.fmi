@@ -56,8 +56,6 @@ jobs:
         id: tagging
         run: |
           # make sure we are at the head of development
-          git checkout development
-          git pull 
           NEW_RELEASE_VERSION=${{ github.event.inputs.releaseversion }}
           echo "Input version is $NEW_RELEASE_VERSION"
           # remove all but the release version
@@ -304,6 +302,7 @@ jobs:
 
       - name: Merging release
         run: |
+          git fetch origin ${{ needs.version_change.outputs.build_branch }}
           git checkout development
           git merge ${{ needs.version_change.outputs.build_branch }}
           git push
