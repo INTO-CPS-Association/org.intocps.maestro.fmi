@@ -15,7 +15,7 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
     protected static final String MODEL_DESCRIPTION = "modelDescription.xml";
     public final String name;
     public final File dir;
-    private final NativeLoadManager lifeCycle;
+    protected final NativeLoadManager lifeCycle;
 
     public long getFmuPtr() {
         return lifeCycle.getFmuPtr();
