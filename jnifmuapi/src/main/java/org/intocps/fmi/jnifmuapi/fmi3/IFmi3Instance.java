@@ -59,6 +59,22 @@ public interface IFmi3Instance {
         long[] elementIndicesOfIndependents;
         Fmi3DependencyKind[] dependencyKinds;
 
+        public long[] getElementIndicesOfDependent() {
+            return elementIndicesOfDependent;
+        }
+
+        public long[] getIndependents() {
+            return independents;
+        }
+
+        public long[] getElementIndicesOfIndependents() {
+            return elementIndicesOfIndependents;
+        }
+
+        public Fmi3DependencyKind[] getDependencyKinds() {
+            return dependencyKinds;
+        }
+
         public VariableDependency(int size) {
             this.dependencyKinds = new Fmi3DependencyKind[size];
             this.elementIndicesOfDependent = new long[size];
@@ -93,6 +109,14 @@ public interface IFmi3Instance {
         double[] intervals;
         Fmi3IntervalQualifier[] qualifiers;
 
+        public double[] getIntervals() {
+            return intervals;
+        }
+
+        public Fmi3IntervalQualifier[] getQualifiers() {
+            return qualifiers;
+        }
+
         public GetIntervalDecimalResponse(int size) {
             this.intervals = new double[size];
             this.qualifiers = new Fmi3IntervalQualifier[size];
@@ -105,6 +129,18 @@ public interface IFmi3Instance {
         long[] intervalCounters;
         long[] resolutions;
         Fmi3IntervalQualifier[] qualifiers;
+
+        public long[] getIntervalCounters() {
+            return intervalCounters;
+        }
+
+        public long[] getResolutions() {
+            return resolutions;
+        }
+
+        public Fmi3IntervalQualifier[] getQualifiers() {
+            return qualifiers;
+        }
 
         public IntervalFractionResponse(int size) {
             this.intervalCounters = new long[size];
@@ -121,6 +157,14 @@ public interface IFmi3Instance {
     class GetShiftFractionResponse {
         long[] shiftCounters;
         long[] resolutions;
+
+        public long[] getShiftCounters() {
+            return shiftCounters;
+        }
+
+        public long[] getResolutions() {
+            return resolutions;
+        }
 
         public GetShiftFractionResponse(int size) {
             this.shiftCounters = new long[size];
@@ -149,6 +193,30 @@ public interface IFmi3Instance {
         boolean nextEventTimeDefined;
         double nextEventTime;
 
+        public boolean isDiscreteStatesNeedUpdate() {
+            return discreteStatesNeedUpdate;
+        }
+
+        public boolean isTerminateSimulation() {
+            return terminateSimulation;
+        }
+
+        public boolean isNominalsOfContinuousStatesChanged() {
+            return nominalsOfContinuousStatesChanged;
+        }
+
+        public boolean isValuesOfContinuousStatesChanged() {
+            return valuesOfContinuousStatesChanged;
+        }
+
+        public boolean isNextEventTimeDefined() {
+            return nextEventTimeDefined;
+        }
+
+        public double getNextEventTime() {
+            return nextEventTime;
+        }
+
         public UpdateDiscreteStates(boolean discreteStatesNeedUpdate, boolean terminateSimulation, boolean nominalsOfContinuousStatesChanged,
                 boolean valuesOfContinuousStatesChanged, boolean nextEventTimeDefined, double nextEventTime) {
             this.discreteStatesNeedUpdate = discreteStatesNeedUpdate;
@@ -167,6 +235,14 @@ public interface IFmi3Instance {
     class CompletedIntegratorStepResponse {
         boolean enterEventMode;
         boolean terminateSimulation;
+
+        public boolean isEnterEventMode() {
+            return enterEventMode;
+        }
+
+        public boolean isTerminateSimulation() {
+            return terminateSimulation;
+        }
 
         public CompletedIntegratorStepResponse(boolean enterEventMode, boolean terminateSimulation) {
             this.enterEventMode = enterEventMode;
@@ -204,6 +280,22 @@ public interface IFmi3Instance {
         final boolean eventHandlingNeeded;
         final boolean terminateSimulation;
         final boolean earlyReturn;
+
+        public boolean isEventHandlingNeeded() {
+            return eventHandlingNeeded;
+        }
+
+        public boolean isTerminateSimulation() {
+            return terminateSimulation;
+        }
+
+        public boolean isEarlyReturn() {
+            return earlyReturn;
+        }
+
+        public double getLastSuccessfulTime() {
+            return lastSuccessfulTime;
+        }
 
         public DoStepResult(boolean eventHandlingNeeded, boolean terminateSimulation, boolean earlyReturn, double lastSuccessfulTime) {
             this.eventHandlingNeeded = eventHandlingNeeded;
