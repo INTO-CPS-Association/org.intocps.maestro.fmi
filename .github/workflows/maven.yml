@@ -122,6 +122,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - id: install-secret-key
         name: Install gpg secret key
