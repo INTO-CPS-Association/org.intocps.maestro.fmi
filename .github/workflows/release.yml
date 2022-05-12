@@ -307,5 +307,5 @@ jobs:
           git merge origin/${{ needs.version_change.outputs.build_branch }}
           git push
           git checkout master
-          git reset --hard origin/${{ needs.version_change.outputs.build_tag }}
+          git reset --hard ${{ needs.version_change.outputs.build_tag }}
           git push -f origin master
