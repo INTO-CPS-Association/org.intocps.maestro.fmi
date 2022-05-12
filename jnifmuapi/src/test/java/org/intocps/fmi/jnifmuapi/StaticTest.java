@@ -21,7 +21,7 @@ public class StaticTest {
 
         String apiVersion = DirectoryFmi3Fmu.getJniApiFmiVersion();
         Assert.assertTrue("Library should have been loaded", NativeFmuLibraryLoader.isNativeApiLoaded());
-        Assert.assertEquals("3.0-beta.5", apiVersion);
+        Assert.assertEquals("3.0", apiVersion);
 
     }
 }

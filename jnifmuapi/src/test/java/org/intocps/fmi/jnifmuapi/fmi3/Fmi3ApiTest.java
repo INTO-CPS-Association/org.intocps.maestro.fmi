@@ -20,7 +20,7 @@ import java.util.zip.ZipOutputStream;
 
 public class Fmi3ApiTest {
 
-    public static final String FMI_VERSION = "3.0-beta.5";
+    public static final String FMI_VERSION = "3.0";
 
     @Test
     public void testPlatformVersion() {
@@ -531,8 +531,7 @@ public class Fmi3ApiTest {
 
     @Test
     public void testEnterEventMode() throws FmiInvalidNativeStateException {
-        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode(Fmi3EventQualifier.EventTrue, Fmi3EventQualifier.EventTrue, new int[]{1, 2, 3},
-                Fmi3EventQualifier.EventTrue));
+        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode());
     }
 
     @Test

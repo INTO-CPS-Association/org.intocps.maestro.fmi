@@ -58,7 +58,7 @@ public class BouncingBallFmi3InstanceTest {
     @Before
     public void before() throws FmuInvocationException, FmuMissingLibraryException {
         org.junit.Assume.assumeTrue(!SystemUtils.IS_OS_WINDOWS);
-        
+
         fmu = new DirectoryFmi3Fmu(new File(FMU_UNPACKED_PATH), "bouncingball");
         fmu.load();
         ILogMessageCallback lm = (instanceName, status, category, message) -> {
@@ -117,8 +117,7 @@ public class BouncingBallFmi3InstanceTest {
     @Test
     public void enterEventMode() throws Exception {
         exitInitializationMode();
-        Assert.assertEquals(Fmi3Status.OK,
-                instance.enterEventMode(Fmi3EventQualifier.EventFalse, Fmi3EventQualifier.EventFalse, null, Fmi3EventQualifier.EventFalse));
+        Assert.assertEquals(Fmi3Status.OK, instance.enterEventMode());
     }
 
     @Test

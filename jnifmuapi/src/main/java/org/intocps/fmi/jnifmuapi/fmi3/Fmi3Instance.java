@@ -47,14 +47,10 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public Fmi3Status enterEventMode(Fmi3EventQualifier stepEvent, Fmi3EventQualifier stateEvent, int[] rootsFound,
-            Fmi3EventQualifier timeEvent) throws FmiInvalidNativeStateException {
+    public Fmi3Status enterEventMode() throws FmiInvalidNativeStateException {
         checkState();
-        if (rootsFound == null) {
-            rootsFound = new int[0];
-        }
 
-        return this.nEnterEventMode(instancePtr, stepEvent.getValue(), stateEvent.getValue(), rootsFound, rootsFound.length, timeEvent.getValue());
+        return this.nEnterEventMode(instancePtr);
     }
 
     @Override
