@@ -123,6 +123,29 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
+    public Fmi3Status setClock(long[] valueReferences, boolean[] clockActive) throws FmiInvalidNativeStateException {
+        checkState();
+        if (valueReferences == null) {
+            valueReferences = new long[0];
+        }
+        if (clockActive == null) {
+            clockActive = new boolean[0];
+        }
+
+        return nSetClock(instancePtr, valueReferences, valueReferences.length, clockActive);
+    }
+
+    @Override
+    public FmuResult<boolean[]> getClock(long[] valueReferences) throws FmiInvalidNativeStateException {
+        checkState();
+        if (valueReferences == null) {
+            valueReferences = new long[0];
+        }
+        boolean[] result = new boolean[valueReferences.length];
+        return new FmuResult<>(nGetClock(instancePtr, valueReferences, valueReferences.length, result), result);
+    }
+
+    @Override
     public FmuResult<VariableDependency> getVariableDependencies(long dependent, long nDependencies) throws FmiInvalidNativeStateException {
         checkState();
 

@@ -801,7 +801,7 @@ __attribute__((unused)) JNIEXPORT jobject JNICALL Java_org_intocps_fmi_jnifmuapi
     DECLARE_ARRAY(fmi3Clock, nativeClocks, nValueReferences)
     copyArray_jboolean_to_fmi3Clock(env, values, nativeClocks, nValueReferences);
 
-    fmi3Status status = instanceNode->owner->fmu.fmi3GetClock(instanceNode->instance, value_refs, nValueReferences,
+    fmi3Status status = instanceNode->owner->fmu.fmi3SetClock(instanceNode->instance, value_refs, nValueReferences,
                                                               nativeClocks);
 
     free(value_refs);

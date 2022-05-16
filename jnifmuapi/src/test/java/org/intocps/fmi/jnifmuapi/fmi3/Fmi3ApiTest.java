@@ -469,24 +469,15 @@ public class Fmi3ApiTest {
         Assert.assertArrayEquals(bool, result.result);
     }
 
-    //    @Test
-    //    public void testSetGetChar() throws FmiInvalidNativeStateException {
-    //        Assert.assertEquals(Fmi3Status.Error, instance.getC(VREFS_TOO_MANY).status);
-    //        Assert.assertEquals(Fmi3Status.OK, instance.setBoolean(VREFS, bool));
-    //        FmuResult<boolean[]> result = instance.getBoolean(VREFS);
-    //        Assert.assertEquals(Fmi3Status.OK, result.status);
-    //        Assert.assertArrayEquals(bool, result.result);
-    //    }
+    @Test
+    public void testSetGetClock() throws FmiInvalidNativeStateException {
 
+        Assert.assertEquals(Fmi3Status.OK, instance.setClock(VREFS, new boolean[]{true, false, true}));
 
-    //    @Test
-    //        public void testSetGetClocks() throws FmiInvalidNativeStateException {
-    //            Assert.assertEquals(Fmi3Status.Error, instance.getClass(VREFS_TOO_MANY).status);
-    //            Assert.assertEquals(Fmi3Status.OK, instance.setBoolean(VREFS, bool));
-    //            FmuResult<boolean[]> result = instance.getBoolean(VREFS);
-    //            Assert.assertEquals(Fmi3Status.OK, result.status);
-    //            Assert.assertArrayEquals(bool, result.result);
-    //        }
+        FmuResult<boolean[]> result = instance.getClock(VREFS);
+        Assert.assertEquals(Fmi3Status.OK, result.status);
+        Assert.assertArrayEquals(result.result, new boolean[]{true, false, true});
+    }
 
     @Test
     public void testSetGetString() throws FmiInvalidNativeStateException {

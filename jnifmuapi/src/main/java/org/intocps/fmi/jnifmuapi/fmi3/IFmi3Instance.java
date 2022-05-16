@@ -53,6 +53,10 @@ public interface IFmi3Instance {
 
     FmuResult<Long> getNumberOfVariableDependencies(long valueReference) throws FmiInvalidNativeStateException;
 
+    Fmi3Status setClock(long[] valueReferences, boolean[] clockActive) throws FmiInvalidNativeStateException;
+
+    FmuResult<boolean[]> getClock(long[] valueReferences) throws FmiInvalidNativeStateException;
+
     class VariableDependency {
         long[] elementIndicesOfDependent;
         long[] independents;

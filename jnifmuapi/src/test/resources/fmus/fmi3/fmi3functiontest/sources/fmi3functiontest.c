@@ -379,7 +379,7 @@ fmi3Status fmi3GetClock(fmi3Instance instance, const fmi3ValueReference valueRef
             return fmi3Error;
         }
         fmi3Clock val = ((struct Model *) instance)->v_fmi3Clock[vref];
-        print_log(instance, fmi3OK, "fmi3Ok", "Get##type_name VR %d at index %d", vref, i);
+        print_log(instance, fmi3OK, "fmi3Ok", "Get##type_name VR %d at index %d, val %d", vref, i,val);
         values[i] = val;
     }
     return fmi3OK;
@@ -630,7 +630,7 @@ fmi3Status fmi3SetClock(fmi3Instance instance, const fmi3ValueReference valueRef
             return fmi3Error;
         }
         fmi3Clock val = values[i];
-        print_log(instance, fmi3OK, "fmi3Ok", "Get##type_name VR %d at index %d", vref, i);
+        print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d, value %d", vref, i,val);
         ((struct Model *) instance)->v_fmi3Clock[vref] = val;
     }
     return fmi3OK;
