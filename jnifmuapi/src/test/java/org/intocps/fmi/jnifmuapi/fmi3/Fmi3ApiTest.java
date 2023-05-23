@@ -5,6 +5,7 @@ import org.intocps.fmi.FmuInvocationException;
 import org.intocps.fmi.FmuMissingLibraryException;
 import org.junit.*;
 import org.junit.rules.TestName;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -121,7 +122,12 @@ public class Fmi3ApiTest {
             System.out.printf("Received log message:\n" + "instanceName: '%s'\n" + "Status: '%s'\n" + "Category: '%s'\n" + "Message: '%s'%n",
                     instanceName, status.name(), category, message);
         };
-        instance = fmu.instantiateCoSimulation("fmi3functiontest", VALID_TOKEN, "/tmp", true, true, true, true, new long[]{1, 2}, lm, null);
+
+        DirectoryFmi3Fmu aSpy = (DirectoryFmi3Fmu) Mockito.spy(fmu);
+        Mockito.when(aSpy.getResourceLocation()).thenReturn("/resources");
+        fmu = aSpy;
+
+        instance = fmu.instantiateCoSimulation("fmi3functiontest", VALID_TOKEN, true, true, true, true, new long[]{1, 2}, lm, null);
 
         Assert.assertNotNull("Instantiate returned null", instance);
         Assert.assertTrue(instance.isValid());
@@ -150,34 +156,29 @@ public class Fmi3ApiTest {
     public void instantiateModelExchangeNoCallback() throws FmiInvalidNativeStateException {
 
         String validName = "fmi3functiontest";
-        String validResourceLocation = "/tmp";
         boolean validVisible = true;
         boolean validLoginOn = true;
 
-        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null);
+        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validVisible, validLoginOn, null);
         Assert.assertNotNull("Parameters not send correctly", validInstance);
         Assert.assertTrue(validInstance.isValid());
         validInstance.freeInstance();
 
-
-        Assert.assertNull("Name not send correctly",
-                fmu.instantiateModelExchange("not as expected", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null));
-        Assert.assertNull("Token not send correctly",
-                fmu.instantiateModelExchange(validName, "123", validResourceLocation, validVisible, validLoginOn, null));
-        Assert.assertNull("ResourcePath not send correctly",
-                fmu.instantiateModelExchange(validName, VALID_TOKEN, "123", validVisible, validLoginOn, null));
-        Assert.assertNull("Visible not send correctly",
-                fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, null));
-        Assert.assertNull("LoggingOn not send correctly",
-                fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, false, null));
-        Assert.assertNull("All not send correctly", fmu.instantiateModelExchange(null, null, null, false, false, null));
+        Assert.assertNull("Name not send correctly", fmu.instantiateModelExchange("not as expected", VALID_TOKEN, validVisible, validLoginOn, null));
+        Assert.assertNull("Token not send correctly", fmu.instantiateModelExchange(validName, "123", validVisible, validLoginOn, null));
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("123");
+        Assert.assertNull("ResourcePath not send correctly", fmu.instantiateModelExchange(validName, VALID_TOKEN, validVisible, validLoginOn, null));
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("/tmp");
+        Assert.assertNull("Visible not send correctly", fmu.instantiateModelExchange(validName, VALID_TOKEN, false, validLoginOn, null));
+        Assert.assertNull("LoggingOn not send correctly", fmu.instantiateModelExchange(validName, VALID_TOKEN, validVisible, false, null));
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn(null);
+        Assert.assertNull("All not send correctly", fmu.instantiateModelExchange(null, null, false, false, null));
     }
 
     @Test
     public void instantiateModelExchangeCallbackCheck() throws FmiInvalidNativeStateException {
 
         String validName = "fmi3functiontest";
-        String validResourceLocation = "/tmp";
         boolean validVisible = true;
         boolean validLoginOn = true;
 
@@ -192,8 +193,7 @@ public class Fmi3ApiTest {
 
 
         CallbackChecker callbacks = new CallbackChecker();
-        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
-                callbacks);
+        IFmi3Instance validInstance = fmu.instantiateModelExchange(validName, VALID_TOKEN, validVisible, validLoginOn, callbacks);
         Assert.assertNotNull("Instantiation failed", validInstance);
         Assert.assertTrue(validInstance.isValid());
         Assert.assertFalse("log cb not working", callbacks.logs.isEmpty());
@@ -207,36 +207,39 @@ public class Fmi3ApiTest {
     public void instantiateScheduledNoCallback() throws FmiInvalidNativeStateException {
 
         String validName = "fmi3functiontest";
-        String validResourceLocation = "/tmp";
         boolean validVisible = true;
         boolean validLoginOn = true;
 
-        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
-                null, null, null, null);
+        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validVisible, validLoginOn, null, null, null, null);
         Assert.assertNotNull("Parameters not send correctly", validInstance);
         Assert.assertTrue(validInstance.isValid());
         validInstance.freeInstance();
 
 
         Assert.assertNull("Name not send correctly",
-                fmu.instantiateScheduledExecution("not as expected", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, null, null, null,
-                        null));
+                fmu.instantiateScheduledExecution("not as expected", VALID_TOKEN, validVisible, validLoginOn, null, null, null, null));
         Assert.assertNull("Token not send correctly",
-                fmu.instantiateScheduledExecution(validName, "123", validResourceLocation, validVisible, validLoginOn, null, null, null, null));
+                fmu.instantiateScheduledExecution(validName, "123", validVisible, validLoginOn, null, null, null, null));
+
+
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("123");
         Assert.assertNull("ResourcePath not send correctly",
-                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, "123", validVisible, validLoginOn, null, null, null, null));
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validVisible, validLoginOn, null, null, null, null));
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("/tmp");
+
         Assert.assertNull("Visible not send correctly",
-                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, null, null, null, null));
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, false, validLoginOn, null, null, null, null));
         Assert.assertNull("LoggingOn not send correctly",
-                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, false, null, null, null, null));
-        Assert.assertNull("All not send correctly", fmu.instantiateScheduledExecution(null, null, null, false, false, null, null, null, null));
+                fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validVisible, false, null, null, null, null));
+
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("123");
+        Assert.assertNull("All not send correctly", fmu.instantiateScheduledExecution(null, null, false, false, null, null, null, null));
     }
 
     @Test
     public void instantiateScheduledCallbackCheck() throws FmiInvalidNativeStateException {
 
         String validName = "fmi3functiontest";
-        String validResourceLocation = "/tmp";
         boolean validVisible = true;
         boolean validLoginOn = true;
 
@@ -270,8 +273,8 @@ public class Fmi3ApiTest {
 
 
         CallbackChecker callbacks = new CallbackChecker();
-        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
-                callbacks, callbacks, callbacks, callbacks);
+        IFmi3Instance validInstance = fmu.instantiateScheduledExecution(validName, VALID_TOKEN, validVisible, validLoginOn, callbacks, callbacks,
+                callbacks, callbacks);
         Assert.assertNotNull("Instantiation failed", validInstance);
         Assert.assertTrue(validInstance.isValid());
         Assert.assertEquals("Locked cb not working", true, callbacks.locked);
@@ -294,41 +297,44 @@ public class Fmi3ApiTest {
         boolean validEarlyReturnAllowed = true;
         long[] validRequiredIntermediateVariables = new long[]{1, 2};
 
-        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
-                validEventModeUsed, validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null);
+        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, validLoginOn, validEventModeUsed,
+                validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null);
         Assert.assertNotNull("Parameters not send correctly", validInstance);
         Assert.assertTrue(validInstance.isValid());
         validInstance.freeInstance();
 
         Assert.assertNull("Name not send correctly",
-                fmu.instantiateCoSimulation("not valid", VALID_TOKEN, validResourceLocation, validVisible, validLoginOn, validEventModeUsed,
-                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
-        Assert.assertNull("Token not send correctly",
-                fmu.instantiateCoSimulation(validName, "123", validResourceLocation, validVisible, validLoginOn, validEventModeUsed,
-                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
-        Assert.assertNull("ResourcePath not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, "123", validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
+                fmu.instantiateCoSimulation("not valid", VALID_TOKEN, validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
                         validRequiredIntermediateVariables, null, null));
+        Assert.assertNull("Token not send correctly",
+                fmu.instantiateCoSimulation(validName, "123", validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
+
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("123");
+        Assert.assertNull("ResourcePath not send correctly",
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn("/tmp");
         Assert.assertNull("Visible not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, false, validLoginOn, validEventModeUsed,
-                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, false, validLoginOn, validEventModeUsed, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
         Assert.assertNull("LoggingOn not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed,
-                        validEarlyReturnAllowed, validRequiredIntermediateVariables, null, null));
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, false, validEventModeUsed, validEarlyReturnAllowed,
+                        validRequiredIntermediateVariables, null, null));
         Assert.assertNull("EventModeUsed not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, false, validEarlyReturnAllowed,
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, false, false, validEarlyReturnAllowed,
                         validRequiredIntermediateVariables, null, null));
         Assert.assertNull("EarlyReturnAllowed not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed, false,
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, false, validEventModeUsed, false,
                         validRequiredIntermediateVariables, null, null));
         Assert.assertNull("RequiredIntermediateVariables not send correctly",
-                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, false, validEventModeUsed,
-                        validEarlyReturnAllowed, new long[]{4, 5, 6}, null, null));
+                fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, false, validEventModeUsed, validEarlyReturnAllowed,
+                        new long[]{4, 5, 6}, null, null));
 
 
+        Mockito.when(((DirectoryFmi3Fmu) fmu).getResourceLocation()).thenReturn(null);
         Assert.assertNull("All not send correctly",
-                fmu.instantiateCoSimulation(null, null, null, validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed, null, null,
-                        null));
+                fmu.instantiateCoSimulation(null, null, validVisible, validLoginOn, validEventModeUsed, validEarlyReturnAllowed, null, null, null));
 
 
     }
@@ -361,8 +367,8 @@ public class Fmi3ApiTest {
         }
         CallbackChecker callbacks = new CallbackChecker();
 
-        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validResourceLocation, validVisible, validLoginOn,
-                validEventModeUsed, validEarlyReturnAllowed, validRequiredIntermediateVariables, callbacks, callbacks);
+        IFmi3Instance validInstance = fmu.instantiateCoSimulation(validName, VALID_TOKEN, validVisible, validLoginOn, validEventModeUsed,
+                validEarlyReturnAllowed, validRequiredIntermediateVariables, callbacks, callbacks);
         Assert.assertNotNull("Parameters not send correctly", validInstance);
         Assert.assertTrue(validInstance.isValid());
         Assert.assertFalse("log cb not working", callbacks.logs.isEmpty());

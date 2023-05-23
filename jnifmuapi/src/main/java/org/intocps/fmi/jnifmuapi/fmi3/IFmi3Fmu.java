@@ -34,15 +34,15 @@ public interface IFmi3Fmu {
 
     boolean isValid();
 
-    IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, ILogMessageCallback logMessage);
+    IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, boolean visible, boolean loggingOn,
+            ILogMessageCallback logMessage);
 
-    IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, String resourceLocation, boolean visible, boolean loggingOn,
-            boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables, ILogMessageCallback logMessage,
+    IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, boolean visible, boolean loggingOn, boolean eventModeUsed,
+            boolean earlyReturnAllowed, long[] requiredIntermediateVariables, ILogMessageCallback logMessage,
             IIntermediateUpdateCallback intermediateUpdate);
 
-    IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate, ILockPreemptionCallback lockPreemption,
+    IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, boolean visible, boolean loggingOn,
+            ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate, ILockPreemptionCallback lockPreemption,
             IUnlockPreemptionCallback unlockPreemption);
 
 
