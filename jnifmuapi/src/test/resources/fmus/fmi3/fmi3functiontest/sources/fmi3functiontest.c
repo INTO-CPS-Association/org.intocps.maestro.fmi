@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 
+bool endsWith (char* base, char* str) {
+    int blen = strlen(base);
+    int slen = strlen(str);
+    return (blen >= slen) && (0 == strcmp(base + blen - slen, str));
+}
+
 #define VL 4
 struct Model {
     fmi3Float32 v_fmi3Float32[VL];
@@ -84,7 +90,7 @@ fmi3Instance fmi3InstantiateModelExchange(
     }
 
     if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
-        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn) {
+      !endsWith(resourcePath, "resources") || !visible || !loggingOn) {
         printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d\n", instanceName,
                instantiationToken, resourcePath, visible, loggingOn);
         return NULL;
@@ -121,7 +127,7 @@ fmi3Instance fmi3InstantiateCoSimulation(
     }
 
     if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
-        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn || !eventModeUsed || !earlyReturnAllowed) {
+        !endsWith(resourcePath, "resources") || !visible || !loggingOn || !eventModeUsed || !earlyReturnAllowed) {
         printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d, eventModeUsed: %d, earlyReturnAllowed: %d\n",
                instanceName,
                instantiationToken, resourcePath, visible, loggingOn, eventModeUsed, earlyReturnAllowed);
@@ -179,7 +185,7 @@ fmi3Instance fmi3InstantiateScheduledExecution(
     }
 
     if (strstr(instanceName, "fmi3functiontest") == NULL || strcmp(instantiationToken, "{FMI3_TEST_TOKEN}") != 0 ||
-        strcmp(resourcePath, "/tmp") != 0 || !visible || !loggingOn) {
+        !endsWith(resourcePath, "resources") || !visible || !loggingOn) {
         printf("Name: '%s', token: '%s', resourcePath: '%s', visible: %d, loggingOn: %d\n", instanceName,
                instantiationToken, resourcePath, visible, loggingOn);
         return NULL;

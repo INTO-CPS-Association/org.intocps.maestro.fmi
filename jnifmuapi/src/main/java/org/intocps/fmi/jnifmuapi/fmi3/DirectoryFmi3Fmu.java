@@ -101,15 +101,27 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
         return lifeCycle.isValid();
     }
 
+
+    protected String getResourceLocation() {
+        File resourceDir = new File(dir, "resources");
+        //noinspection ResultOfMethodCallIgnored
+        resourceDir.mkdirs();
+        resourceDir = resourceDir.getAbsoluteFile();
+
+
+        logger.trace("resourceLocation is: '{}'", resourceDir);
+        return resourceDir.toString();
+    }
+
     @Override
-    public IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, ILogMessageCallback logMessage) {
+    public IFmi3Instance instantiateModelExchange(String instanceName, String instantiationToken, boolean visible, boolean loggingOn,
+            ILogMessageCallback logMessage) {
 
         if (!lifeCycle.isLoaded()) {
             return null;
         }
-        long instancePtr = nInstantiateModelExchange(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible, loggingOn,
-                logMessage);
+        long instancePtr = nInstantiateModelExchange(lifeCycle.getFmuPtr(), instanceName, instantiationToken, getResourceLocation(), visible,
+                loggingOn, logMessage);
         if (instancePtr == 0) {
             return null;
         }
@@ -118,9 +130,9 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
 
 
     @Override
-    public IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables,
-            ILogMessageCallback logMessage, IIntermediateUpdateCallback intermediateUpdate) {
+    public IFmi3Instance instantiateCoSimulation(String instanceName, String instantiationToken, boolean visible, boolean loggingOn,
+            boolean eventModeUsed, boolean earlyReturnAllowed, long[] requiredIntermediateVariables, ILogMessageCallback logMessage,
+            IIntermediateUpdateCallback intermediateUpdate) {
         if (!lifeCycle.isLoaded()) {
             return null;
         }
@@ -129,8 +141,8 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
             requiredIntermediateVariables = new long[0];
         }
 
-        long instancePtr = nInstantiateCoSimulation(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible, loggingOn,
-                eventModeUsed, earlyReturnAllowed, requiredIntermediateVariables, requiredIntermediateVariables.length, logMessage,
+        long instancePtr = nInstantiateCoSimulation(lifeCycle.getFmuPtr(), instanceName, instantiationToken, getResourceLocation(), visible,
+                loggingOn, eventModeUsed, earlyReturnAllowed, requiredIntermediateVariables, requiredIntermediateVariables.length, logMessage,
                 intermediateUpdate);
         if (instancePtr == 0) {
             return null;
@@ -139,15 +151,15 @@ public class DirectoryFmi3Fmu extends NativeFmu3 implements IFmi3Fmu {
     }
 
     @Override
-    public IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, String resourceLocation, boolean visible,
-            boolean loggingOn, ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate, ILockPreemptionCallback lockPreemption,
+    public IFmi3Instance instantiateScheduledExecution(String instanceName, String instantiationToken, boolean visible, boolean loggingOn,
+            ILogMessageCallback logMessage, IClockUpdateCallback clockUpdate, ILockPreemptionCallback lockPreemption,
             IUnlockPreemptionCallback unlockPreemption) {
 
         if (!lifeCycle.isLoaded()) {
             return null;
         }
 
-        long instancePtr = nInstantiateScheduledExecution(lifeCycle.getFmuPtr(), instanceName, instantiationToken, resourceLocation, visible,
+        long instancePtr = nInstantiateScheduledExecution(lifeCycle.getFmuPtr(), instanceName, instantiationToken, getResourceLocation(), visible,
                 loggingOn, logMessage, clockUpdate, lockPreemption, unlockPreemption);
         if (instancePtr == 0) {
             return null;

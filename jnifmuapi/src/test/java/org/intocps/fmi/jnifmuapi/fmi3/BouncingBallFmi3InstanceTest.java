@@ -67,7 +67,7 @@ public class BouncingBallFmi3InstanceTest {
             System.out.printf("Received log message:\n" + "instanceName: '%s'\n" + "Status: '%s'\n" + "Category: '%s'\n" + "Message: '%s'%n",
                     instanceName, status.name(), category, message);
         };
-        instance = fmu.instantiateCoSimulation("Bouncing Ball", FMU_GUID, null, false, true, false, false, null, lm, null);
+        instance = fmu.instantiateCoSimulation("Bouncing Ball", FMU_GUID, false, true, false, false, null, lm, null);
         Assert.assertNotNull("Instantiate returned null", instance);
     }
 
