@@ -97,6 +97,10 @@ jobs:
             jnifmuapi/target/fmus/**/*.dll
           retention-days: 1
 
+      - name: List windows dependencies
+        if: matrix.os == 'windows-latest'
+        run: for /r %i IN (*.dll) DO objdump -p %i | findstr "DLL Name:"
+
       - name: artifact
         if: always()
         uses: actions/upload-artifact@v2
