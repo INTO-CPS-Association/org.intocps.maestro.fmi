@@ -89,7 +89,7 @@ if (WIN32)
     #windows
     
 		
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic -lstdc++ -lpthread ")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic -lstdc++ -lwinpthread ")
 
     SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 endif ()
