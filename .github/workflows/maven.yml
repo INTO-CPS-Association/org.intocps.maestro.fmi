@@ -99,6 +99,7 @@ jobs:
 
       - name: List windows dependencies
         if: matrix.os == 'windows-latest'
+        shell: cmd
         run: for /r %i IN (*.dll) DO objdump -p %i | findstr "DLL Name:"
 
       - name: artifact
