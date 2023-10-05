@@ -87,7 +87,9 @@ target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
 
 if (WIN32)
     #windows
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -static-libstdc++ -static-libgcc -lstdc++")
+    
+		 find_library(PTHREAD_LIBRARY NAMES libpthread.a libpthread.dylib)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
 
     SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 endif ()
