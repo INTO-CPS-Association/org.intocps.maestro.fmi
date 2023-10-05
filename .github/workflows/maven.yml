@@ -99,8 +99,8 @@ jobs:
 
       - name: List windows dependencies
         if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: for /r %i IN (*.dll) DO objdump -p %i | findstr "DLL Name:"
+        shell: bash
+        run: find . -name *.dll -exec echo {} \; -exec bash -c "objdump -p {} | grep 'DLL Name:'" \;
 
       - name: artifact
         if: always()
