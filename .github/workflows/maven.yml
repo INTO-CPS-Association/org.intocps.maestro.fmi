@@ -173,16 +173,16 @@ jobs:
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
 
-      - name: Maven Deploy
-        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' && github.ref != 'refs/heads/master' )
-        run: mvn -P au -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
-        env:
-          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+#      - name: Maven Deploy
+#        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' && github.ref != 'refs/heads/master' )
+#        run: mvn -P au -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
+#        env:
+#          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+#          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
-      - name: Maven Deploy SNAPSHOT
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/development' )
-        run: mvn -P au -B deploy -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
+      - name: Maven Deploy SNAPSHOT to SONATYPE
+        if: github.ref == 'refs/heads/development'
+        run: mvn -B deploy -Dsha1= -Dchangelist=-SNAPSHOT -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
