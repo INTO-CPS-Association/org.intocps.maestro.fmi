@@ -6,7 +6,7 @@ name: Build SNAPSHOT
 on: [ workflow_dispatch, push, pull_request ]
 env:
   JAVA_VERSION: 1.8
-  SERVER_ID: au-artifactory-snapshots
+  SERVER_ID: ossrh
   PYTHON_VERSION: '3.9.9'
 
 
@@ -165,6 +165,7 @@ jobs:
           server-id: ${{ env.SERVER_ID }}
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
 
       - name: Maven download
