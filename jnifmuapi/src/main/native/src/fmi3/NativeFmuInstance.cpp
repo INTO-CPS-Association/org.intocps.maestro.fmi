@@ -317,14 +317,14 @@ __attribute__((unused)) JNIEXPORT jobject JNICALL Java_org_intocps_fmi_jnifmuapi
 {\
      auto instance = getInstancePtr( instancePtr);\
 \
-    jsize len = env->GetArrayLength( valueReferences);\
+    jsize len = nValueReferences;/*env->GetArrayLength( valueReferences);*/\
 \
-    fmi3ValueReference *vr_arr = createArray_uint_from_jlong(env, valueReferences, len);\
+    fmi3ValueReference *vr_arr = createArray_uint_from_jlong(env, valueReferences, nValueReferences);\
 \
-    fmi3##fmiType inputs[len]; \
-    copyArray_##jniType##_to_##fmi3##fmiType(env, values,inputs, len);\
+    fmi3##fmiType inputs[nValues]; \
+    copyArray_##jniType##_to_##fmi3##fmiType(env, values,inputs, nValues);\
 \
-    auto status = instance->owner->fmu.fmi3Set##fmiType(instance->instance, vr_arr, len, inputs,len);\
+    auto status = instance->owner->fmu.fmi3Set##fmiType(instance->instance, vr_arr, nValueReferences, inputs,nValues);\
 \
     delete vr_arr;\
 \

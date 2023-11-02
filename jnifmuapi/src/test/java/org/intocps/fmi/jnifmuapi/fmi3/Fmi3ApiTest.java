@@ -396,7 +396,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetUInt8() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getUInt8(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setUInt8(VREFS, uint8));
+        Assert.assertEquals(Fmi3Status.OK, instance.setUInt8(VREFS,VREFS.length, uint8,uint8.length));
         FmuResult<byte[]> result = instance.getUInt8(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(uint8, result.result);
@@ -405,7 +405,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetInt8() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getInt8(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, VREFS.length,int8,int8.length));
         FmuResult<byte[]> result = instance.getInt8(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(int8, result.result);
@@ -414,7 +414,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetUInt16() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getUInt16(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setUInt16(VREFS, uint16));
+        Assert.assertEquals(Fmi3Status.OK, instance.setUInt16(VREFS,VREFS.length, uint16,uint16.length));
         FmuResult<short[]> result = instance.getUInt16(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(uint16, result.result);
@@ -423,7 +423,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetInt16() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getInt16(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt16(VREFS, int16));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt16(VREFS,VREFS.length, int16,int16.length));
         FmuResult<short[]> result = instance.getInt16(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(int16, result.result);
@@ -432,7 +432,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetUInt32() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getUInt32(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setUInt32(VREFS, uint32));
+        Assert.assertEquals(Fmi3Status.OK, instance.setUInt32(VREFS,VREFS.length, uint32,uint32.length));
         FmuResult<int[]> result = instance.getUInt32(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(uint32, result.result);
@@ -441,7 +441,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetInt32() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getInt32(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt32(VREFS, int32));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt32(VREFS,VREFS.length, int32,int32.length));
         FmuResult<int[]> result = instance.getInt32(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(int32, result.result);
@@ -451,7 +451,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetUInt64() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getUInt64(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setUInt64(VREFS, uint64));
+        Assert.assertEquals(Fmi3Status.OK, instance.setUInt64(VREFS,VREFS.length, uint64,uint64.length));
         FmuResult<long[]> result = instance.getUInt64(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(uint64, result.result);
@@ -460,7 +460,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetInt64() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getInt64(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt64(VREFS, int64));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt64(VREFS,VREFS.length, int64,int64.length));
         FmuResult<long[]> result = instance.getInt64(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(int64, result.result);
@@ -469,7 +469,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetBoolean() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getBoolean(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setBoolean(VREFS, bool));
+        Assert.assertEquals(Fmi3Status.OK, instance.setBoolean(VREFS,VREFS.length, bool,bool.length));
         FmuResult<boolean[]> result = instance.getBoolean(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         Assert.assertArrayEquals(bool, result.result);
@@ -488,7 +488,7 @@ public class Fmi3ApiTest {
     @Test
     public void testSetGetString() throws FmiInvalidNativeStateException {
         Assert.assertEquals(Fmi3Status.Error, instance.getString(VREFS_TOO_MANY).status);
-        Assert.assertEquals(Fmi3Status.OK, instance.setString(VREFS, strings));
+        Assert.assertEquals(Fmi3Status.OK, instance.setString(VREFS,VREFS.length, strings,strings.length));
         FmuResult<String[]> result = instance.getString(VREFS);
         Assert.assertEquals(Fmi3Status.OK, result.status);
         //the jniapi will convert null to "\0" so the FMUs never receive an invalid char pointer
@@ -570,7 +570,7 @@ public class Fmi3ApiTest {
 
     @Test
     public void testState() throws FmiInvalidNativeStateException {
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, new byte[]{0, 0, 0}));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS,VREFS.length, new byte[]{0, 0, 0},3));
         FmuResult<byte[]> baseInt = instance.getInt8(VREFS);
         Assert.assertEquals(Fmi3Status.OK, baseInt.status);
 
@@ -593,11 +593,11 @@ public class Fmi3ApiTest {
         checker.accept(new AbstractMap.SimpleEntry<>(state1, baseInt.result));
 
         //make state dirty and then override it
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS,VREFS.length, int8,int8.length));
         checker.accept(new AbstractMap.SimpleEntry<>(state1, baseInt.result));
 
         //make a new state
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS,VREFS.length, int8,int8.length));
         FmuResult<byte[]> tmp = instance.getInt8(VREFS);
         Assert.assertEquals(Fmi3Status.OK, tmp.status);
         Assert.assertArrayEquals(int8, tmp.result);
@@ -617,7 +617,7 @@ public class Fmi3ApiTest {
     @Test
     @Ignore
     public void testSerializeState() throws FmiInvalidNativeStateException {
-        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS, int8));
+        Assert.assertEquals(Fmi3Status.OK, instance.setInt8(VREFS,VREFS.length, int8,int8.length));
         FmuResult<Fmi3State> res = instance.getState();
         Assert.assertEquals(Fmi3Status.OK, res.status);
 

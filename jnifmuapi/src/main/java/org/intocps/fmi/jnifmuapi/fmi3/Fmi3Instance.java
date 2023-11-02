@@ -627,79 +627,79 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public Fmi3Status setFloat32(long[] valueReferences, float[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setFloat32(long[] valueReferences, int nValueReferences, float[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetFloat32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetFloat32(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setFloat64(long[] valueReferences, double[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setFloat64(long[] valueReferences, int nValueReferences, double[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetFloat64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetFloat64(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setInt8(long[] valueReferences, int nValueReferences, byte[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetInt8(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetInt8(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setUInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setUInt8(long[] valueReferences, int nValueReferences, byte[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetUInt8(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetUInt8(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setInt16(long[] valueReferences, int nValueReferences, short[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetInt16(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetInt16(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setUInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setUInt16(long[] valueReferences, int nValueReferences, short[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetUInt16(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetUInt16(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setInt32(long[] valueReferences, int nValueReferences, int[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetInt32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetInt32(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setUInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setUInt32(long[] valueReferences, int nValueReferences, int[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetUInt32(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetUInt32(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setInt64(long[] valueReferences, int nValueReferences, long[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetInt64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetInt64(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setUInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setUInt64(long[] valueReferences, int nValueReferences, long[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetUInt64(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetUInt64(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setBoolean(long[] valueReferences, boolean[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setBoolean(long[] valueReferences, int nValueReferences, boolean[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetBoolean(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetBoolean(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setString(long[] valueReferences, String[] values) throws FmiInvalidNativeStateException {
+    public Fmi3Status setString(long[] valueReferences, int nValueReferences, String[] values, int nv) throws FmiInvalidNativeStateException {
         checkState();
-        return nSetString(instancePtr, valueReferences, valueReferences.length, values, values.length);
+        return nSetString(instancePtr, valueReferences, nValueReferences, values, nv);
     }
 
     @Override
-    public Fmi3Status setBinary(long[] valueReferences, byte[][] array_name) throws FmiInvalidNativeStateException {
+    public Fmi3Status setBinary(long[] valueReferences,  byte[][] array_name) throws FmiInvalidNativeStateException {
         checkState();
         long[] sizes = new long[array_name.length];
         for (int i = 0; i < array_name.length; i++) {

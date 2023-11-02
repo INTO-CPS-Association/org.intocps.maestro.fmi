@@ -342,29 +342,29 @@ public interface IFmi3Instance {
     /* end::Getters[] */
 
     /* tag::Setters[] */
-    Fmi3Status setFloat32(long[] valueReferences, float[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setFloat32(long[] valueReferences, int nValueReferences, float[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setFloat64(long[] valueReferences, double[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setFloat64(long[] valueReferences,int nValueReferences, double[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setInt8(long[] valueReferences, int nValueReferences, byte[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setUInt8(long[] valueReferences, byte[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setUInt8(long[] valueReferences, int nValueReferences, byte[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setInt16(long[] valueReferences, int nValueReferences, short[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setUInt16(long[] valueReferences, short[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setUInt16(long[] valueReferences, int nValueReferences, short[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setInt32(long[] valueReferences, int nValueReferences, int[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setUInt32(long[] valueReferences, int[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setUInt32(long[] valueReferences, int nValueReferences, int[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setInt64(long[] valueReferences, int nValueReferences, long[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setUInt64(long[] valueReferences, long[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setUInt64(long[] valueReferences, int nValueReferences, long[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setBoolean(long[] valueReferences, boolean[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setBoolean(long[] valueReferences, int nValueReferences, boolean[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setString(long[] valueReferences, String[] values) throws FmiInvalidNativeStateException;
+    Fmi3Status setString(long[] valueReferences, int nValueReferences, String[] values,int nv) throws FmiInvalidNativeStateException;
 
-    Fmi3Status setBinary(long[] valueReferences, byte[][] array_name) throws FmiInvalidNativeStateException;
+    Fmi3Status setBinary(long[] valueReferences,  byte[][] array_name) throws FmiInvalidNativeStateException;
 }
