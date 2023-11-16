@@ -536,91 +536,91 @@ public class Fmi3Instance extends NativeFmu3Instance implements IFmi3Instance {
     }
 
     @Override
-    public FmuResult<float[]> getFloat32(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<float[]> getFloat32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         float[] out = new float[valueReferences.length];
-        return new FmuResult<>(nGetFloat32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetFloat32(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<double[]> getFloat64(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<double[]> getFloat64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         double[] out = new double[valueReferences.length];
-        return new FmuResult<>(nGetFloat64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetFloat64(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<byte[]> getInt8(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<byte[]> getInt8(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         byte[] out = new byte[valueReferences.length];
-        return new FmuResult<>(nGetInt8(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetInt8(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<byte[]> getUInt8(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<byte[]> getUInt8(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         byte[] out = new byte[valueReferences.length];
-        return new FmuResult<>(nGetUInt8(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetUInt8(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<short[]> getInt16(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<short[]> getInt16(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         short[] out = new short[valueReferences.length];
-        return new FmuResult<>(nGetInt16(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetInt16(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<short[]> getUInt16(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<short[]> getUInt16(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         short[] out = new short[valueReferences.length];
-        return new FmuResult<>(nGetUInt16(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetUInt16(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<int[]> getInt32(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<int[]> getInt32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         int[] out = new int[valueReferences.length];
-        return new FmuResult<>(nGetInt32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetInt32(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<int[]> getUInt32(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<int[]> getUInt32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         int[] out = new int[valueReferences.length];
-        return new FmuResult<>(nGetUInt32(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetUInt32(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<long[]> getInt64(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<long[]> getInt64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         long[] out = new long[valueReferences.length];
-        return new FmuResult<>(nGetInt64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetInt64(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<long[]> getUInt64(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<long[]> getUInt64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         long[] out = new long[valueReferences.length];
-        return new FmuResult<>(nGetUInt64(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetUInt64(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<boolean[]> getBoolean(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<boolean[]> getBoolean(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         boolean[] out = new boolean[valueReferences.length];
-        return new FmuResult<>(nGetBoolean(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetBoolean(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<String[]> getString(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<String[]> getString(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException {
         checkState();
         String[] out = new String[valueReferences.length];
-        return new FmuResult<>(nGetString(instancePtr, valueReferences, valueReferences.length, out, out.length), out);
+        return new FmuResult<>(nGetString(instancePtr, valueReferences, nValueReferences, out, nValues), out);
     }
 
     @Override
-    public FmuResult<byte[][]> getBinary(long[] valueReferences) throws FmiInvalidNativeStateException {
+    public FmuResult<byte[][]> getBinary(long[] valueReferences, int nValueReferences) throws FmiInvalidNativeStateException {
         checkState();
         byte[][] out = new byte[valueReferences.length][];
         return new FmuResult<>(nGetBinary(instancePtr, valueReferences, valueReferences.length, out, out.length), out);

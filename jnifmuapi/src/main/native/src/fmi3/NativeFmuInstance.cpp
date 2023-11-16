@@ -126,13 +126,12 @@ __attribute__((unused)) JNIEXPORT jobject JNICALL Java_org_intocps_fmi_jnifmuapi
         (JNIEnv *env, __attribute__((unused)) jobject obj, jlong instancePtr, jlongArray valueReferences, jint nValueReferences,\
          jniType##Array values, jint nValues) {\
     Fmi3InstanceNode *instance = getInstancePtr( instancePtr);\
-    jsize len = env->GetArrayLength(valueReferences);\
-    fmi3ValueReference *vr_arr = createArray_uint_from_jlong(env, valueReferences, len);\
+    fmi3ValueReference *vr_arr = createArray_uint_from_jlong(env, valueReferences,nValueReferences);\
 \
-    fmi3 ## fmiType outputValues[len];\
-    auto status = instance->owner->fmu.fmi3Get##fmiType(instance->instance, vr_arr, len, outputValues,len);\
+    fmi3 ## fmiType outputValues[nValues];\
+    auto status = instance->owner->fmu.fmi3Get##fmiType(instance->instance, vr_arr, nValueReferences, outputValues,nValues);\
     if (status == fmi3OK || status == fmi3Warning) {\
-        copyArray_##fmi3##fmiType##_to_##jniType(env, outputValues,values, len);\
+        copyArray_##fmi3##fmiType##_to_##jniType(env, outputValues,values, nValues);\
     }\
 \
     delete (vr_arr);\

@@ -314,31 +314,31 @@ public interface IFmi3Instance {
     Fmi3Status activateModelPartition(long clockReference, double activationTime) throws FmiInvalidNativeStateException;
 
 
-    FmuResult<float[]> getFloat32(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<float[]> getFloat32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<double[]> getFloat64(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<double[]> getFloat64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<byte[]> getInt8(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<byte[]> getInt8(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<byte[]> getUInt8(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<byte[]> getUInt8(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<short[]> getInt16(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<short[]> getInt16(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<short[]> getUInt16(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<short[]> getUInt16(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<int[]> getInt32(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<int[]> getInt32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<int[]> getUInt32(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<int[]> getUInt32(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<long[]> getInt64(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<long[]> getInt64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<long[]> getUInt64(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<long[]> getUInt64(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<boolean[]> getBoolean(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<boolean[]> getBoolean(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<String[]> getString(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<String[]> getString(long[] valueReferences, int nValueReferences,int nValues) throws FmiInvalidNativeStateException;
 
-    FmuResult<byte[][]> getBinary(long[] valueReferences) throws FmiInvalidNativeStateException;
+    FmuResult<byte[][]> getBinary(long[] valueReferences, int nValueReferences) throws FmiInvalidNativeStateException;
     /* end::Getters[] */
 
     /* tag::Setters[] */
