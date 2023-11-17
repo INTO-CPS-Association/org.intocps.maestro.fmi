@@ -277,6 +277,7 @@ void print_log(fmi3Instance instance,
     }
 }
 
+#define str(s) #s
 #define GET(type_name) \
 fmi3Status  fmi3Get##type_name(  fmi3Instance instance,\
                             const fmi3ValueReference valueReferences[],\
@@ -290,9 +291,9 @@ fmi3Status  fmi3Get##type_name(  fmi3Instance instance,\
             print_log(instance,fmi3Error,"fmi3Error","VR %d at index %d is our of range max is %d",vref,i,VL);\
             return fmi3Error;                               \
        }\
-                       \
+        if(i>=nValues)continue;               \
         printf("In geting %d\n",vref);fmi3##type_name val = ((struct Model*)instance)->v_fmi3##type_name[vref];\
-        print_log(instance,fmi3OK,"fmi3Ok","Get##type_name VR %d at index %d",vref,i);\
+        print_log(instance,fmi3OK,"fmi3Ok","Get%s VR %d at index %d",str(type_name),vref,i);\
         values[i]=val;\
     }                   \
     return fmi3OK;\
@@ -330,20 +331,30 @@ GET(Byte)
 //GET(Clock)
 fmi3Status fmi3GetString(fmi3Instance instance, const fmi3ValueReference valueReferences[], size_t nValueReferences,
                          fmi3String values[], size_t nValues) {
+
+                         int vIndex=0;
     for (int i = 0; i < nValueReferences; i++) {
         const fmi3ValueReference vref = valueReferences[i];
         if (vref < 0 || vref > 4) {
-            print_log(instance, fmi3Error, "fmi3Error", "VR %d at index %d is our of range max is %d", vref, i, 4);
+            print_log(instance, fmi3Error, "fmi3Error", "VR %d at index %d is out of range max is %d", vref, vIndex, 4);
             return fmi3Error;
         }
         fmi3String val = ((struct Model *) instance)->v_fmi3String[vref];
-        print_log(instance, fmi3OK, "fmi3Ok", "Get##type_name VR %d at index %d", vref, i);
+
+if(vIndex >= nValues)
+{
+  print_log(instance, fmi3Error, "fmi3Error", "VR %d at index %d is out of range max value range is %d", vref, vIndex,nValues);
+            return fmi3Error;
+}
+
+        print_log(instance, fmi3OK, "fmi3Ok", "GetString VR %d at index %d", vref, vIndex);
         printf("string is '%s'\n", val);
         if (val == 0) {
-            values[i] = "";
+            values[vIndex] = "";
         } else {
-            values[i] = val;
+            values[vIndex] = val;
         }
+        vIndex++;
     }
     return fmi3OK;
 }
@@ -385,7 +396,7 @@ fmi3Status fmi3GetClock(fmi3Instance instance, const fmi3ValueReference valueRef
             return fmi3Error;
         }
         fmi3Clock val = ((struct Model *) instance)->v_fmi3Clock[vref];
-        print_log(instance, fmi3OK, "fmi3Ok", "Get##type_name VR %d at index %d, val %d", vref, i,val);
+        print_log(instance, fmi3OK, "fmi3Ok", "GetClock VR %d at index %d, val %d", vref, i,val);
         values[i] = val;
     }
     return fmi3OK;
@@ -529,9 +540,9 @@ fmi3Status  fmi3Set##type_name(  fmi3Instance instance,\
             print_log(instance,fmi3Error,"fmi3Error","VR %d at index %d is our of range max is %d",vref,i,VL);\
             return fmi3Error;                               \
        }\
-       \
+       if(i>=nValues)continue;\
         fmi3##type_name val = values[i];\
-        print_log(instance,fmi3OK,"fmi3Ok","Set##type_name VR %d at index %d",vref,i);\
+        print_log(instance,fmi3OK,"fmi3Ok","Set%s VR %d at index %d",str(type_name),vref,i);\
         ((struct Model*)instance)->v_fmi3##type_name[vref]=val;\
     }                   \
     return fmi3OK;\
@@ -577,14 +588,14 @@ fmi3Status fmi3SetString(fmi3Instance instance, const fmi3ValueReference valueRe
         return fmi3Error;
     }
 
-    for (int i = 0; i < nValueReferences; i++) {
+    for (int i = 0; i < nValueReferences && i <nValues; i++) {
         const fmi3ValueReference vref = valueReferences[i];
         if (vref < 0 || vref > 4) {
             print_log(instance, fmi3Error, "fmi3Error", "VR %d at index %d is our of range max is %d", vref, i, 4);
             return fmi3Error;
         }
         fmi3String val = values[i];
-        print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d", vref, i);
+        print_log(instance, fmi3OK, "fmi3Ok", "SetString VR %d at index %d", vref, i);
         // print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d, value %s", vref, i,val);
         ((struct Model *) instance)->v_fmi3String[vref] = strdup(val);
     }
@@ -603,7 +614,7 @@ fmi3Status fmi3SetBinary(fmi3Instance instance, const fmi3ValueReference valueRe
         }
         size_t binSize = valueSizes[i];
         fmi3Binary val = values[i];
-        print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d. Size %d", vref, i, binSize);
+        print_log(instance, fmi3OK, "fmi3Ok", "SetBinary VR %d at index %d. Size %d", vref, i, binSize);
 
         struct Model *model = instance;
 
@@ -621,7 +632,7 @@ fmi3Status fmi3SetBinary(fmi3Instance instance, const fmi3ValueReference valueRe
         //record size for next fetch
         model->v_fmiBinarySizes[vref] = binSize;
 
-        print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d. Size %d. Recorded size: %d", vref, i,
+        print_log(instance, fmi3OK, "fmi3Ok", "SetBinary VR %d at index %d. Size %d. Recorded size: %d", vref, i,
                   binSize, ((struct Model *) instance)->v_fmiBinarySizes[vref]);
     }
     return fmi3OK;
@@ -636,7 +647,7 @@ fmi3Status fmi3SetClock(fmi3Instance instance, const fmi3ValueReference valueRef
             return fmi3Error;
         }
         fmi3Clock val = values[i];
-        print_log(instance, fmi3OK, "fmi3Ok", "Set##type_name VR %d at index %d, value %d", vref, i,val);
+        print_log(instance, fmi3OK, "fmi3Ok", "SetClock VR %d at index %d, value %d", vref, i,val);
         ((struct Model *) instance)->v_fmi3Clock[vref] = val;
     }
     return fmi3OK;
