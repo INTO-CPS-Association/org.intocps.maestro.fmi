@@ -18,7 +18,7 @@ on:
 env:
   JAVA_VERSION: 1.8
   SERVER_ID: ossrh
-  PYTHON_VERSION: '3.9.9'
+  PYTHON_VERSION: '3.12.1'
 
 
 
