@@ -60,7 +60,7 @@ file(GLOB CPP_FILES src/*.cpp)
 file(GLOB C_FILES_3 src/fmi3/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES_3 src/fmi3/*.cpp)
 
-add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
+
 
 add_definitions(-DSTANDALONE_XML_PARSER -DLIBXML_STATIC -DFMI_COSIMULATION)
 
@@ -97,6 +97,8 @@ if (WIN32)
 
     SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 endif ()
+
+add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
 
 include(JavaPlatformFolder.cmake)
 get_java_osarch_folder(output_folders)
