@@ -109,9 +109,22 @@ endforeach ()
 
 #target_link_libraries(${PROJECT_NAME} /usr/lib/x86_64-linux-gnu/libc.a)
 
-message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
-message(STATUS "Static linking with libc.a in ${LIBC_LIBRARY}")
-target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY} ${LIBC_LIBRARY})
+if(DEFINED STDCPP_LIBRARY)
+    message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
+    target_link_libraries(${PROJECT_NAME}  ${STDCPP_LIBRARY})
+
+endif()
+
+if(DEFINED LIBC_LIBRARY)
+    message(STATUS "Static linking with libc.a in ${LIBC_LIBRARY}")
+ #   target_link_libraries(${PROJECT_NAME}  ${LIBC_LIBRARY})
+    target_link_libraries(${PROJECT_NAME}
+        -static-libgcc
+        -static-libstdc++
+        -static
+        ${LIBC_LIBRARY}
+    )
+endif()
 
 #
 # Post build commands
