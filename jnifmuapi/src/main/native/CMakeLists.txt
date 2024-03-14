@@ -85,6 +85,10 @@ target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
 #target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
 
 
+if (UNIX)
+
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
+endif ()
 if (WIN32)
     #windows
     
