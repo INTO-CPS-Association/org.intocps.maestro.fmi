@@ -9,9 +9,12 @@ configure_file(src/config.h.in config.h)
 include(JavaJni.cmake)
 add_java_jni()
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include(clang-format.cmake)
+
+#
+# Compiler flags
+#
 
 include(CheckCXXCompilerFlag)
 
@@ -30,15 +33,34 @@ else ()
 endif ()
 
 
-include_directories($ENV{JAVA_HOME}/include)
+
+
+
+if (UNIX)
+ if (APPLE)
+    else ()
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++ ")
+
+    endif ()
+endif ()
 
 if (WIN32)
     #windows
-    #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--add-stdcall-alias")
     include_directories($ENV{JAVA_HOME}/include/win32)
+
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
+
+    SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 endif ()
 
+#
+# Includes
+#
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+include_directories($ENV{JAVA_HOME}/include)
 if (UNIX)
 
     if (APPLE)
@@ -48,11 +70,13 @@ if (UNIX)
     endif ()
 endif ()
 
-#include_directories(${libshmfmi_SOURCE_DIR})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src/fmi3 ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared/fmi2/headers ${CMAKE_CURRENT_SOURCE_DIR}/src/external/shared/fmi3/headers)
 
-#add_library(${PROJECT_NAME} SHARED src/main/native/sharedmemory.cpp ${PROTO_SRCS} ${PROTO_HDRS})
+#
+# Target and sources
+#
+
 
 file(GLOB C_FILES src/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES src/*.cpp)
@@ -64,10 +88,9 @@ add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FI
 
 add_definitions(-DSTANDALONE_XML_PARSER -DLIBXML_STATIC -DFMI_COSIMULATION)
 
-#target_link_libraries(${PROJECT_NAME} libshmfmi)
-#target_link_libraries(${PROJECT_NAME} ${libshmfmi_LIBS})
-
-
+#
+# Target link libraries
+#
 foreach (LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 
     if (EXISTS "${LETTER}/libstdc++.a")
@@ -76,30 +99,24 @@ foreach (LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
     else ()
         #  message (STATUS "${LETTER} ---- not these")
     endif ()
+     if (EXISTS "${LETTER}/libc.a")
+            #   message (STATUS "${LETTER}")
+            set(LIBC_LIBRARY "${LETTER}/libc.a")
+        else ()
+            #  message (STATUS "${LETTER} ---- not these")
+        endif ()
 endforeach ()
 
+#target_link_libraries(${PROJECT_NAME} /usr/lib/x86_64-linux-gnu/libc.a)
+
 message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
-target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
+message(STATUS "Static linking with libc.a in ${LIBC_LIBRARY}")
+target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY} ${LIBC_LIBRARY})
 
-#find_library(PTHREAD_LIBRARY NAMES libpthread.a)
-#target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
+#
+# Post build commands
+#
 
-
-if (UNIX)
- if (APPLE)
-    else ()
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++ ")
-        target_link_libraries(${PROJECT_NAME} /usr/lib/x86_64-linux-gnu/libc.a)
-    endif ()
-endif ()
-if (WIN32)
-    #windows
-    
-		
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
-
-    SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-endif ()
 
 include(JavaPlatformFolder.cmake)
 get_java_osarch_folder(output_folders)
