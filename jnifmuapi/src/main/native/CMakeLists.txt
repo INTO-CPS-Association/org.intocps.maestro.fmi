@@ -68,18 +68,7 @@ add_definitions(-DSTANDALONE_XML_PARSER -DLIBXML_STATIC -DFMI_COSIMULATION)
 #target_link_libraries(${PROJECT_NAME} ${libshmfmi_LIBS})
 
 
-foreach (LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 
-    if (EXISTS "${LETTER}/libstdc++.a")
-        #   message (STATUS "${LETTER}")
-        set(STDCPP_LIBRARY "${LETTER}/libstdc++.a")
-    else ()
-        #  message (STATUS "${LETTER} ---- not these")
-    endif ()
-endforeach ()
-
-message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
-target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
 
 #find_library(PTHREAD_LIBRARY NAMES libpthread.a)
 #target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
@@ -99,6 +88,19 @@ if (WIN32)
 endif ()
 
 add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
+
+foreach (LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
+
+    if (EXISTS "${LETTER}/libstdc++.a")
+        #   message (STATUS "${LETTER}")
+        set(STDCPP_LIBRARY "${LETTER}/libstdc++.a")
+    else ()
+        #  message (STATUS "${LETTER} ---- not these")
+    endif ()
+endforeach ()
+
+message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
+target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
 
 include(JavaPlatformFolder.cmake)
 get_java_osarch_folder(output_folders)
