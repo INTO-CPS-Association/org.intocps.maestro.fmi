@@ -60,34 +60,13 @@ file(GLOB CPP_FILES src/*.cpp)
 file(GLOB C_FILES_3 src/fmi3/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES_3 src/fmi3/*.cpp)
 
-
+add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
 
 add_definitions(-DSTANDALONE_XML_PARSER -DLIBXML_STATIC -DFMI_COSIMULATION)
 
 #target_link_libraries(${PROJECT_NAME} libshmfmi)
 #target_link_libraries(${PROJECT_NAME} ${libshmfmi_LIBS})
 
-
-
-
-#find_library(PTHREAD_LIBRARY NAMES libpthread.a)
-#target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
-
-
-if (UNIX)
-
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
-endif ()
-if (WIN32)
-    #windows
-    
-		
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
-
-    SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-endif ()
-
-add_library(${PROJECT_NAME} SHARED ${C_FILES} ${CPP_FILES} ${C_FILES_3} ${CPP_FILES_3})
 
 foreach (LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 
@@ -101,6 +80,25 @@ endforeach ()
 
 message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
 target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
+
+#find_library(PTHREAD_LIBRARY NAMES libpthread.a)
+#target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
+
+
+if (UNIX)
+ if (APPLE)
+    else ()
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+    endif ()
+endif ()
+if (WIN32)
+    #windows
+    
+		
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
+
+    SET_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+endif ()
 
 include(JavaPlatformFolder.cmake)
 get_java_osarch_folder(output_folders)
