@@ -102,6 +102,16 @@ jobs:
         shell: bash
         run: find . -name *.dll -exec echo {} \; -exec bash -c "objdump -p {} | grep 'DLL Name:'" \;
 
+      - name: List linux dependencies
+        if: matrix.os == 'ubuntu-20.04'
+        shell: bash
+        run: . -name *.so -exec echo {} \; -exec ldd {} \;
+
+      - name: List macos dependencies
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: find . -name *.dylib -exec echo {} \; -exec otool -L {} \;
+
       - name: artifact
         if: always()
         uses: actions/upload-artifact@v2
