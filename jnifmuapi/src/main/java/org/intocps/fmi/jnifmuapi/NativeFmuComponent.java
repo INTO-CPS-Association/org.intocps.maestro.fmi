@@ -113,10 +113,12 @@ class NativeFmuComponent
 	// typedef fmi2Status fmi2FreeFMUstateTYPE (fmi2Component, fmi2FMUstate*);
 	protected native byte nFreeFmuState(long fmu, long component, long statePtr);
 
-	// We will not support serialization, it is too slow anyway
 	// typedef fmi2Status fmi2SerializedFMUstateSizeTYPE(fmi2Component, fmi2FMUstate, size_t*);
+	protected native byte nSerializedFMUstateSize(long fmu, long component, long statePtr, long[] size);
 	// typedef fmi2Status fmi2SerializeFMUstateTYPE (fmi2Component, fmi2FMUstate, fmi2Byte[], size_t);
+	protected native byte nSerializeFMUstate(long fmu, long component, long statePtr,byte[] bytes, long size);
 	// typedef fmi2Status fmi2DeSerializeFMUstateTYPE (fmi2Component, const fmi2Byte[], size_t, fmi2FMUstate*);
+	protected native byte nDeSerializeFMUstate(long fmu, long component, byte[] bytes, long size,long[] statePtr);
 
 	/* Getting partial derivatives */
 	// typedef fmi2Status fmi2GetDirectionalDerivativeTYPE(fmi2Component, const fmi2ValueReference[], size_t,

@@ -555,6 +555,104 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nFreeFmuState(
   return res;
 }
 
+
+/*
+ * Class:     org_intocps_fmi_jnifmuapi_NativeFmuComponent
+ * Method:    nSerializedFMUstateSize
+ * Signature: (JJJ[J)B
+ */
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSerializedFMUstateSize(
+JNIEnv *env, jobject obj, jlong fmuPtr, jlong componentPtr, jlong statePtr, jlongArray sizeArray){
+
+  fmi2Component c = getCompPtr(componentPtr);
+
+  fmi2FMUstate state = ((fmi2FMUstate)statePtr);
+  size_t fmiStateSize;
+  fmi2Status res = getFmuPtr(fmuPtr)->serializedFMUstateSize(c, state, &fmiStateSize);
+  if( res == fmi2OK)
+  {
+      // Get a pointer to the elements of the array
+      jlong *elements = (*env)->GetLongArrayElements(env, sizeArray, NULL);
+
+      // Set the value at the specified index
+      elements[0] = fmiStateSize;
+
+      // Release the array elements and commit changes
+      (*env)->ReleaseLongArrayElements(env, sizeArray, elements, 0);
+  }
+
+  return res;
+}
+
+/*
+ * Class:     org_intocps_fmi_jnifmuapi_NativeFmuComponent
+ * Method:    nSerializeFMUstate
+ * Signature: (JJJ[BJ)B
+ */
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nSerializeFMUstate__JJJ_3BJ
+  (JNIEnv *env, jobject obj, jlong fmuPtr, jlong componentPtr, jlong statePtr, jbyteArray bytesArray, jlong bytesSize){
+
+    fmi2Component c = getCompPtr(componentPtr);
+
+    size_t len = bytesSize;
+
+    char bytes[len];
+
+    fmi2FMUstate state = ((fmi2FMUstate)statePtr);
+    fmi2Status status = getFmuPtr(fmuPtr)->serializeFMUstate(c,state, bytes, len);
+
+
+   if(status==fmi2OK)
+   {
+       jbyte *vbody = (*env)->GetByteArrayElements(env, bytesArray, 0);
+
+       int i;
+       for (i = 0; i < len; i++) {
+           vbody[i] = bytes[i];
+       }
+
+       (*env)->ReleaseByteArrayElements(env, bytesArray, vbody, 0);
+   }
+
+    return status;
+}
+
+/*
+ * Class:     org_intocps_fmi_jnifmuapi_NativeFmuComponent
+ * Method:    nDeSerializeFMUstate
+ * Signature: (JJ[BJ[J)B
+ */
+JNIEXPORT jbyte JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nDeSerializeFMUstate__JJ_3BJ_3J
+  (JNIEnv *env, jobject obj, jlong fmuPtr, jlong componentPtr, jbyteArray bytesArray, jlong bytesSize, jlongArray statePtrArr){
+
+    fmi2Component c = getCompPtr(componentPtr);
+
+    size_t len = bytesSize;
+
+    char bytes[len];
+    {
+        jbyte *vbody = (*env)->GetByteArrayElements(env, bytesArray, 0);
+
+        int i;
+        for (i = 0; i < len; i++) {
+            bytes[i] = vbody[i];
+        }
+
+        (*env)->ReleaseByteArrayElements(env, bytesArray, vbody, 0);
+    }
+    fmi2FMUstate state;
+    state = NULL;
+    fmi2Status status = getFmuPtr(fmuPtr)->deSerializeFMUstate(c, bytes, len,&state);
+    if(state==fmi2OK)
+    {
+        jlong *vbody = (*env)->GetLongArrayElements(env, statePtrArr, 0);
+        vbody[0] = (jlong) (state);
+
+        (*env)->ReleaseLongArrayElements(env, statePtrArr, vbody, 0);
+    }
+    return status;
+}
+
 // INTO CPS
 JNIEXPORT jbyte JNICALL
 Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nGetMaxStepsize(
