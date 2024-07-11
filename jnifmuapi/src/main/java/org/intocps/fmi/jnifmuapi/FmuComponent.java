@@ -584,7 +584,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 		throw new FmuInvocationException("Invalid state");
 
 	}
-	public	FmuResult<IFmiComponentState> serializeFMUstate(IFmiComponentState state, byte[] bytes, long size) throws FmuInvocationException{
+	public	FmuResult<IFmiComponentState> deSerializeFMUstate( byte[] bytes, long size) throws FmuInvocationException{
 		long statePtr[] = new long[1];
 		Fmi2Status res = Fmi2Status.valueOf(nDeSerializeFMUstate(fmuPtr, componentPtr, bytes,size,statePtr));
 

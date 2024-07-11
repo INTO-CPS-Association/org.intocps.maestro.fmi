@@ -140,7 +140,7 @@ public interface IFmiComponent {
 
     FmuResult<Long> getSerializedFMUstateSize(IFmiComponentState state) throws FmuInvocationException;
     FmuResult<byte[]> serializeFMUstate(IFmiComponentState state, long size) throws FmuInvocationException;
-    FmuResult<IFmiComponentState> serializeFMUstate(IFmiComponentState state, byte[] bytes, long size) throws FmuInvocationException;
+    FmuResult<IFmiComponentState> deSerializeFMUstate( byte[] bytes, long size) throws FmuInvocationException;
 
     public abstract boolean isValid();
 

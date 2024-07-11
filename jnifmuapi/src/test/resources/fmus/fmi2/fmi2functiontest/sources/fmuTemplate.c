@@ -673,6 +673,13 @@ fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 fmi2Status fmi2SetFMUstate(fmi2Component c, fmi2FMUstate FMUstate)
 {int i = 0;
 	ModelInstance *comp = c;
+
+	if (FMUstate==NULL)
+	{
+	    FILTERED_LOG(comp, fmi2Error, LOG_FMI_CALL, "fmi2SetFMUstate -- State pointer invalid");
+	    return fmi2Error;
+	}
+
 	fmi2Real *r =(fmi2Real *)(FMUstate);
 
 
@@ -714,16 +721,33 @@ fmi2Status fmi2FreeFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 }
 fmi2Status fmi2SerializedFMUstateSize(fmi2Component c, fmi2FMUstate FMUstate, size_t *size)
 {
-	return unsupportedFunction(c, "fmi2SerializedFMUstateSize", MASK_fmi2SerializedFMUstateSize);
+    *size = NUMBER_OF_REALS * sizeof(fmi2Real);
+	return fmi2OK;
 }
 fmi2Status fmi2SerializeFMUstate(fmi2Component c, fmi2FMUstate FMUstate, fmi2Byte serializedState[], size_t size)
 {
-	return unsupportedFunction(c, "fmi2SerializeFMUstate", MASK_fmi2SerializeFMUstate);
+    ModelInstance *comp = c;
+    size_t stateSize = NUMBER_OF_REALS * sizeof(fmi2Real);
+    if(size!=stateSize)
+        return fmi2Error;
+
+
+    memcpy(serializedState, comp->r, stateSize);
+    return fmi2OK;
 }
 fmi2Status fmi2DeSerializeFMUstate(fmi2Component c, const fmi2Byte serializedState[], size_t size,
 		fmi2FMUstate* FMUstate)
 {
-	return unsupportedFunction(c, "fmi2DeSerializeFMUstate", MASK_fmi2DeSerializeFMUstate);
+    ModelInstance *comp = c;
+    size_t stateSize = NUMBER_OF_REALS * sizeof(fmi2Real);
+    if(size!=stateSize)
+        return fmi2Error;
+
+    fmi2Real *r = (fmi2Real *) comp->functions->allocateMemory(NUMBER_OF_REALS, sizeof(fmi2Real));
+
+    memcpy(r,serializedState, stateSize);
+    *FMUstate = r;
+	return fmi2OK;
 }
 
 fmi2Status fmi2GetDirectionalDerivative(fmi2Component c, const fmi2ValueReference vUnknown_ref[], size_t nUnknown,

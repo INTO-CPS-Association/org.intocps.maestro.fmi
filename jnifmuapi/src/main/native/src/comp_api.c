@@ -643,9 +643,10 @@ JNIEXPORT jbyte JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nDeSer
     fmi2FMUstate state;
     state = NULL;
     fmi2Status status = getFmuPtr(fmuPtr)->deSerializeFMUstate(c, bytes, len,&state);
-    if(state==fmi2OK)
+    if(status==fmi2OK)
     {
         jlong *vbody = (*env)->GetLongArrayElements(env, statePtrArr, 0);
+        
         vbody[0] = (jlong) (state);
 
         (*env)->ReleaseLongArrayElements(env, statePtrArr, vbody, 0);
