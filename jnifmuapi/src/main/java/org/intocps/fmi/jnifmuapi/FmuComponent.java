@@ -552,6 +552,50 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 		throw new FmuInvocationException("Invalid state");
 	}
 
+	public FmuResult<Long> getSerializedFMUstateSize(IFmiComponentState state) throws FmuInvocationException{
+		if (state != null && state instanceof FmuComponentState)
+		{
+			FmuComponentState st = (FmuComponentState) state;
+			if (st.comp == this && st.allocated)
+			{
+				long[] byteSize= new long[1];
+				Fmi2Status res = Fmi2Status.valueOf(nSerializedFMUstateSize(fmuPtr, componentPtr, st.ptr,byteSize));
+
+				return new FmuResult<>(res,byteSize[0]);
+			}
+		}
+
+		throw new FmuInvocationException("Invalid state");
+
+	}
+	public	FmuResult<byte[]> serializeFMUstate(IFmiComponentState state, long byteSize) throws FmuInvocationException{
+		if (state != null && state instanceof FmuComponentState)
+		{
+			FmuComponentState st = (FmuComponentState) state;
+			if (st.comp == this && st.allocated && byteSize>=0)
+			{
+				byte[] bytes= new byte[(int) byteSize];
+				Fmi2Status res = Fmi2Status.valueOf(nSerializeFMUstate(fmuPtr, componentPtr, st.ptr,bytes,byteSize));
+
+				return new FmuResult<>(res,bytes);
+			}
+		}
+
+		throw new FmuInvocationException("Invalid state");
+
+	}
+	public	FmuResult<IFmiComponentState> deSerializeFMUstate( byte[] bytes, long size) throws FmuInvocationException{
+		long statePtr[] = new long[1];
+		Fmi2Status res = Fmi2Status.valueOf(nDeSerializeFMUstate(fmuPtr, componentPtr, bytes,size,statePtr));
+
+		if (res == Fmi2Status.OK)
+		{
+			return new FmuResult<IFmiComponentState>(res, new FmuComponentState(this, statePtr[0]));
+		}
+
+		return new FmuResult<IFmiComponentState>(res, null);
+	}
+
 	@Override
 	public FmuResult<Double> getMaxStepSize()
 			throws FmiInvalidNativeStateException
