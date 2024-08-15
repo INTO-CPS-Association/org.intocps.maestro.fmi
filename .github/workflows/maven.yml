@@ -189,7 +189,7 @@ jobs:
         run: mvn validate dependency:resolve-plugins -B --quiet
 
       - name: Maven Build Final
-        run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+        run: mvn -B package --file pom.xml -Dmaven.test.skip=true -Pmake
 
 #      - name: Maven Deploy
 #        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' && github.ref != 'refs/heads/master' )
