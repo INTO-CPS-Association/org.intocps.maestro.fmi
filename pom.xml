@@ -19,8 +19,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.4.2</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>1.5.0</revision>
+        <changelist></changelist>
         <sha1/>
     </properties>
 
