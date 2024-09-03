@@ -150,13 +150,13 @@ jobs:
         run: echo ${{ env.SERVER_ID }}
 
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: lib
           path: jnifmuapi/target/classes/lib
 
       - name: Download all workflow run test artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: lib-test-fmus
           path: jnifmuapi/target/fmus
