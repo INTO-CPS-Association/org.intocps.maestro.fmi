@@ -90,7 +90,7 @@ Add this dependency to your project (replace the `version` with the latest relea
 The classes:
 
 * `org.intocps.fmi.jnifmuapi` - fmi2 main factory
-* `org.intocps.fmi.jnifmuapi.fmi3 - fmi3 main interface without the zip
+* `org.intocps.fmi.jnifmuapi.fmi3` - fmi3 main interface without the zip
 
 # Release Procedure
 
