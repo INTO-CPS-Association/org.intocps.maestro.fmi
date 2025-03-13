@@ -78,7 +78,7 @@ jobs:
         if: matrix.platform == 'x64'
 
       - name: artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: lib
           path: |
@@ -88,7 +88,7 @@ jobs:
           retention-days: 1
 
       - name: artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: lib-test-fmus
           path: |
@@ -114,7 +114,7 @@ jobs:
 
       - name: artifact
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: jvm_crash_logs
           path: |
@@ -150,13 +150,13 @@ jobs:
         run: echo ${{ env.SERVER_ID }}
 
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: lib
           path: jnifmuapi/target/classes/lib
 
       - name: Download all workflow run test artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: lib-test-fmus
           path: jnifmuapi/target/fmus
@@ -207,7 +207,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
       - name: upload jnifmuapi
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: jnifmuapi
           path: |
@@ -216,7 +216,7 @@ jobs:
           retention-days: 5
 
       - name: upload test fmus
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-fmus
           path: |
