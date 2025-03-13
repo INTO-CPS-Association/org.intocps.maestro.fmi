@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console appender for output to console -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- Layout pattern similar to the original one in Log4j 1.x -->
+            <PatternLayout pattern="%5p [%t] (%F:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root logger definition -->
+        <Root level="all">
+            <!-- Attach the console appender to the root logger -->
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
