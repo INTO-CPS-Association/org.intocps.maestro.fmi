@@ -158,9 +158,9 @@ jobs:
         if: matrix.platform == 'x64'
 
       - name: artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: lib-${{ needs.version_change.outputs.build_version }}
+          name: lib-${{ matrix.os }}-${{ needs.version_change.outputs.build_version }}
           path: |
             jnifmuapi/target/classes/lib/**/libfmuapi.so
             jnifmuapi/target/classes/lib/**/libfmuapi.dylib
@@ -189,10 +189,26 @@ jobs:
         run: echo ${{ env.SERVER_ID }}
 
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
-          name: lib-${{ needs.version_change.outputs.build_version }}
+          name: lib-ubuntu-20.04-${{ needs.version_change.outputs.build_version }}
           path: jnifmuapi/target/classes/lib
+
+
+
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-macos-13-${{ needs.version_change.outputs.build_version }}
+          path: jnifmuapi/target/classes/lib
+
+
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-windows-latest-${{ needs.version_change.outputs.build_version }}
+          path: jnifmuapi/target/classes/lib
+
 
       - name: Set up Java x64
         if: matrix.platform == 'x64'
