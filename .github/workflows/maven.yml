@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04, macos-latest, windows-latest ] # ubuntu-latest, , macos-latest
+        os: [ ubuntu-20.04, macos-13, windows-latest ] # ubuntu-latest, , macos-latest
         platform: [ x64 ] #x32, x64 ]
         exclude:
           - os: macos-latest
@@ -80,7 +80,7 @@ jobs:
       - name: artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lib
+          name: lib-${{ matrix.os }}
           path: |
             jnifmuapi/target/classes/lib/**/libfmuapi.so
             jnifmuapi/target/classes/lib/**/libfmuapi.dylib
@@ -90,7 +90,7 @@ jobs:
       - name: artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lib-test-fmus
+          name: lib-test-fmus-${{ matrix.os }}
           path: |
             jnifmuapi/target/fmus/**/*.so
             jnifmuapi/target/fmus/**/*.dylib
@@ -149,17 +149,51 @@ jobs:
       - name: Environment variables
         run: echo ${{ env.SERVER_ID }}
 
+
+
+#linux
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
         with:
-          name: lib
+          name: lib-ubuntu-20.04
           path: jnifmuapi/target/classes/lib
 
       - name: Download all workflow run test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: lib-test-fmus
+          name: lib-test-fmus-ubuntu-20.04
           path: jnifmuapi/target/fmus
+
+
+#mac
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-macos-13
+          path: jnifmuapi/target/classes/lib
+
+      - name: Download all workflow run test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-test-fmus-macos-13
+          path: jnifmuapi/target/fmus
+
+# windows
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-windows-latest
+          path: jnifmuapi/target/classes/lib
+
+      - name: Download all workflow run test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lib-test-fmus-windows-latest
+          path: jnifmuapi/target/fmus
+
+
+
+
 
       - name: Set up Java x64
         if: matrix.platform == 'x64'
