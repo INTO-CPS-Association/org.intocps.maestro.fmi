@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <revision>1.5.1</revision>
         <changelist>-SNAPSHOT</changelist>
-        <sha1/>
+        <sha1></sha1>
     </properties>
 
     <dependencyManagement>
