@@ -62,23 +62,21 @@ public class NativeLoadManager {
         }
 
 
-        final String errorMsg = "Fmu do not conform to the standard. Unable to obtain modelIndentifier '%s' for co-simulation, defaulting to archieve name '%s'";
+        final String errorMsg = "Fmu do not conform to the standard. Unable to obtain Model Identifier '{}' for co-simulation, defaulting to archive name '{}'";
         final String recovery_log_message = "Attempting to recover loading of the library by setting modelIdentifier to '{}'";
         if (modelIdentifier == null) {
+            logger.error(errorMsg, "", name);
             modelIdentifier = name;
         }
 
-        if (modelIdentifier == null) {
-            logger.error(String.format(errorMsg, "", name));
-            logger.warn(recovery_log_message, name);
-        }
+
 
         File libraryPath = generateLibraryFile(modelIdentifier, fmiVersion);
 
         if (!libraryPath.exists()) {
-            logger.error(String.format("The library corresponding to the modelIdentifier '%s' could not be found at: '%s", modelIdentifier,
-                    logMessageLibraryPath(libraryPath)));
-            logger.warn(String.format(recovery_log_message, name));
+            logger.error("The library corresponding to the modelIdentifier '{}' could not be found at: '{}", modelIdentifier,
+                    logMessageLibraryPath(libraryPath));
+            logger.warn(recovery_log_message, name);
             modelIdentifier = name;
             libraryPath = generateLibraryFile(modelIdentifier, fmiVersion);
         }
@@ -122,7 +120,7 @@ public class NativeLoadManager {
 
         logger.debug("Successfully loaded FMU library: {}", libraryPath);
         loaded = true;
-        logger.debug("Loaded library into DLL pointer: " + fmuPtr);
+        logger.debug("Loaded library into DLL pointer: {}", fmuPtr);
     }
 
 
