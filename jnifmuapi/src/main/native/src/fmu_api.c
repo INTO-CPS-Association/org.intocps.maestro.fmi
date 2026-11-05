@@ -51,21 +51,16 @@ FMU *getFmuPtr(jlong fmuPtr) { return (FMU *)fmuPtr; }
 
 JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nLoadLibrary(
     JNIEnv *env, jobject obj, jstring libraryPath) {
-  if (libraryPath == NULL) {
-    throwException(env, "Library path must not be null");
-    return 0;
-  }
-  const char *path = (*env)->GetStringUTFChars(env, libraryPath, NULL);
-  if (path == NULL) return 0;
+  const char *path;
+
+  path = (*env)->GetStringUTFChars(env, libraryPath, NULL);
 
   // load the FMU dll
 
-  FMU *fmu = (FMU *)calloc(1, sizeof(FMU));
+  FMU *fmu = (FMU *)malloc(sizeof(FMU));
 
   if (fmu == NULL) {
     throwException(env, "malloc for fmu failed");
-    (*env)->ReleaseStringUTFChars(env, libraryPath, path);
-    return 0;
   }
 
   if (!loadDll(path, fmu)) {
