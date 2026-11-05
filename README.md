@@ -122,6 +122,8 @@ libraries into one JAR without rebuilding them and verifies all expected resourc
 The snapshot workflow also assembles combined multi-platform test FMUs.
 The release workflow generates a changelog before deploying the Maven artifacts, then
 creates a GitHub release linking to Maven Central without attaching additional binaries.
+Both publishing workflows supply the signing passphrase through `MAVEN_GPG_PASSPHRASE`;
+the shared Maven GPG plugin reads it directly for non-interactive signing.
 OS-specific steps use `runner.os`, independently of the selected runner image label.
 See the [GitHub-hosted runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 for current label availability.
