@@ -42,6 +42,8 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 class DirectoryFmu extends NativeFmu implements IFmu {
 
@@ -73,6 +75,7 @@ class DirectoryFmu extends NativeFmu implements IFmu {
     public final String name;
     public final File dir;
     protected final NativeLoadManager lifeCycle;
+    private final Set<FmuComponent> components = new HashSet<>();
 
     public DirectoryFmu(File path, String name) {
         this.dir = path;
@@ -109,8 +112,9 @@ class DirectoryFmu extends NativeFmu implements IFmu {
     @Override
     public IFmiComponent instantiate(String guid, String name, boolean visible, boolean loggingOn,
             final IFmuCallback callback) throws XPathExpressionException, FmiInvalidNativeStateException {
-        if (!lifeCycle.isLoaded()) {
-            return null;
+        lifeCycle.checkState();
+        if (guid == null || guid.isEmpty() || name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Instance name and GUID must not be null or empty");
         }
 
         File resourceDir = new File(dir, "resources");
@@ -156,13 +160,16 @@ class DirectoryFmu extends NativeFmu implements IFmu {
 
         long c;
         synchronized (NativeLoadManager.lock) {
+            lifeCycle.checkState();
             c = ninstantiate(lifeCycle.getFmuPtr(), name, guid, resourceLocation, visible, loggingOn, cb);
+            if (c == 0) {
+                logger.error("FMU '{}' rejected instantiation of '{}'", this.name, name);
+                return null;
+            }
+            FmuComponent component = new FmuComponent(this, c, guid, name);
+            components.add(component);
+            return component;
         }
-        if (c == 0) {
-            return null;// init failed
-        }
-
-        return new FmuComponent(this, c, guid, name);
     }
 
     /*
@@ -171,7 +178,15 @@ class DirectoryFmu extends NativeFmu implements IFmu {
      */
     @Override
     public void unLoad() throws FmiInvalidNativeStateException {
-        this.lifeCycle.unLoad();
+        synchronized (NativeLoadManager.lock) {
+            for (FmuComponent component : new HashSet<>(components)) {
+                if (component.isValid()) {
+                    component.internalFreeInstance();
+                }
+            }
+            components.clear();
+            this.lifeCycle.unLoad();
+        }
     }
 
     /*
@@ -214,7 +229,13 @@ class DirectoryFmu extends NativeFmu implements IFmu {
 
     void synchronizedFree(FmuComponent comp) throws FmiInvalidNativeStateException {
         synchronized (NativeLoadManager.lock) {
-            comp.internalFreeInstance();
+            try {
+                comp.internalFreeInstance();
+            } finally {
+                if (!comp.isValid()) {
+                    components.remove(comp);
+                }
+            }
         }
     }
 

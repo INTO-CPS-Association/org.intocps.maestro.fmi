@@ -88,6 +88,10 @@ JNIEXPORT jbyte JNICALL
 Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nTerminate(
     JNIEnv *env, jobject obj, jlong fmuptr, jlong componentPtr) {
   fmi2Component comp = getCompPtr(componentPtr);
+  if (!isComponentValid(getFmuPtr(fmuptr), comp)) {
+    throwException(env, "Cannot terminate an invalid or freed FMU instance");
+    return fmi2Error;
+  }
   return getFmuPtr(fmuptr)->terminate(comp);
 }
 
@@ -95,7 +99,11 @@ JNIEXPORT void JNICALL
 Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nFreeInstance(
     JNIEnv *env, jobject obj, jlong fmuPtr, jlong componentPtr) {
   fmi2Component comp = getCompPtr(componentPtr);
-
+  CompHashmapNode *node = beginFreeComponent(getFmuPtr(fmuPtr), comp);
+  if (node == NULL) {
+    throwException(env, "Cannot free an invalid or already freed FMU instance");
+    return;
+  }
   getFmuPtr(fmuPtr)->freeInstance(comp);
 
   freeComp(env, comp);

@@ -311,7 +311,7 @@ void fmuLogger(void *componentEnvironment, fmi2String instanceName,
 
   // replace C format strings
   va_start(argp, message);
-  vsprintf(msg, message, argp);
+  vsnprintf(msg, sizeof(msg), message ? message : "NULL", argp);
   va_end(argp);
 
   // replace e.g. ## and #r12#

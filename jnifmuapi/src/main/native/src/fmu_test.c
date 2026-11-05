@@ -40,8 +40,14 @@
 
 JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_callbackTest(
     JNIEnv *env, jobject obj, jlong fmuPtr, jstring name) {
+  if (!isFmuLoaded(getFmuPtr(fmuPtr)) || name == NULL) {
+    throwException(env, "FMU callback test requires a loaded FMU and non-null name");
+    return;
+  }
   const char *instanceName = GetString(env, name);
-  fmuLoggerCache((FMU *)fmuPtr, instanceName, fmi2Warning, NULL, NULL);
+  if (instanceName == NULL) return;
+  fmuLoggerCache(getCallbackEnvironment(getFmuPtr(fmuPtr), instanceName),
+                 instanceName, fmi2Warning, NULL, NULL);
   (*env)->ReleaseStringUTFChars(env, name, instanceName);
 }
 
