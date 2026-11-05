@@ -31,28 +31,27 @@ __attribute__((unused)) JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi
 
 __attribute__((unused)) JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nLoadLibrary(
         JNIEnv *env, __attribute__((unused)) jobject obj, jstring libraryPath) {
-    const char *path;
-
-    path = env->GetStringUTFChars(libraryPath, NULL);
+    if (libraryPath == nullptr) {
+        throwException3(env, "Library path must not be null");
+        return 0;
+    }
+    const char *path = env->GetStringUTFChars(libraryPath, NULL);
+    if (path == nullptr) return 0;
 
     // load the FMU dll
     auto node = new Fmi3Node();
     node->name = path;
 
-    char **errorMessage = (char **) malloc(sizeof(char **));
-    *errorMessage = nullptr;
-
-    if (!loadDll3(path, &node->fmu, errorMessage)) {
-        const char *beginMsg = "Load failed!. Missing functions: [";
-        char *msg = (char *) malloc(strlen(beginMsg) + 1 + strlen(*errorMessage));
-        strcat(msg, beginMsg);
-        strcat(msg, *errorMessage);
-        strcat(msg, "]");
-        throwException(env, msg);
-        free(msg);
+    char *errorMessage = nullptr;
+    if (!loadDll3(path, &node->fmu, &errorMessage)) {
+        throwException3(env, errorMessage ? errorMessage : "Unable to allocate library-load error details");
+        free(errorMessage);
+        env->ReleaseStringUTFChars(libraryPath, path);
+        delete node;
         return 0;
     }
 
+    free(errorMessage);
     env->ReleaseStringUTFChars(libraryPath, path);
     return (jlong) node;
 }
@@ -633,7 +632,6 @@ Java_org_intocps_fmi_jnifmuapi_fmi3_NativeFmu3_nInstantiateScheduledExecution
 
     return (jlong) node;
 }
-
 
 
 

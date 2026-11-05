@@ -43,6 +43,7 @@
 #include <string.h>
 
 #include "fmi2.h"
+#include "shared/library_error.h"
 
 static void *getAdrOptional(int *success, HMODULE dllHandle,
                             const char *functionName, bool optional) {
@@ -76,7 +77,7 @@ static void *getAdr(int *success, HMODULE dllHandle, const char *functionName) {
 
 // Load the given dll and set function pointers in fmu
 // Return 0 to indicate failure
-int loadDll(const char *dllPath, FMU *fmu) {
+int loadDll(const char *dllPath, FMU *fmu, char **errorMessage) {
   int x = 1, s = 1;
 
 #ifdef _WIN32
@@ -97,23 +98,9 @@ int loadDll(const char *dllPath, FMU *fmu) {
 #endif
 
   if (!h) {
-    printf("error: Could not load %s\n", dllPath);
-
-#ifdef _WIN32
-// TODO figure out how to format GetLastError() in C
-#elif __APPLE__
-#if TARGET_OS_MAC
-    // Other kinds of Mac OS
-    fputs(dlerror(), stderr);
+    *errorMessage = lastLibraryError(dllPath);
+    fprintf(stderr, "%s\n", *errorMessage ? *errorMessage : "Unable to allocate library-load error details");
     fflush(stderr);
-#else
-// Unsupported platform
-#endif
-#elif __linux
-    // linux
-    fputs(dlerror(), stderr);
-    fflush(stderr);
-#endif
     return 0;  // failure
   }
   fmu->dllHandle = h;
@@ -276,6 +263,15 @@ int loadDll(const char *dllPath, FMU *fmu) {
         (fmi2GetNominalsOfContinuousStatesTYPE *)getAdr(
             &s, h, "fmiGetNominalsOfContinuousStates");
 #endif
+  }
+  if (!s) {
+    *errorMessage = createLibraryError(dllPath, "Required FMI 2 functions are missing");
+#ifdef _WIN32
+    FreeLibrary(h);
+#else
+    dlclose(h);
+#endif
+    fmu->dllHandle = NULL;
   }
   return s;
 }

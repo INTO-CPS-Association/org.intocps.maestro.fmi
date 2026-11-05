@@ -42,6 +42,7 @@
 
 #include "fmi3.h"
 #include "sim_support3.h"
+#include "../shared/library_error.h"
 
 static void *getAdrOptional(int *success, HMODULE dllHandle, char **errorMessage,
                             const char *functionName, bool optional) {
@@ -67,13 +68,6 @@ static void *getAdrOptional(int *success, HMODULE dllHandle, char **errorMessage
             printf("warning: Function %s not found in library\n", functionName);
             if (*errorMessage == NULL) {
                 *errorMessage = strdup(functionName);
-            }else{size_t newSize = strlen(*errorMessage)+1+ strlen(functionName);
-                 char* m = malloc(newSize);
-                strcat(m,*errorMessage);
-                strcat(m,",");
-                strcat(m,functionName);
-                free(*errorMessage);
-                *errorMessage=m;
             }
             *success = 0;
         }
@@ -110,23 +104,9 @@ int loadDll3(const char *dllPath, FMU3 *fmu, char **errorMessage) {
 #endif
 
     if (!h) {
-        printf("error: Could not load %s\n", dllPath);
-
-#ifdef _WIN32
-        // TODO figure out how to format GetLastError() in C
-#elif __APPLE__
-#if TARGET_OS_MAC
-        // Other kinds of Mac OS
-        fputs(dlerror(), stderr);
+        *errorMessage = lastLibraryError(dllPath);
+        fprintf(stderr, "%s\n", *errorMessage ? *errorMessage : "Unable to allocate library-load error details");
         fflush(stderr);
-#else
-        // Unsupported platform
-#endif
-#elif __linux
-        // linux
-        fputs(dlerror(), stderr);
-        fflush(stderr);
-#endif
         return 0;  // failure
     }
     fmu->dllHandle = h;
@@ -257,6 +237,19 @@ int loadDll3(const char *dllPath, FMU3 *fmu, char **errorMessage) {
     fmu->fmi3ActivateModelPartition = (fmi3ActivateModelPartitionTYPE *) getAdr(
             &s, h, errorMessage, "fmi3ActivateModelPartition");
 
+    if (!s) {
+        char reason[512];
+        snprintf(reason, sizeof(reason), "Missing required FMI 3 function: %s",
+                 *errorMessage ? *errorMessage : "symbol name unavailable (allocation failed)");
+        free(*errorMessage);
+        *errorMessage = createLibraryError(dllPath, reason);
+#ifdef _WIN32
+        FreeLibrary(h);
+#else
+        dlclose(h);
+#endif
+        fmu->dllHandle = NULL;
+    }
     return s;
 }
 
