@@ -51,22 +51,43 @@ jobs:
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
-          install: make mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+          msystem: UCRT64
+          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake
           path-type: inherit
 
       - name: Put Windows native toolchain on PATH
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "C:\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\msys64\ucrt64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Verify Windows native toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          foreach ($tool in @('gcc', 'g++', 'cmake')) {
+            $actual = (Get-Command $tool -CommandType Application -ErrorAction Stop).Source
+            $expected = "C:\msys64\ucrt64\bin\${tool}.exe"
+            if (-not [string]::Equals($actual, $expected, [System.StringComparison]::OrdinalIgnoreCase)) {
+              throw "Expected $tool at $expected, found $actual"
+            }
+          }
 
       - name: Build and test
         run: mvn -B -ntp package "-Pmake,native_release"
         env:
           CC: ${{ runner.os == 'macOS' && '/usr/bin/clang' || 'gcc' }}
           CXX: ${{ runner.os == 'macOS' && '/usr/bin/clang++' || 'g++' }}
+
+      - name: Test Windows libraries without MSYS2 on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $maven = (Get-Command mvn -CommandType Application -ErrorAction Stop).Source
+          $env:PATH = "$env:JAVA_HOME\bin;$env:SystemRoot\System32;$env:SystemRoot"
+          & $maven -B -ntp -pl jnifmuapi -am test "-Dtest=StaticTest,FmuTest,FmuLoadTest#loadAndInstantiateLegacyWindowsFmu,Fmi3ApiTest#testPlatformVersion" "-Dsurefire.failIfNoSpecifiedTests=false"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Verify universal macOS libraries
         if: runner.os == 'macOS'
@@ -128,9 +149,9 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           server-id: ${{ env.SERVER_ID }}
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          server-username-env-var: MAVEN_USERNAME
+          server-password-env-var: MAVEN_PASSWORD
+          gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
       - name: Download native libraries
         uses: actions/download-artifact@v8

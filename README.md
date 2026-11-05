@@ -26,13 +26,14 @@ The API can be build using the following tools:
 * Maven 3.6 >
 * https://www.msys2.org/
     * With package:
-        * `pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
-        * `pacman -S mingw64/mingw-w64-x86_64-cmake`
+        * `pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain`
+        * `pacman -S mingw-w64-ucrt-x86_64-cmake`
     * Add Java and Maven to `~/.bash_profile`, using your installation paths:
         * `export JAVA_HOME="/c/path/to/jdk-21"`
         * `export PATH="$JAVA_HOME/bin:/c/path/to/apache-maven/bin:$PATH"`
 
-Build using `c:\msys64\mingw64.exe` terminal
+Build using the `C:\msys64\ucrt64.exe` terminal. The resulting libraries use the
+Universal CRT, which is included with Windows 10 and Windows Server 2016 or newer.
 
 ## Checkout
 
@@ -96,6 +97,9 @@ Both snapshot and release workflows build and test on these GitHub-hosted runner
 | Windows x86_64 | `windows-2022` | `x64` |
 | macOS Intel | `macos-15-intel` | `x64` |
 | macOS Apple Silicon | `macos-15` | `aarch64` |
+
+Windows uses the MSYS2 UCRT64 toolchain. CI also runs FMI smoke tests without
+MSYS2 on `PATH` to check that the resulting libraries do not require the build tools.
 
 All Maven jobs use JDK 21. The Maven compiler still targets Java 8 source and bytecode;
 older JVMs are not currently tested by CI.
