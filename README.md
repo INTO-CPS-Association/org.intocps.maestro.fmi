@@ -40,8 +40,11 @@ Build using `c:\msys64\mingw64.exe` terminal
 git clone git@github.com:INTO-CPS-Association/org.intocps.maestro.fmi.git 
 cd org.intocps.maestro.fmi
 # The FMI headers and schemas are submodules
-git submodules update --init
+git submodule update --init
 ```
+
+The FMI 2 and FMI 3 submodules are pinned to releases `v2.0.5` and `v3.0.2`,
+respectively.
 
 ## Build
 
