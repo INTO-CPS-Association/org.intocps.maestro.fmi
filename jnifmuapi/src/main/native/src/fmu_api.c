@@ -69,8 +69,6 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nLoadLibrary(
   }
 
   if (!loadDll(path, fmu)) {
-    (*env)->ReleaseStringUTFChars(env, libraryPath, path);
-    free(fmu);
     throwException(env, "Load failed!!!");
     return 0;
   }
