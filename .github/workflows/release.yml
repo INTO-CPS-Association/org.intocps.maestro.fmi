@@ -27,6 +27,8 @@ jobs:
   version_change:
     name: Create version and tag
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     outputs:
       build_tag: ${{ steps.tagging.outputs.build_tag }} # map step output to job output
       build_tag_created: ${{ steps.tagging.outputs.build_tag_created }}
@@ -200,6 +202,10 @@ jobs:
   final:
     name: Build and Deploy Combined Release
     runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: read
 
     needs: [ version_change , build ]
     steps:
@@ -255,6 +261,17 @@ jobs:
             grep -Fx "lib/$library" packaged-files.txt
           done
 
+      - name: Generate changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v6
+        with:
+          configurationJson: '{"max_back_track_time_days":1095}'
+          toTag: ${{ needs.version_change.outputs.build_tag }}
+          fromTag: ${{ needs.version_change.outputs.previous_release_tag }}
+          failOnError: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Maven Deploy RELEASE
         # If autorelease is false then it must be released from here: https://oss.sonatype.org/#stagingRepositories
         run: mvn -B deploy -Dchangelist= -Dsha1= -Dmaven.test.skip=true -DskipITs -fae -Prelease -DautoReleaseAfterClose=true
@@ -263,29 +280,13 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
-
-      - name: Create changelog config
-        run: echo '{"max_back_track_time_days":1095}' > configuration.json
-
-      - name: Generate changelog
-        id: changelog
-        uses: mikepenz/release-changelog-builder-action@v2.9.0
-        with:
-          configuration: "configuration.json"
-          toTag: ${{ needs.version_change.outputs.build_tag }}
-          fromTag: ${{ needs.version_change.outputs.previous_release_tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.version_change.outputs.build_tag }}
-          release_name: ${{ needs.version_change.outputs.build_tag }}
-          body: |
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.version_change.outputs.build_tag }}
+          RELEASE_BODY: |
             Grab the new version from Maven central https://search.maven.org/artifact/org.into-cps.fmi/jnifmuapi/${{ needs.version_change.outputs.build_version }}/jar:
 
             ```
@@ -298,13 +299,14 @@ jobs:
 
             ### Things that changed in this release
             ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
+        run: gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --notes "$RELEASE_BODY" --verify-tag
 
 
   rollback:
     name: Rollback on error
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
 
     needs: [ version_change , build, final ]
     if: always() && (needs.version_change.result == 'failure' || needs.build.result == 'failure' || needs.final.result == 'failure')
@@ -324,6 +326,8 @@ jobs:
   cleanup:
     name: Update development and master with new release
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
 
     needs: [ final,version_change ]
     steps:
