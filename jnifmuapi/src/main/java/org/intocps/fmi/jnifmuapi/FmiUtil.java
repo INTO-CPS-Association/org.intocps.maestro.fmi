@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class FmiUtil {
 
@@ -70,76 +71,58 @@ public class FmiUtil {
      * @return the platform file
      */
     public static File generateLibraryFileFromPlatform(String osName, String osArch, String modelIdentifier, File fmuRoot, FMIVersion fmiVersion) {
-        String arch = osArch;
-
-        String libDir = "";
-        String libExtension = "";
-
-        if (osName.toLowerCase().contains("windows")) {
-            libExtension = ".dll";
-            switch (fmiVersion) {
-                case FMI2:
-                    if (arch.contains("amd64")) {
-                        libDir = "win64";
-                    } else {
-                        // x86
-                        libDir = "win32";
-                    }
-                    break;
-                case FMI3:
-                    if (arch.contains("amd64")) {
-                        libDir = "x86_64-windows";
-                    } else {
-                        // x86
-                        libDir = "x86-windows";
-                    }
-                    break;
-            }
-        } else if (osName.contains("nix") || osName.contains("nux") || osName.indexOf("aix") > 0) {
-            libExtension = ".so";
-            switch (fmiVersion) {
-                case FMI2:
-                    if (arch.contains("amd64")) {
-                        libDir = "linux64";
-                    } else {
-                        // x86
-                        libDir = "linux32";
-                    }
-                    break;
-                case FMI3:
-                    if (arch.contains("amd64")) {
-                        libDir = "x86_64-linux";
-                    } else {
-                        // x86
-                        libDir = "x86-linux";
-                    }
-                    break;
-            }
-        } else if (osName.toLowerCase().contains("mac"))// extension
-        {
-            libExtension = ".dylib";
-            switch (fmiVersion) {
-                case FMI2:
-                    if (arch.contains("x86_64")) {
-                        libDir = "darwin64";
-                    } else {
-                        // x86
-                        libDir = "darwin32";
-                    }
-                    break;
-                case FMI3:
-                    if (arch.contains("x86_64")) {
-                        libDir = "x86_64-darwin";
-                    } else {
-                        // x86
-                        libDir = "x86_32-darwin";
-                    }
-                    break;
-            }
+        String arch = osArch.toLowerCase(Locale.ROOT);
+        switch (arch) {
+            case "amd64":
+                arch = "x86_64";
+                break;
+            case "arm64":
+                arch = "aarch64";
+                break;
+            case "i386":
+            case "i486":
+            case "i586":
+            case "i686":
+                arch = "x86";
+                break;
+            default:
+                break;
         }
 
-        File libraryPath = new File(new File(new File(fmuRoot, "binaries"), libDir), modelIdentifier + libExtension);
-        return libraryPath;
+        String os = osName.toLowerCase(Locale.ROOT);
+        String platform;
+        String legacyPlatform;
+        String libExtension;
+        if (os.contains("windows")) {
+            platform = "windows";
+            legacyPlatform = "win";
+            libExtension = ".dll";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+            platform = "linux";
+            legacyPlatform = "linux";
+            libExtension = ".so";
+        } else if (os.contains("mac")) {
+            platform = "darwin";
+            legacyPlatform = "darwin";
+            libExtension = ".dylib";
+        } else {
+            throw new IllegalArgumentException("Unsupported FMU operating system: " + osName);
+        }
+
+        String libDir;
+        if (fmiVersion == FMIVersion.FMI2) {
+            if (arch.equals("x86_64") || (platform.equals("darwin") && arch.equals("aarch64"))) {
+                libDir = legacyPlatform + "64";
+            } else if (arch.equals("x86")) {
+                libDir = legacyPlatform + "32";
+            } else {
+                throw new IllegalArgumentException("Unsupported FMI 2 architecture: " + osArch);
+            }
+        } else {
+            libDir = arch + "-" + platform;
+        }
+
+        return new File(new File(new File(fmuRoot, "binaries"), libDir), modelIdentifier + libExtension);
     }
 
     /**

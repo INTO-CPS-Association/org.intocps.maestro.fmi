@@ -1,259 +1,236 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
 name: Build SNAPSHOT
 
-on: [ workflow_dispatch, push, pull_request ]
+on: [workflow_dispatch, push, pull_request]
+
 env:
-  JAVA_VERSION: 1.8
+  JAVA_VERSION: '21'
   SERVER_ID: ossrh
-  PYTHON_VERSION: '3.12.1'
-
-
+  PYTHON_VERSION: '3.12'
 
 jobs:
   build:
+    name: Build and test (${{ matrix.os }}, ${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-13, windows-latest ] # ubuntu-latest, , macos-latest
-        platform: [ x64 ] #x32, x64 ]
-        exclude:
-          - os: macos-latest
-            platform: x32
-    #        config:
-    #          - {
-    #            name: "Windows Latest MinGW", artifact: "Windows-MinGW.tar.xz",
-    #            os: windows-latest,
-    #            build_type: "Release", cc: "mingw32-gcc.exe", cxx: "mingw32-c++.exe",
-    #            generators: "Unix Makefiles"
-    #          }
+        include:
+          - os: ubuntu-24.04
+            arch: x64
+            artifact: linux-x64
+            publish: true
+          - os: windows-2022
+            arch: x64
+            artifact: windows-x64
+            publish: true
+          - os: macos-15-intel
+            arch: x64
+            artifact: macos-intel-test
+            publish: false
+          - os: macos-15
+            arch: aarch64
+            artifact: macos-universal
+            publish: true
+
     steps:
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v6
         with:
-          submodules: 'true'
-
-      - name: ubuntu add 32bit compiler
-        run: sudo apt-get update && sudo apt-get install gcc-multilib
-        if: matrix.platform == 'x32' && matrix.os == 'ubuntu-latest'
-
-      - name: Set up Java x64
-        if: matrix.platform == 'x64'
-        uses: actions/setup-java@v1
-        with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-          architecture: x64
+          architecture: ${{ matrix.arch }}
 
-      - name: Set up Java x32
-        if: matrix.platform == 'x86'
-        uses: actions/setup-java@v1
+      - name: Set up Windows native toolchain
+        id: msys2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x32
+          msystem: UCRT64
+          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake
+          path-type: inherit
 
-      - name: Put MSYS2_MinGW64 on PATH for windows
-        if: matrix.os == 'windows-latest'
-        # there is not yet an environment variable for this path from msys2/setup-msys2
-        # We need this to get a gcc 11.2 that is new enough to compile the reference FMU3
-        run: echo "C:\msys64/mingw64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Put Windows native toolchain on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          (Join-Path $env:MSYS2_LOCATION 'usr\bin') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          (Join-Path $env:MSYS2_LOCATION 'ucrt64\bin') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Maven download
-        run: mvn validate dependency:resolve-plugins -B --quiet
-      #      - name: Alter path
-      #        run: echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
+      - name: Verify Windows native toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          foreach ($tool in @('gcc', 'g++', 'cmake', 'make', 'sh')) {
+            $toolDirectory = if ($tool -in @('make', 'sh')) { 'usr\bin' } else { 'ucrt64\bin' }
+            $actual = (Get-Command $tool -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+            $expected = Join-Path $env:MSYS2_LOCATION "$toolDirectory\${tool}.exe"
+            if (-not [string]::Equals($actual, $expected, [System.StringComparison]::OrdinalIgnoreCase)) {
+              throw "Expected $tool at $expected, found $actual"
+            }
+            Write-Output "$tool resolved to $actual"
+          }
 
-      - name: Maven Build x32
-        run: mvn -B package --file pom.xml -Pmake32
-        if: matrix.platform == 'x32'
+      - name: Build and test
+        run: mvn -B -ntp package "-Pmake,native_release"
+        env:
+          CC: ${{ runner.os == 'macOS' && '/usr/bin/clang' || 'gcc' }}
+          CXX: ${{ runner.os == 'macOS' && '/usr/bin/clang++' || 'g++' }}
 
-      - name: Maven Build x64
-        run: mvn -B package --file pom.xml -Pmake
-        if: matrix.platform == 'x64'
+      - name: Test Windows libraries without MSYS2 on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $maven = (Get-Command mvn -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+          $env:PATH = "$env:JAVA_HOME\bin;$env:SystemRoot\System32;$env:SystemRoot"
+          & $maven -B -ntp -pl jnifmuapi -am test "-Dtest=StaticTest,FmuTest,FmuLoadTest#loadAndInstantiateLegacyWindowsFmu,Fmi3ApiTest#testPlatformVersion" "-Dsurefire.failIfNoSpecifiedTests=false"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: artifact
-        uses: actions/upload-artifact@v4
+      - name: Verify universal macOS libraries
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify() {
+            echo "$1: $(lipo -archs "$1")"
+            lipo "$1" -verify_arch x86_64 arm64
+          }
+          verify jnifmuapi/target/native/libfmuapi.dylib
+          # Only check FMUs built here; target/fmus/binaries/darwin holds prebuilt x86_64-only fixtures.
+          while IFS= read -r -d '' library; do
+            verify "$library"
+          done < <(find jnifmuapi/target/fmus \( -path '*/binaries/darwin64/*' -o -path '*/binaries/*-darwin/*' \) -name '*.dylib' -print0)
+
+      # Both Macs build and test universal binaries; publish only one set to avoid overwrites.
+      - name: Upload native libraries
+        if: matrix.publish
+        uses: actions/upload-artifact@v7
         with:
-          name: lib-${{ matrix.os }}
-          path: |
-            jnifmuapi/target/classes/lib/**/libfmuapi.so
-            jnifmuapi/target/classes/lib/**/libfmuapi.dylib
-            jnifmuapi/target/classes/lib/**/fmuapi.dll
+          name: native-${{ matrix.artifact }}
+          path: jnifmuapi/target/classes/lib/
+          if-no-files-found: error
           retention-days: 1
 
-      - name: artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload test FMU contents
+        if: matrix.publish
+        uses: actions/upload-artifact@v7
         with:
-          name: lib-test-fmus-${{ matrix.os }}
+          name: test-fmus-${{ matrix.artifact }}
           path: |
-            jnifmuapi/target/fmus/**/*.so
-            jnifmuapi/target/fmus/**/*.dylib
-            jnifmuapi/target/fmus/**/*.dll
+            jnifmuapi/target/fmus/fmi*/**/binaries/**
+            jnifmuapi/target/fmus/fmi*/**/modelDescription.xml
+            jnifmuapi/target/fmus/fmi*/**/resources/**
+          if-no-files-found: error
           retention-days: 1
 
-      - name: List windows dependencies
-        if: matrix.os == 'windows-latest'
-        shell: bash
-        run: find . -name *.dll -exec echo {} \; -exec bash -c "objdump -p {} | grep 'DLL Name:'" \;
-
-      - name: List linux dependencies
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash
-        run: find . -name *.so -exec echo {} \; -exec ldd {} \;
-
-      - name: List macos dependencies
-        if: matrix.os == 'macos-latest'
-        shell: bash
-        run: find . -name *.dylib -exec echo {} \; -exec otool -L {} \;
-
-      - name: artifact
+      - name: Upload JVM crash logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: jvm_crash_logs
-          path: |
-            **/hs_err*
+          name: jvm-crash-logs-${{ matrix.os }}-${{ matrix.arch }}
+          path: '**/hs_err*'
+          if-no-files-found: ignore
           retention-days: 1
-
-  #      - name: artifact
-  #        if: always() && matrix.os == 'windows-latest'
-  #        uses: actions/upload-artifact@v2
-  #        with:
-  #          name: bblog
-  #          path: |
-  #
-  #            jnifmuapi/target/fmus/*
-  #          retention-days: 1
 
   final:
-    runs-on: ubuntu-latest
-
+    name: Assemble multi-platform package
+    runs-on: ubuntu-24.04
     needs: build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
-          submodules: 'true'
+          submodules: true
 
-      - id: install-secret-key
-        name: Install gpg secret key
-        run: |
-          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
-          gpg --list-secret-keys --keyid-format LONG
-
-      - name: Environment variables
-        run: echo ${{ env.SERVER_ID }}
-
-
-
-#linux
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-java@v6
         with:
-          name: lib-ubuntu-latest
-          path: jnifmuapi/target/classes/lib
-
-      - name: Download all workflow run test artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-test-fmus-ubuntu-latest
-          path: jnifmuapi/target/fmus
-
-
-#mac
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-macos-13
-          path: jnifmuapi/target/classes/lib
-
-      - name: Download all workflow run test artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-test-fmus-macos-13
-          path: jnifmuapi/target/fmus
-
-# windows
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-windows-latest
-          path: jnifmuapi/target/classes/lib
-
-      - name: Download all workflow run test artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-test-fmus-windows-latest
-          path: jnifmuapi/target/fmus
-
-
-
-
-
-      - name: Set up Java x64
-        if: matrix.platform == 'x64'
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x64
-
-      - name: Set up Java x32
-        if: matrix.platform == 'x86'
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x32
-
-      - name: Deploy server
-        uses: actions/setup-java@v1
-        with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           server-id: ${{ env.SERVER_ID }}
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          server-username-env-var: MAVEN_USERNAME
+          server-password-env-var: MAVEN_PASSWORD
+          gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
+      - name: Download native libraries
+        uses: actions/download-artifact@v8
+        with:
+          pattern: native-*
+          merge-multiple: true
+          path: jnifmuapi/target/classes/lib
 
-      - name: Maven download
-        run: mvn validate dependency:resolve-plugins -B --quiet
+      - name: Download test FMU contents
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-fmus-*
+          merge-multiple: true
+          path: jnifmuapi/target/fmus
 
-      - name: Maven Build Final
-        run: mvn -B package --file pom.xml -Dmaven.test.skip=true -Pmake
+      - name: Package combined test FMUs
+        shell: bash
+        run: |
+          set -euo pipefail
+          for model in jnifmuapi/target/fmus/fmi*/*/modelDescription.xml; do
+            directory=$(dirname "$model")
+            (
+              cd "$directory"
+              contents=(modelDescription.xml binaries)
+              if [[ -d resources ]]; then contents+=(resources); fi
+              zip -r "../$(basename "$directory").fmu" "${contents[@]}"
+            )
+          done
 
-#      - name: Maven Deploy
-#        if: github.event_name == 'push' && (github.ref != 'refs/heads/development' && github.ref != 'refs/heads/master' )
-#        run: mvn -P au -B deploy -Dsha1=-`git rev-parse --abbrev-ref HEAD | sed "s|/|-|g"` -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Package without rebuilding native libraries
+        run: mvn -B -ntp package -Dmaven.test.skip=true
+
+      - name: Verify all platforms are packaged
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar tf jnifmuapi/target/jnifmuapi-*.jar > packaged-files.txt
+          for library in \
+            Linux-amd64/libfmuapi.so Linux-x86_64/libfmuapi.so \
+            Windows-amd64/fmuapi.dll Windows-x86_64/fmuapi.dll \
+            Mac-x86_64/libfmuapi.dylib Mac-aarch64/libfmuapi.dylib Mac-arm64/libfmuapi.dylib; do
+            grep -Fx "lib/$library" packaged-files.txt
+          done
+
+      - name: Install GPG secret key
+        if: github.event_name == 'push' && github.ref == 'refs/heads/development'
+        env:
+          GPG_SECRET_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+        run: printf '%b' "$GPG_SECRET_KEY" | gpg --batch --import
 
       - name: Maven Deploy SNAPSHOT to SONATYPE
-        if: github.ref == 'refs/heads/development'
-        run: mvn -B deploy -Dsha1= -Dchangelist=-SNAPSHOT -Dmaven.test.skip=true -DskipITs -fae -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} -Prelease
+        if: github.event_name == 'push' && github.ref == 'refs/heads/development'
+        run: mvn -B deploy -Dsha1= -Dchangelist=-SNAPSHOT -Dmaven.test.skip=true -DskipITs -fae -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
-      - name: upload jnifmuapi
-        uses: actions/upload-artifact@v4
+      - name: Upload Java packages
+        uses: actions/upload-artifact@v7
         with:
           name: jnifmuapi
           path: |
             jnifmuapi/target/jnifmuapi-*-SNAPSHOT.jar
             fmi2/target/fmi2-*-SNAPSHOT.jar
+          if-no-files-found: error
           retention-days: 5
 
-      - name: upload test fmus
-        uses: actions/upload-artifact@v4
+      - name: Upload combined test FMUs
+        uses: actions/upload-artifact@v7
         with:
           name: test-fmus
-          path: |
-            jnifmuapi/target/fmus/**/*.fmu
+          path: jnifmuapi/target/fmus/**/*.fmu
+          if-no-files-found: error
           retention-days: 5
-

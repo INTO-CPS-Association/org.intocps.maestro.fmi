@@ -34,6 +34,10 @@
 
 package org.intocps.fmi.jnifmuapi;
 
+import org.apache.commons.lang3.SystemUtils;
+import org.intocps.fmi.IFmiComponent;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.File;
@@ -71,5 +75,29 @@ public class FmuLoadTest
 
 		f.unLoad();
 
+	}
+
+	@Test
+	public void loadAndInstantiateLegacyWindowsFmu() throws Exception
+	{
+		Assume.assumeTrue("The legacy FMU contains only a Windows x64 library",
+				SystemUtils.IS_OS_WINDOWS &&
+						("amd64".equalsIgnoreCase(SystemUtils.OS_ARCH) || "x86_64".equalsIgnoreCase(SystemUtils.OS_ARCH)));
+
+		Fmu fmu = new Fmu(new File(FMU_PATH));
+		fmu.load();
+		try {
+			Assert.assertEquals("2.0", fmu.getVersion());
+			IFmiComponent component = fmu.instantiate("{8c4e810f-3df3-4a00-8276-176fa3c9f000}",
+					"legacy", false, false, TestUtils.getTestCallback());
+			Assert.assertNotNull("Unable to instantiate the legacy FMU", component);
+			try {
+				Assert.assertTrue("Instance not valid", component.isValid());
+			} finally {
+				component.freeInstance();
+			}
+		} finally {
+			fmu.unLoad();
+		}
 	}
 }

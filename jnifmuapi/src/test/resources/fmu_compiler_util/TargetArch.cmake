@@ -1,12 +1,14 @@
 # Based on the Qt 5 processor detection code, so should be very accurate
 # https://qt.gitorious.org/qt/qtbase/blobs/master/src/corelib/global/qprocessordetection.h
-# Currently handles arm (v5, v6, v7), x86 (32/64), ia64, and ppc (32/64)
+# Currently handles arm (v5, v6, v7, arm64), x86 (32/64), ia64, and ppc (32/64)
 
 # Regarding POWER/PowerPC, just as is noted in the Qt source,
 # "There are many more known variants/revisions that we do not handle/detect."
 
 set(archdetect_c_code "
-#if defined(__arm__) || defined(__TARGET_ARCH_ARM)
+#if defined(__aarch64__) || defined(__arm64__) || defined(_M_ARM64)
+    #error cmake_ARCH arm64
+#elif defined(__arm__) || defined(__TARGET_ARCH_ARM)
     #if defined(__ARM_ARCH_7__) \\
         || defined(__ARM_ARCH_7A__) \\
         || defined(__ARM_ARCH_7R__) \\
@@ -71,6 +73,8 @@ function(target_architecture output_var)
                 set(osx_arch_i386 TRUE)
             elseif("${osx_arch}" STREQUAL "x86_64")
                 set(osx_arch_x86_64 TRUE)
+            elseif("${osx_arch}" STREQUAL "arm64")
+                set(osx_arch_arm64 TRUE)
             elseif("${osx_arch}" STREQUAL "ppc64" AND ppc_support)
                 set(osx_arch_ppc64 TRUE)
             else()
@@ -91,6 +95,10 @@ function(target_architecture output_var)
             list(APPEND ARCH x86_64)
         endif()
 
+        if(osx_arch_arm64)
+            list(APPEND ARCH arm64)
+        endif()
+
         if(osx_arch_ppc64)
             list(APPEND ARCH ppc64)
         endif()
@@ -107,13 +115,12 @@ function(target_architecture output_var)
         # #error preprocessor directives... but by exploiting the preprocessor in this
         # way, we can detect the correct target architecture even when cross-compiling,
         # since the program itself never needs to be run (only the compiler/preprocessor)
-        try_run(
-                run_result_unused
+        try_compile(
                 compile_result_unused
-                "${CMAKE_BINARY_DIR}"
+                "${CMAKE_BINARY_DIR}/CMakeFiles/arch-detect"
                 "${CMAKE_BINARY_DIR}/arch.c"
-                COMPILE_OUTPUT_VARIABLE ARCH
-                CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+                OUTPUT_VARIABLE ARCH
+                CMAKE_FLAGS "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}"
         )
 
         # Parse the architecture name from the compiler output

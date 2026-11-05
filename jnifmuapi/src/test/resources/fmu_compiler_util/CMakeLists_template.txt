@@ -1,7 +1,11 @@
 # Prepends <prefix> to every entry in <arg> and stores in <var>
 
 
-cmake_minimum_required (VERSION 2.8.5)
+cmake_minimum_required (VERSION 3.10)
+if (CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS target architectures")
+endif ()
+
 project (FMU_NAME C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR on)
@@ -100,5 +104,4 @@ get_fmi_binary_folder(output_folder)
 add_custom_command(TARGET FMU_NAME POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/${output_folder}/"
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/${output_folder}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
-        DEPENDS ${PROJECT_NAME}
         )
