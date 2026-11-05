@@ -51,24 +51,32 @@ FMU *getFmuPtr(jlong fmuPtr) { return (FMU *)fmuPtr; }
 
 JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nLoadLibrary(
     JNIEnv *env, jobject obj, jstring libraryPath) {
-  const char *path;
-
-  path = (*env)->GetStringUTFChars(env, libraryPath, NULL);
+  if (libraryPath == NULL) {
+    throwException(env, "Library path must not be null");
+    return 0;
+  }
+  const char *path = (*env)->GetStringUTFChars(env, libraryPath, NULL);
+  if (path == NULL) return 0;
 
   // load the FMU dll
 
-  FMU *fmu = (FMU *)malloc(sizeof(FMU));
+  FMU *fmu = (FMU *)calloc(1, sizeof(FMU));
 
   if (fmu == NULL) {
     throwException(env, "malloc for fmu failed");
+    (*env)->ReleaseStringUTFChars(env, libraryPath, path);
+    return 0;
   }
 
   if (!loadDll(path, fmu)) {
+    (*env)->ReleaseStringUTFChars(env, libraryPath, path);
+    free(fmu);
     throwException(env, "Load failed!!!");
     return 0;
   }
 
   (*env)->ReleaseStringUTFChars(env, libraryPath, path);
+  storeFmu(fmu);
 
   return (jlong)fmu;
 }
@@ -76,6 +84,14 @@ JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nLoadLibrary(
 JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nUnLoad(
     JNIEnv *env, jobject obj, jlong fmuptr) {
   FMU *ptr = getFmuPtr(fmuptr);
+  if (!isFmuLoaded(ptr)) {
+    throwException(env, "Cannot unload an invalid or unloaded FMU");
+    return;
+  }
+  if (hasFmuComponents(ptr)) {
+    throwException(env, "Free all FMU instances before unloading the library");
+    return;
+  }
 #ifdef _WIN32
   FreeLibrary(ptr->dllHandle);
 #elif __APPLE__
@@ -90,6 +106,7 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nUnLoad(
   dlclose(ptr->dllHandle);
 #endif
 
+  removeFmu(ptr);
   free(ptr);
 }
 
@@ -99,6 +116,10 @@ JNIEXPORT void JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nUnLoad(
 
 JNIEXPORT jstring JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_nGetVersion(
     JNIEnv *env, jobject obj, jlong fmuPtr) {
+  if (!isFmuLoaded(getFmuPtr(fmuPtr))) {
+    throwException(env, "Cannot query an invalid or unloaded FMU");
+    return NULL;
+  }
   jstring result = (*env)->NewStringUTF(env, getFmuPtr(fmuPtr)->getVersion());
   return result;
 }
@@ -107,129 +128,128 @@ JNIEXPORT jstring JNICALL
 Java_org_intocps_fmi_jnifmuapi_NativeFmu_nGetTypesPlatform(JNIEnv *env,
                                                            jobject obj,
                                                            jlong fmuPtr) {
+  if (!isFmuLoaded(getFmuPtr(fmuPtr))) {
+    throwException(env, "Cannot query an invalid or unloaded FMU");
+    return NULL;
+  }
   jstring result =
       (*env)->NewStringUTF(env, getFmuPtr(fmuPtr)->getTypesPlatform());
   return result;
 }
 
-HashmapNode *configureCallback(JNIEnv *env, jobject obj, jlong fmuPtr,
-                               jobject callbackObj, const char *instanceName) {
-  // convert local to global reference
-  // (local will die after this method call)
-  jobject g_obj = (*env)->NewGlobalRef(env, callbackObj);
-
-  HashmapNode *cbn = (HashmapNode *)malloc(sizeof(HashmapNode));
-
-  cbn->callbackObj = g_obj;
-  cbn->fmu = (FMU *)fmuPtr;
-  JavaVM *g_vm;
-  (*env)->GetJavaVM(env, &g_vm);
-  cbn->g_vm = g_vm;
-  cbn->env = env;
-  cbn->name = instanceName;
-
-  // save refs for callback
-  jclass g_clazz = (*env)->GetObjectClass(env, g_obj);
-  if (g_clazz == NULL) {
-    throwException(env, "Failed to find class");
+static HashmapNode *configureCallback(JNIEnv *env, FMU *fmu, jobject callbackObj,
+                                      const char *instanceName) {
+  HashmapNode *callback = (HashmapNode *)calloc(1, sizeof(HashmapNode));
+  if (callback == NULL) {
+    throwException(env, "Unable to allocate FMU callback");
+    return NULL;
   }
-
-  jmethodID method = (*env)->GetMethodID(env, g_clazz, "log",
-                                         FMU_CALLBACK_METHOD_ID);  //"(I)V");
-
-  cbn->callbackMethod = method;
-
-  if (cbn->callbackMethod == NULL) {
-    throwException(env, "Unable to get method ref");
+  callback->fmu = fmu;
+  callback->name = strdup(instanceName);
+  if (callback->name == NULL) {
+    free(callback);
+    throwException(env, "Unable to allocate FMU callback name");
+    return NULL;
   }
-
-  storeCallbackHandler(cbn);
-  // g_callbackMap[getFreeCallbackMapIndex()] = cbn;
-  return cbn;
+  callback->callbackObj = (*env)->NewGlobalRef(env, callbackObj);
+  if (callback->callbackObj == NULL) {
+    freeCallbackHandler(env, callback);
+    return NULL;
+  }
+  jclass clazz = (*env)->GetObjectClass(env, callbackObj);
+  if (clazz != NULL) {
+    callback->callbackMethod = (*env)->GetMethodID(env, clazz, "log", FMU_CALLBACK_METHOD_ID);
+    (*env)->DeleteLocalRef(env, clazz);
+  }
+  if (callback->callbackMethod == NULL) {
+    freeCallbackHandler(env, callback);
+    return NULL;
+  }
+  if ((*env)->GetJavaVM(env, &callback->g_vm) != JNI_OK) {
+    freeCallbackHandler(env, callback);
+    throwException(env, "Unable to obtain Java VM for FMU callback");
+    return NULL;
+  }
+  storeCallbackHandler(callback);
+  return callback;
 }
 
 JNIEXPORT jlong JNICALL Java_org_intocps_fmi_jnifmuapi_NativeFmu_ninstantiate(
     JNIEnv *env, jobject obj, jlong fmuPtr, jstring name, jstring jguid,
     jstring resourceLocation, jboolean visible, jboolean loggingOn,
     jobject callbackObj) {
-  const char *instanceName = GetString(env, name);
-  const char *fmuResourceLocation = GetString(env, resourceLocation);
-  const char *guid = GetString(env, jguid);
-
-  CompHashmapNode *compNode =
-      (CompHashmapNode *)malloc(sizeof(CompHashmapNode));
-
-  if (compNode == NULL) {
-    throwException(env, "malloc of compNode failed");
+  FMU *fmu = getFmuPtr(fmuPtr);
+  if (!isFmuLoaded(fmu)) {
+    throwException(env, "Cannot instantiate an invalid or unloaded FMU");
+    return 0;
   }
-
+  if (name == NULL || jguid == NULL || resourceLocation == NULL) {
+    throwException(env, "Instance name, GUID and resource location must not be null");
+    return 0;
+  }
+  if (!beginFmuInstantiation(fmu)) {
+    throwException(env, "Cannot instantiate an unloaded FMU");
+    return 0;
+  }
+  const char *instanceName = NULL;
+  const char *fmuResourceLocation = NULL;
+  const char *guid = NULL;
+  fmi2Component component = NULL;
+  CompHashmapNode *node = (CompHashmapNode *)calloc(1, sizeof(CompHashmapNode));
+  if (node == NULL) {
+    throwException(env, "Unable to allocate FMU instance");
+    endFmuInstantiation(fmu);
+    return 0;
+  }
+  node->fmu = fmu;
+  instanceName = GetString(env, name);
+  if (instanceName == NULL) goto cleanup;
+  guid = GetString(env, jguid);
+  if (guid == NULL) goto cleanup;
+  fmuResourceLocation = GetString(env, resourceLocation);
+  if (fmuResourceLocation == NULL) goto cleanup;
+  if (instanceName[0] == '\0' || guid[0] == '\0') {
+    throwException(env, "Instance name and GUID must not be empty");
+    goto cleanup;
+  }
   if (callbackObj != NULL) {
-    int size = strlen(instanceName);
-
-    const char *cname = strcpy(malloc(sizeof(char) * (size + 1)), instanceName);
-
-    if (cname == NULL) {
-      throwException(env, "malloc of cname failed");
-    }
-
-    compNode->callback =
-        configureCallback(env, obj, fmuPtr, callbackObj, cname);
+    node->callback = configureCallback(env, fmu, callbackObj, instanceName);
+    if (node->callback == NULL) goto cleanup;
   }
-  fmi2CallbackFunctions *callbacks =
-      (fmi2CallbackFunctions *)malloc(sizeof(fmi2CallbackFunctions));
-
-  if (callbacks == NULL) {
-    throwException(env, "malloc of callbacks failed");
+  node->callbackFunctions = (fmi2CallbackFunctions *)calloc(1, sizeof(fmi2CallbackFunctions));
+  if (node->callbackFunctions == NULL) {
+    throwException(env, "Unable to allocate FMU callback functions");
+    goto cleanup;
   }
-
-  fmi2CallbackFunctions cb = {
-      callbackObj != NULL ? fmuLoggerCache : fmuLogger, calloc, free, NULL,
-      (FMU *)fmuPtr};  // called by the model during simulation
-
-  memcpy(callbacks, &cb, sizeof(fmi2CallbackFunctions));
-  compNode->callbackFunctions = callbacks;
-
+  node->callbackFunctions->logger = callbackObj != NULL ? fmuLoggerCache : fmuLogger;
+  node->callbackFunctions->allocateMemory = calloc;
+  node->callbackFunctions->freeMemory = free;
+  node->callbackFunctions->componentEnvironment = node->callback;
+  component = fmu->instantiate(instanceName, fmi2CoSimulation, guid,
+                               fmuResourceLocation, node->callbackFunctions, visible, loggingOn);
   if ((*env)->ExceptionCheck(env)) {
-    printf("exception\n");
-    (*env)->ExceptionDescribe(env);
+    if (component != NULL) fmu->freeInstance(component);
+    component = NULL;
+  }
+  if (component != NULL) {
+    node->comp = component;
+    storeComponent(node);
+    node = NULL;
   }
 
-  fmi2Component c =
-      ((FMU *)fmuPtr)
-          ->instantiate(instanceName, fmi2CoSimulation, guid,
-                        fmuResourceLocation, callbacks, visible, loggingOn);
-
-  if (c != NULL) {
-    compNode->comp = c;
-    // store for later free
-    storeComponent(compNode);
-  } else {
-    free((void*)compNode->callback->name);
-    free(compNode->callbackFunctions);
-    compNode->callbackFunctions = NULL;
-    free(compNode);
-    compNode = NULL;
-  }
-
-  if ((*env)->ExceptionCheck(env)) {
-    throwException(env, "exception - 2\n");
-    (*env)->ExceptionDescribe(env);
-  }
-
-  (*env)->ReleaseStringUTFChars(env, name, instanceName);
-  (*env)->ReleaseStringUTFChars(env, resourceLocation, fmuResourceLocation);
-  (*env)->ReleaseStringUTFChars(env, jguid, guid);
-
-  return (jlong)c;
+cleanup:
+  freeComponentNode(env, node);
+  endFmuInstantiation(fmu);
+  if (instanceName != NULL) (*env)->ReleaseStringUTFChars(env, name, instanceName);
+  if (fmuResourceLocation != NULL) (*env)->ReleaseStringUTFChars(env, resourceLocation, fmuResourceLocation);
+  if (guid != NULL) (*env)->ReleaseStringUTFChars(env, jguid, guid);
+  return (jlong)component;
 }
 
 void fmuLoggerCache(void *componentEnvironment, fmi2String instanceName,
                     fmi2Status status, fmi2String category, fmi2String message,
                     ...) {
-  size_t n = MAX_MSG_SIZE;
-
   char msg[MAX_MSG_SIZE];
-  char *copy;
   va_list argp;
 
   if (message == NULL) {
@@ -237,75 +257,41 @@ void fmuLoggerCache(void *componentEnvironment, fmi2String instanceName,
   }
   // replace C format strings
   va_start(argp, message);
-  int truncation = vsnprintf(msg, MAX_MSG_SIZE, message, argp);
+  vsnprintf(msg, MAX_MSG_SIZE, message, argp);
   va_end(argp);
 
-  int i = 0;
-
-  int reported = 0;
-
-  HashmapNode *callBackNode = getCallbackHandler(instanceName);
-
-  if (callBackNode != NULL) {
-    reported = 1;
-    JNIEnv *env = callBackNode->env;
-    JavaVM *vm = callBackNode->g_vm;
-
-    JNIEnv *g_env;
-    // double check it's all ok
-
-    int getEnvStat = (*vm)->GetEnv(vm, (void **)&g_env, JNI_VERSION_1_6);
-    if (getEnvStat == JNI_EDETACHED) {
-      // printf("GetEnv: not attached\n");
-      if ((*vm)->AttachCurrentThread(vm, (void **)&g_env, NULL) != 0) {
-        printf("Failed to attach\n");
-      }
-    } else if (getEnvStat == JNI_OK) {
-    } else if (getEnvStat == JNI_EVERSION) {
-      printf("GetEnv: version not supported\n");
-    } else if (getEnvStat == JNI_ERR) {
-      printf("GetEnv: error\n");
-    } else {
-      printf("GetEnv: %i\n", getEnvStat);
-    }
-
-    env = g_env;
-
-    if ((*env)->ExceptionCheck(env)) {
-      printf("exception\n");
-      (*env)->ExceptionDescribe(env);
-    }
-    jstring jinstanceName = (*env)->NewStringUTF(env, instanceName);
-
-    if ((*env)->ExceptionCheck(env)) {
-      printf("exception\n");
-      (*env)->ExceptionDescribe(env);
-    }
-
-    jstring jcategory = (*env)->NewStringUTF(env, category);
-    jstring jmessage = (*env)->NewStringUTF(env, msg);
-
-    // call callback
-    (*env)->CallVoidMethod(env, callBackNode->callbackObj,
-                           callBackNode->callbackMethod, jinstanceName, status,
-                           jcategory, jmessage);
-    if ((*env)->ExceptionCheck(env)) {
-      (*env)->ExceptionDescribe(env);
-    }
-
-    (*env)->DeleteLocalRef(env, jinstanceName);
-    (*env)->DeleteLocalRef(env, jcategory);
-    (*env)->DeleteLocalRef(env, jmessage);
-
-    if ((*env)->ExceptionCheck(env)) {
-      (*env)->ExceptionDescribe(env);
-    }
-
-    (*vm)->DetachCurrentThread(vm);
+  JavaVM *vm = getCallbackVm(componentEnvironment);
+  if (vm == NULL) {
+    fprintf(stderr, "No FMU callback receiver for %s: %s\n", instanceName ? instanceName : "?", msg);
+    return;
   }
-
-  if (reported == 0) {
-    // no receiver found
-    printf("Unable to find receiver for %s reporting: %s", instanceName, msg);
+  JNIEnv *env = NULL;
+  int state = (*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6);
+  int attached = state == JNI_EDETACHED;
+  if (attached) state = (*vm)->AttachCurrentThread(vm, (void **)&env, NULL);
+  if (state != JNI_OK || env == NULL) {
+    fprintf(stderr, "Unable to attach FMU callback thread to Java VM: %d\n", state);
+    return;
+  }
+  if (!(*env)->ExceptionCheck(env) && (*env)->PushLocalFrame(env, 4) == JNI_OK) {
+    jmethodID method = NULL;
+    jobject receiver = getCallbackReference(env, componentEnvironment, &method);
+    if (receiver != NULL) {
+      jstring jname = (*env)->NewStringUTF(env, instanceName ? instanceName : "");
+      jstring jcategory = NULL;
+      jstring jmessage = NULL;
+      if (jname != NULL) jcategory = (*env)->NewStringUTF(env, category ? category : "");
+      if (jcategory != NULL) jmessage = (*env)->NewStringUTF(env, msg);
+      if (jmessage != NULL) {
+        (*env)->CallVoidMethod(env, receiver, method, jname, (jbyte)status, jcategory, jmessage);
+      }
+    } else if (!(*env)->ExceptionCheck(env)) {
+      fprintf(stderr, "FMU callback receiver was released: %s\n", msg);
+    }
+    (*env)->PopLocalFrame(env, NULL);
+  }
+  if (attached) {
+    if ((*env)->ExceptionCheck(env)) (*env)->ExceptionDescribe(env);
+    (*vm)->DetachCurrentThread(vm);
   }
 }

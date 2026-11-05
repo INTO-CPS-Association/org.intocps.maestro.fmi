@@ -68,6 +68,11 @@ The test FMUs built by the `make` profile are also universal on macOS, with thei
 libraries copied into the appropriate FMI 2 or FMI 3 directories.
 An Intel-only FMU still requires an Intel JVM, for example under Rosetta on Apple Silicon.
 
+FMI 2 instantiation accepts a null Java callback and uses the native logger instead.
+Instance names and GUIDs must be non-null and non-empty. A freed instance cannot be
+used or freed again; these calls raise an invalid-state exception. Unloading an FMI 2
+FMU frees its remaining instances before unloading the native library.
+
 ```bash
 mvn clean package -Pmake
 ...

@@ -137,10 +137,11 @@ public class NativeLoadManager {
             lifecycleFunc.lifeCycleUnLoad(fmuPtr);
         }
         loaded = false;
+        fmuPtr = 0;
     }
 
     public boolean isValid() {
-        return fmuPtr != 0;
+        return loaded && fmuPtr != 0;
     }
 
     public void checkState() throws FmiInvalidNativeStateException {

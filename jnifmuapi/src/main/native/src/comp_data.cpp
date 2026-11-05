@@ -36,72 +36,136 @@
 #include "comp_data.h"
 
 #include <map>
-#include <string>
+#include <mutex>
 
 using namespace std;
 
-static map<string, HashmapNode *> g_callbackMap;
-
+static map<void *, HashmapNode *> g_callbackMap;
 static map<fmi2Component, CompHashmapNode *> g_compMap;
+static map<FMU *, size_t> g_fmus;
+static mutex g_mutex;
 
 extern "C" void storeCallbackHandler(HashmapNode *callback) {
-  g_callbackMap[string(callback->name)] = callback;
+  lock_guard<mutex> lock(g_mutex);
+  g_callbackMap[callback] = callback;
 }
 
 extern "C" void storeComponent(CompHashmapNode *comp) {
   if (comp->comp == NULL) return;
-
+  lock_guard<mutex> lock(g_mutex);
   g_compMap[comp->comp] = comp;
 }
 
-extern "C" void freeComp(JNIEnv *env, fmi2Component comp) {
-  auto itr = g_compMap.find(comp);
-
-  CompHashmapNode *cn = NULL;
-  if (itr != g_compMap.end()) {
-    cn = itr->second;
+extern "C" void freeCallbackHandler(JNIEnv *env, HashmapNode *callback) {
+  if (callback == NULL) return;
+  lock_guard<mutex> lock(g_mutex);
+  g_callbackMap.erase(callback);
+  if (callback->callbackObj != NULL) {
+    env->DeleteGlobalRef(callback->callbackObj);
   }
-
-  if (cn == NULL) {
-    return;
-  }
-
-  if (cn->callback != NULL) {
-    // first remove callback from the list which is searched by the cache
-    // callback
-
-    for (auto it = g_callbackMap.begin(); it != g_callbackMap.end(); ++it) {
-      if (it->second == cn->callback) {
-        string key = it->first;
-        g_callbackMap.erase(it);
-        break;
-      }
-    }
-
-    // This is concurrency issue, technically it is possible to delete
-    // the object here at the same time as fmu_loggerCache tries to use it
-    if (cn->callback->callbackObj != NULL) {
-      env->DeleteGlobalRef(cn->callback->callbackObj);
-      cn->callback->callbackObj = NULL;
-    }
-
-    free(cn->callback);
-    cn->callback = NULL;
-  }
-  if (cn->callbackFunctions != NULL) {
-    free(cn->callbackFunctions);
-    cn->callbackFunctions = NULL;
-  }
-  g_compMap.erase(itr);
-  free(cn);
+  free(callback->name);
+  free(callback);
 }
 
-extern "C" HashmapNode *getCallbackHandler(fmi2String instanceName) {
-  auto itr = g_callbackMap.find(string(instanceName));
-
-  if (itr == g_callbackMap.end()) {
-    return NULL;
-  } else {
-    return itr->second;
+extern "C" void *getCallbackEnvironment(FMU *fmu, const char *instanceName) {
+  if (instanceName == NULL) return NULL;
+  lock_guard<mutex> lock(g_mutex);
+  for (const auto &entry : g_callbackMap) {
+    if (entry.second->fmu == fmu && strcmp(entry.second->name, instanceName) == 0) {
+      return entry.first;
+    }
   }
+  return NULL;
+}
+
+extern "C" JavaVM *getCallbackVm(void *componentEnvironment) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_callbackMap.find(componentEnvironment);
+  return it == g_callbackMap.end() ? NULL : it->second->g_vm;
+}
+
+extern "C" jobject getCallbackReference(JNIEnv *env, void *componentEnvironment,
+                                        jmethodID *method) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_callbackMap.find(componentEnvironment);
+  if (it == g_callbackMap.end()) return NULL;
+  *method = it->second->callbackMethod;
+  // Keep the receiver alive even if another thread frees the component.
+  return env->NewLocalRef(it->second->callbackObj);
+}
+
+extern "C" void freeComponentNode(JNIEnv *env, CompHashmapNode *comp) {
+  if (comp == NULL) return;
+  freeCallbackHandler(env, comp->callback);
+  free(comp->callbackFunctions);
+  free(comp);
+}
+
+extern "C" void freeComp(JNIEnv *env, fmi2Component comp) {
+  CompHashmapNode *node;
+  {
+    lock_guard<mutex> lock(g_mutex);
+    auto it = g_compMap.find(comp);
+    if (it == g_compMap.end()) return;
+    node = it->second;
+    g_compMap.erase(it);
+  }
+  freeComponentNode(env, node);
+}
+
+extern "C" int isComponentValid(FMU *fmu, fmi2Component comp) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_compMap.find(comp);
+  return g_fmus.count(fmu) != 0 && it != g_compMap.end() &&
+         it->second->fmu == fmu && !it->second->freeing;
+}
+
+extern "C" CompHashmapNode *beginFreeComponent(FMU *fmu, fmi2Component comp) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_compMap.find(comp);
+  if (g_fmus.count(fmu) == 0 || it == g_compMap.end() ||
+      it->second->fmu != fmu || it->second->freeing) {
+    return NULL;
+  }
+  CompHashmapNode *node = it->second;
+  node->freeing = 1;
+  return node;
+}
+
+extern "C" void storeFmu(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  g_fmus[fmu] = 0;
+}
+
+extern "C" int isFmuLoaded(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  return g_fmus.count(fmu) != 0;
+}
+
+extern "C" int hasFmuComponents(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_fmus.find(fmu);
+  if (it != g_fmus.end() && it->second != 0) return 1;
+  for (const auto &entry : g_compMap) {
+    if (entry.second->fmu == fmu) return 1;
+  }
+  return 0;
+}
+
+extern "C" int beginFmuInstantiation(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  auto it = g_fmus.find(fmu);
+  if (it == g_fmus.end()) return 0;
+  ++it->second;
+  return 1;
+}
+
+extern "C" void endFmuInstantiation(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  --g_fmus.at(fmu);
+}
+
+extern "C" void removeFmu(FMU *fmu) {
+  lock_guard<mutex> lock(g_mutex);
+  g_fmus.erase(fmu);
 }

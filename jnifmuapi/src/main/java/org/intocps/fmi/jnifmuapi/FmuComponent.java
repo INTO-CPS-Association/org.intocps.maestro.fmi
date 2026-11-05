@@ -52,7 +52,7 @@ import org.intocps.fmi.InvalidParameterException;
 public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 {
 
-	final private long componentPtr;
+	private volatile long componentPtr;
 	final private long fmuPtr;
 	final private IFmu fmu;
 	final private String guid;
@@ -471,7 +471,10 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 
 	void internalFreeInstance() throws FmiInvalidNativeStateException
 	{
-		nFreeInstance(fmuPtr, componentPtr);
+		checkState();
+		long ptr = componentPtr;
+		componentPtr = 0;
+		nFreeInstance(fmuPtr, ptr);
 	}
 
 	@Override
@@ -483,16 +486,14 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 	@Override
 	public boolean isValid()
 	{
-		return fmuPtr != 0 && componentPtr != 0;
+		return fmuPtr != 0 && componentPtr != 0 && fmu.isValid();
 	}
 
 	private void checkState() throws FmiInvalidNativeStateException
 	{
 		if (!isValid())
 		{
-			throw new FmiInvalidNativeStateException("The internal "
-					+ (fmuPtr != 0 ? "" : " FMU state is invalid. ")
-					+ (componentPtr != 0 ? "" : " Component state is invalid"));
+			throw new FmiInvalidNativeStateException("The FMU is unloaded or the component has been freed");
 		}
 	}
 
@@ -500,6 +501,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 	public FmuResult<IFmiComponentState> getState()
 			throws FmuInvocationException
 	{
+		checkState();
 		long statePtr[] = new long[1];
 		Fmi2Status res = Fmi2Status.valueOf(nGetFmuState(fmuPtr, componentPtr, statePtr));
 
@@ -516,6 +518,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 	public Fmi2Status setState(IFmiComponentState state)
 			throws FmuInvocationException
 	{
+		checkState();
 		if (state != null && state instanceof FmuComponentState)
 		{
 			FmuComponentState st = (FmuComponentState) state;
@@ -534,6 +537,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 	public Fmi2Status freeState(IFmiComponentState state)
 			throws FmuInvocationException
 	{
+		checkState();
 		if (state != null && state instanceof FmuComponentState)
 		{
 			FmuComponentState st = (FmuComponentState) state;
@@ -553,6 +557,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 	}
 
 	public FmuResult<Long> getSerializedFMUstateSize(IFmiComponentState state) throws FmuInvocationException{
+		checkState();
 		if (state != null && state instanceof FmuComponentState)
 		{
 			FmuComponentState st = (FmuComponentState) state;
@@ -569,6 +574,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 
 	}
 	public	FmuResult<byte[]> serializeFMUstate(IFmiComponentState state, long byteSize) throws FmuInvocationException{
+		checkState();
 		if (state != null && state instanceof FmuComponentState)
 		{
 			FmuComponentState st = (FmuComponentState) state;
@@ -585,6 +591,7 @@ public class FmuComponent extends NativeFmuComponent implements IFmiComponent
 
 	}
 	public	FmuResult<IFmiComponentState> deSerializeFMUstate( byte[] bytes, long size) throws FmuInvocationException{
+		checkState();
 		long statePtr[] = new long[1];
 		Fmi2Status res = Fmi2Status.valueOf(nDeSerializeFMUstate(fmuPtr, componentPtr, bytes,size,statePtr));
 

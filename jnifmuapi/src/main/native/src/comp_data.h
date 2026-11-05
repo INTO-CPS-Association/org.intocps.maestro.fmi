@@ -49,24 +49,37 @@ extern "C" {
 
 typedef struct HashmapNode {
   FMU *fmu;
-  jobject callbackObj;       // free
-  jmethodID callbackMethod;  // free
+  char *name;
+  jobject callbackObj;
+  jmethodID callbackMethod;
   JavaVM *g_vm;
-  JNIEnv *env;
-  const char *name;
 } HashmapNode;
 
 typedef struct CompHashmapNode {
-  fmi2Component *comp;                       // dont free
+  FMU *fmu;
+  fmi2Component comp;                       // dont free
   fmi2CallbackFunctions *callbackFunctions;  // free
   HashmapNode *callback;                     // free
+  int freeing;
 
 } CompHashmapNode;
 
 void storeCallbackHandler(HashmapNode *callback);
+void freeCallbackHandler(JNIEnv *env, HashmapNode *callback);
+JavaVM *getCallbackVm(void *componentEnvironment);
+void *getCallbackEnvironment(FMU *fmu, const char *instanceName);
+jobject getCallbackReference(JNIEnv *env, void *componentEnvironment, jmethodID *method);
 void storeComponent(CompHashmapNode *comp);
+void freeComponentNode(JNIEnv *env, CompHashmapNode *comp);
 void freeComp(JNIEnv *env, fmi2Component comp);
-HashmapNode *getCallbackHandler(fmi2String instanceName);
+CompHashmapNode *beginFreeComponent(FMU *fmu, fmi2Component comp);
+int isComponentValid(FMU *fmu, fmi2Component comp);
+void storeFmu(FMU *fmu);
+int isFmuLoaded(FMU *fmu);
+int beginFmuInstantiation(FMU *fmu);
+void endFmuInstantiation(FMU *fmu);
+int hasFmuComponents(FMU *fmu);
+void removeFmu(FMU *fmu);
 
 #ifdef __cplusplus
 }
