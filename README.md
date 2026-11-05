@@ -56,6 +56,7 @@ variable `CI=1` (`export CI=1`) to use the embedded headers.
 On Linux and Windows, the compiler targets its default host architecture; no architecture
 argument is needed. On macOS, the default is a universal dylib containing both `x86_64`
 and `arm64`, built using the Apple toolchain on either Intel or Apple Silicon.
+Only 64-bit builds are supported. The obsolete `make32` profile has been removed.
 The same universal JNI library is packaged under the Java resource paths
 `lib/Mac-x86_64`, `lib/Mac-aarch64`, and `lib/Mac-arm64` to match `os.arch`.
 Verify both slices with `lipo -archs jnifmuapi/target/classes/lib/Mac-aarch64/libfmuapi.dylib`.
