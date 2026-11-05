@@ -4,7 +4,7 @@ This is a Java API for the fmi standard which is defined as a collection of C he
 
 # Development Environment
 
-* java 11
+* JDK 21
 * Maven 3
 * CMake 3.10 or newer (including CMake 4)
 * A working C and C++ compiler
@@ -22,16 +22,15 @@ This is a Java API for the fmi standard which is defined as a collection of C he
 
 The API can be build using the following tools:
 
-* Java 1.8
+* JDK 21
 * Maven 3.6 >
 * https://www.msys2.org/
     * With package:
         * `pacman -S --needed base-devel mingw-w64-x86_64-toolchain`
         * `pacman -S mingw64/mingw-w64-x86_64-cmake`
-    * Remember to add Java and Maven to `~/.bash_profile`
-        * `PATH="$PATH:/c/Program Files/OpenJDK/jdk-8.0.262.10-hotspot/bin"`
-        * `PATH="$PATH:/c/msys64/home/apache-maven-3.8.4/bin"`
-        * `export PATH`
+    * Add Java and Maven to `~/.bash_profile`, using your installation paths:
+        * `export JAVA_HOME="/c/path/to/jdk-21"`
+        * `export PATH="$JAVA_HOME/bin:/c/path/to/apache-maven/bin:$PATH"`
 
 Build using `c:\msys64\mingw64.exe` terminal
 
@@ -86,9 +85,27 @@ mvn clean package -Pmake -Pnative_debug
 
 # CI integration and cross build
 
-The project is build on github actions with a cross compilation step where the native code is compiled on ubuntu, mac
-and windows and a final step packing these together into one java build make a single bundle that supports all
-platforms.
+Both snapshot and release workflows build and test on these GitHub-hosted runners:
+
+| Target | Runner label | JVM architecture |
+| --- | --- | --- |
+| Linux x86_64 | `ubuntu-24.04` | `x64` |
+| Windows x86_64 | `windows-2022` | `x64` |
+| macOS Intel | `macos-15-intel` | `x64` |
+| macOS Apple Silicon | `macos-15` | `aarch64` |
+
+All Maven jobs use JDK 21. The Maven compiler still targets Java 8 source and bytecode;
+older JVMs are not currently tested by CI.
+
+These are native builds, not Linux-hosted cross-compilation. Both macOS runners
+build universal libraries and run the tests under their native JVM architecture.
+Only the Apple Silicon job uploads the macOS universal libraries, avoiding collisions
+when merging artifacts. The final job packages the Linux, Windows, and universal macOS
+libraries into one JAR without rebuilding them and verifies all expected resource paths.
+The snapshot workflow also assembles combined multi-platform test FMUs.
+OS-specific steps use `runner.os`, independently of the selected runner image label.
+See the [GitHub-hosted runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+for current label availability.
 
 # Usage
 

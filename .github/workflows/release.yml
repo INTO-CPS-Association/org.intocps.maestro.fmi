@@ -16,9 +16,9 @@ on:
 #        default: '2.4.1'
 
 env:
-  JAVA_VERSION: 1.8
+  JAVA_VERSION: '21'
   SERVER_ID: ossrh
-  PYTHON_VERSION: '3.12.1'
+  PYTHON_VERSION: '3.12'
 
 
 
@@ -26,7 +26,7 @@ jobs:
 
   version_change:
     name: Create version and tag
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       build_tag: ${{ steps.tagging.outputs.build_tag }} # map step output to job output
       build_tag_created: ${{ steps.tagging.outputs.build_tag_created }}
@@ -35,11 +35,12 @@ jobs:
       previous_release_tag: ${{ steps.tagging.outputs.previous_release_tag }}
     steps:
       - name: Set up Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -70,11 +71,11 @@ jobs:
           NEW_RELEASE_TAG="Release/${NEW_RELEASE_VERSION}"
           NEW_RELEASE_BRANCH="prepare-release/${NEW_RELEASE_VERSION}"
           
-          echo "::set-output name=build_tag::${NEW_RELEASE_TAG}"
-          echo "::set-output name=build_version::${NEW_RELEASE_VERSION}"
-          echo "::set-output name=build_branch::${NEW_RELEASE_BRANCH}"
+          echo "build_tag=${NEW_RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "build_version=${NEW_RELEASE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "build_branch=${NEW_RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
           PREVIOUS_RELEASE_TAG=$(git tag | sort -V | tail -1)
-          echo "::set-output name=previous_release_tag::${PREVIOUS_RELEASE_TAG}"
+          echo "previous_release_tag=${PREVIOUS_RELEASE_TAG}" >> "$GITHUB_OUTPUT"
           
           
           echo "release version is $NEW_RELEASE_VERSION"
@@ -86,7 +87,7 @@ jobs:
           git commit -m "New release version ${NEW_RELEASE_VERSION}"
           git tag -a "${NEW_RELEASE_TAG}" -m "Release version ${NEW_RELEASE_VERSION}"
           git push origin "${NEW_RELEASE_TAG}"
-          echo "::set-output name=build_tag_created::YES"
+          echo "build_tag_created=YES" >> "$GITHUB_OUTPUT"
           # prepare next snapshot for development
           mvn  -B --quiet ci-friendly-flatten:version -Dprefix.regex="Release/*"
           SNAPSHOTVERSION=$(cat revision.txt)
@@ -99,134 +100,130 @@ jobs:
 
 
   build:
-    name: Java and Native Compilation
+    name: Build and test (${{ matrix.os }}, ${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     needs: version_change
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ] # ubuntu-latest, , macos-latest
-        platform: [ x64 ] #x32, x64 ]
-        exclude:
-          - os: macos-latest
-            platform: x32
+        include:
+          - os: ubuntu-24.04
+            arch: x64
+            artifact: linux-x64
+            publish: true
+          - os: windows-2022
+            arch: x64
+            artifact: windows-x64
+            publish: true
+          - os: macos-15-intel
+            arch: x64
+            artifact: macos-intel-test
+            publish: false
+          - os: macos-15
+            arch: aarch64
+            artifact: macos-universal
+            publish: true
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'true'
           ref: ${{ needs.version_change.outputs.build_tag }}
 
-      - name: ubuntu add 32bit compiler
-        run: sudo apt-get update && sudo apt-get install gcc-multilib
-        if: matrix.platform == 'x32' && matrix.os == 'ubuntu-latest'
-
-      - name: Set up Java x64
-        if: matrix.platform == 'x64'
-        uses: actions/setup-java@v1
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-          architecture: x64
+          architecture: ${{ matrix.arch }}
 
-      - name: Set up Java x32
-        if: matrix.platform == 'x86'
-        uses: actions/setup-java@v1
+      - name: Set up Windows native toolchain
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x32
+          msystem: MINGW64
+          install: make mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+          path-type: inherit
 
-      - name: Put MSYS2_MinGW64 on PATH for windows
-        if: matrix.os == 'windows-latest'
-        # there is not yet an environment variable for this path from msys2/setup-msys2
-        # We need this to get a gcc 11.2 that is new enough to compile the reference FMU3
-        run: echo "C:\msys64/mingw64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Put Windows native toolchain on PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Maven download
-        run: mvn validate dependency:resolve-plugins -B --quiet
+      - name: Build and test
+        run: mvn -B -ntp package -Pmake,native_release
+        env:
+          CC: ${{ runner.os == 'macOS' && '/usr/bin/clang' || 'gcc' }}
+          CXX: ${{ runner.os == 'macOS' && '/usr/bin/clang++' || 'g++' }}
 
-      - name: Maven Build x32
-        run: mvn -B package --file pom.xml -Pmake32
-        if: matrix.platform == 'x32'
+      - name: Verify universal macOS libraries
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          lipo jnifmuapi/target/native/libfmuapi.dylib -verify_arch x86_64 arm64
+          while IFS= read -r -d '' library; do
+            lipo "$library" -verify_arch x86_64 arm64
+          done < <(find jnifmuapi/target/fmus -name '*.dylib' -print0)
 
-      - name: Maven Build x64
-        run: mvn -B package --file pom.xml -Pmake
-        if: matrix.platform == 'x64'
-
-      - name: artifact
+      # Both Macs test universal binaries; only Apple Silicon publishes the macOS artifact.
+      - name: Upload native libraries
+        if: matrix.publish
         uses: actions/upload-artifact@v4
         with:
-          name: lib-${{ matrix.os }}-${{ needs.version_change.outputs.build_version }}
-          path: |
-            jnifmuapi/target/classes/lib/**/libfmuapi.so
-            jnifmuapi/target/classes/lib/**/libfmuapi.dylib
-            jnifmuapi/target/classes/lib/**/fmuapi.dll
+          name: native-${{ matrix.artifact }}
+          path: jnifmuapi/target/classes/lib/
+          if-no-files-found: error
           retention-days: 1
 
+      - name: Upload JVM crash logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jvm-crash-logs-${{ matrix.os }}-${{ matrix.arch }}
+          path: '**/hs_err*'
+          retention-days: 1
 
   final:
     name: Build and Deploy Combined Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs: [ version_change , build ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'true'
           ref: ${{ needs.version_change.outputs.build_tag }}
 
       - id: install-secret-key
         name: Install gpg secret key
-        run: |
-          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
-          gpg --list-secret-keys --keyid-format LONG
+        env:
+          GPG_SECRET_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+        run: printf '%b' "$GPG_SECRET_KEY" | gpg --batch --import
 
       - name: Environment variables
         run: echo ${{ env.SERVER_ID }}
 
-      - name: Download all workflow run artifacts
+      - name: Download native libraries
         uses: actions/download-artifact@v4
         with:
-          name: lib-ubuntu-${{ needs.version_change.outputs.build_version }}
+          pattern: native-*
+          merge-multiple: true
           path: jnifmuapi/target/classes/lib
 
 
-
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-macos-13-${{ needs.version_change.outputs.build_version }}
-          path: jnifmuapi/target/classes/lib
-
-
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-windows-latest-${{ needs.version_change.outputs.build_version }}
-          path: jnifmuapi/target/classes/lib
-
-
-      - name: Set up Java x64
-        if: matrix.platform == 'x64'
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x64
-
-      - name: Set up Java x32
-        if: matrix.platform == 'x86'
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          architecture: x32
 
       - name: Deploy server
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           server-id: ${{ env.SERVER_ID }}
           server-username: MAVEN_USERNAME
@@ -239,6 +236,18 @@ jobs:
 
       - name: Maven Build Final
         run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+
+      - name: Verify all platforms are packaged
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar tf jnifmuapi/target/jnifmuapi-*.jar > packaged-files.txt
+          for library in \
+            Linux-amd64/libfmuapi.so Linux-x86_64/libfmuapi.so \
+            Windows-amd64/fmuapi.dll Windows-x86_64/fmuapi.dll \
+            Mac-x86_64/libfmuapi.dylib Mac-aarch64/libfmuapi.dylib Mac-arm64/libfmuapi.dylib; do
+            grep -Fx "lib/$library" packaged-files.txt
+          done
 
       - name: Maven Deploy RELEASE
         # If autorelease is false then it must be released from here: https://oss.sonatype.org/#stagingRepositories
@@ -289,12 +298,12 @@ jobs:
 
   rollback:
     name: Rollback on error
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs: [ version_change , build, final ]
     if: always() && (needs.version_change.result == 'failure' || needs.build.result == 'failure' || needs.final.result == 'failure')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Rolling back tag
         continue-on-error: true
@@ -308,11 +317,11 @@ jobs:
 
   cleanup:
     name: Update development and master with new release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     needs: [ final,version_change ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
