@@ -6,7 +6,7 @@ This is a Java API for the fmi standard which is defined as a collection of C he
 
 * java 11
 * Maven 3
-* Cmake
+* CMake 3.10 or newer (including CMake 4)
 * A working C and C++ compiler
 
 ## Linux
@@ -16,6 +16,7 @@ This is a Java API for the fmi standard which is defined as a collection of C he
 ## Mac
 
 * `brew install cmake`
+* Install Xcode Command Line Tools: `xcode-select --install`
 
 ## Windows
 
@@ -48,6 +49,21 @@ git submodules update --init
 To build the project simply run maven `package` with the profile `make` to generate the native library for your
 platform. If you dont have `JAVA_HOME` and the includes required there set correctly you can set the environment
 variable `CI=1` (`export CI=1`) to use the embedded headers.
+
+On Linux and Windows, the compiler targets its default host architecture; no architecture
+argument is needed. On macOS, the default is a universal dylib containing both `x86_64`
+and `arm64`, built using the Apple toolchain on either Intel or Apple Silicon.
+The same universal JNI library is packaged under the Java resource paths
+`lib/Mac-x86_64`, `lib/Mac-aarch64`, and `lib/Mac-arm64` to match `os.arch`.
+Verify both slices with `lipo -archs jnifmuapi/target/classes/lib/Mac-aarch64/libfmuapi.dylib`.
+
+FMI 2 macOS FMUs use `binaries/darwin64` on both Intel and Apple Silicon and must
+contain a compatible library (a universal dylib supports both). FMI 3 uses
+`binaries/x86_64-darwin` or `binaries/aarch64-darwin`, according to the JVM architecture,
+as defined by the [FMI 3 platform tuples](https://fmi-standard.org/docs/3.0.2/#platform-tuple-definition).
+The test FMUs built by the `make` profile are also universal on macOS, with their
+libraries copied into the appropriate FMI 2 or FMI 3 directories.
+An Intel-only FMU still requires an Intel JVM, for example under Rosetta on Apple Silicon.
 
 ```bash
 mvn clean package -Pmake

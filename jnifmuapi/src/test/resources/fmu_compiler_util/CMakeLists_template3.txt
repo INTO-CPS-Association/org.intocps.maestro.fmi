@@ -1,7 +1,11 @@
 # Prepends <prefix> to every entry in <arg> and stores in <var>
 
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.10)
+if (CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS target architectures")
+endif ()
+
 project (FMU_NAME C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR on)
@@ -71,8 +75,25 @@ set_target_properties(${PROJECT_NAME}
 
 
 
+set(output_folders "${output_folder}")
+if (APPLE)
+    if ("${output_folder}" MATCHES "-darwin$")
+        set(output_folders)
+        foreach (arch ${CMAKE_OSX_ARCHITECTURES})
+            if ("${arch}" STREQUAL "arm64")
+                list(APPEND output_folders "aarch64-darwin")
+            else ()
+                list(APPEND output_folders "${arch}-darwin")
+            endif ()
+        endforeach ()
+    else ()
+        set(output_folders "darwin64")
+    endif ()
+endif ()
+
+foreach (output_folder ${output_folders})
 add_custom_command(TARGET FMU_NAME POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/binaries/${output_folder}/"
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/binaries/${output_folder}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
-        DEPENDS ${PROJECT_NAME}
         )
+endforeach ()

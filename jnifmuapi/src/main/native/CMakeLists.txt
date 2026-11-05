@@ -1,4 +1,9 @@
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.10)
+
+if (CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS target architectures")
+endif ()
+
 project(fmuapi
         VERSION 3.0.0
         LANGUAGES C CXX
@@ -30,22 +35,10 @@ else ()
 endif ()
 
 
-include_directories($ENV{JAVA_HOME}/include)
-
 if (WIN32)
     #windows
     #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--add-stdcall-alias")
-    include_directories($ENV{JAVA_HOME}/include/win32)
-endif ()
-
-if (UNIX)
-
-    if (APPLE)
-        include_directories($ENV{JAVA_HOME}/include/darwin)
-    else ()
-        include_directories($ENV{JAVA_HOME}/include/linux)
-    endif ()
 endif ()
 
 #include_directories(${libshmfmi_SOURCE_DIR})
@@ -104,6 +97,5 @@ message("${output_folder}")
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/${output_folder}/"
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/classes/lib/${output_folder}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
-        DEPENDS ${PROJECT_NAME}
         )
 endforeach()

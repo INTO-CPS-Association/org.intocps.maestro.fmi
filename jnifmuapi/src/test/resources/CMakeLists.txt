@@ -7,7 +7,11 @@ FUNCTION(PREPEND var prefix arg)
    SET(${var} "${listVar}" PARENT_SCOPE)
 ENDFUNCTION(PREPEND)
 
-cmake_minimum_required (VERSION 2.8.5)
+cmake_minimum_required (VERSION 3.10)
+if (CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS target architectures")
+endif ()
+
 project ($ENV{FMU_NAME} C CXX)
 
 message(STATUS "ENV FMU NAME: $ENV{FMU_NAME}")

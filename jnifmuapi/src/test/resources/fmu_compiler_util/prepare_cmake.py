@@ -43,6 +43,8 @@ import os
 default_platform=str(platform.machine()) + '-' + str(platform.system()).lower()
 if 'AMD64' in default_platform:
     default_platform='x86_64-' + str(platform.system()).lower()
+elif default_platform.startswith('arm64-'):
+    default_platform='aarch64-' + str(platform.system()).lower()
 
 
 parser = argparse.ArgumentParser()
@@ -62,7 +64,7 @@ fmi_bin_platform=args.platform
 
 if args.bin_platform_version<3:
     # we just do a simple mapping from 3 to 2
-    if args.platform=='x86_64-darwin':
+    if args.platform in ('x86_64-darwin', 'aarch64-darwin', 'arm64-darwin'):
         fmi_bin_platform='darwin64'
     elif args.platform=='x86_64-linux':
         fmi_bin_platform='linux64'
