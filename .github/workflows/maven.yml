@@ -48,6 +48,7 @@ jobs:
           architecture: ${{ matrix.arch }}
 
       - name: Set up Windows native toolchain
+        id: msys2
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
@@ -58,20 +59,26 @@ jobs:
       - name: Put Windows native toolchain on PATH
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
-          "C:\msys64\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          "C:\msys64\ucrt64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          (Join-Path $env:MSYS2_LOCATION 'usr\bin') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          (Join-Path $env:MSYS2_LOCATION 'ucrt64\bin') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Verify Windows native toolchain
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
-          foreach ($tool in @('gcc', 'g++', 'cmake')) {
-            $actual = (Get-Command $tool -CommandType Application -ErrorAction Stop).Source
-            $expected = "C:\msys64\ucrt64\bin\${tool}.exe"
+          foreach ($tool in @('gcc', 'g++', 'cmake', 'make', 'sh')) {
+            $toolDirectory = if ($tool -in @('make', 'sh')) { 'usr\bin' } else { 'ucrt64\bin' }
+            $actual = (Get-Command $tool -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+            $expected = Join-Path $env:MSYS2_LOCATION "$toolDirectory\${tool}.exe"
             if (-not [string]::Equals($actual, $expected, [System.StringComparison]::OrdinalIgnoreCase)) {
               throw "Expected $tool at $expected, found $actual"
             }
+            Write-Output "$tool resolved to $actual"
           }
 
       - name: Build and test
@@ -84,7 +91,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $maven = (Get-Command mvn -CommandType Application -ErrorAction Stop).Source
+          $maven = (Get-Command mvn -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
           $env:PATH = "$env:JAVA_HOME\bin;$env:SystemRoot\System32;$env:SystemRoot"
           & $maven -B -ntp -pl jnifmuapi -am test "-Dtest=StaticTest,FmuTest,FmuLoadTest#loadAndInstantiateLegacyWindowsFmu,Fmi3ApiTest#testPlatformVersion" "-Dsurefire.failIfNoSpecifiedTests=false"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
