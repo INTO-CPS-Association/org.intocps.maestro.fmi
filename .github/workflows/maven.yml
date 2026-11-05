@@ -33,15 +33,15 @@ jobs:
             publish: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: true
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
@@ -86,7 +86,7 @@ jobs:
       # Both Macs build and test universal binaries; publish only one set to avoid overwrites.
       - name: Upload native libraries
         if: matrix.publish
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-${{ matrix.artifact }}
           path: jnifmuapi/target/classes/lib/
@@ -95,7 +95,7 @@ jobs:
 
       - name: Upload test FMU contents
         if: matrix.publish
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-fmus-${{ matrix.artifact }}
           path: |
@@ -107,10 +107,11 @@ jobs:
 
       - name: Upload JVM crash logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jvm-crash-logs-${{ matrix.os }}-${{ matrix.arch }}
           path: '**/hs_err*'
+          if-no-files-found: ignore
           retention-days: 1
 
   final:
@@ -118,11 +119,11 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: true
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
@@ -132,14 +133,14 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Download native libraries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: native-*
           merge-multiple: true
           path: jnifmuapi/target/classes/lib
 
       - name: Download test FMU contents
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: test-fmus-*
           merge-multiple: true
@@ -189,7 +190,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
       - name: Upload Java packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jnifmuapi
           path: |
@@ -199,7 +200,7 @@ jobs:
           retention-days: 5
 
       - name: Upload combined test FMUs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-fmus
           path: jnifmuapi/target/fmus/**/*.fmu
