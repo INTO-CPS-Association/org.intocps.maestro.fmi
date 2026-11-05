@@ -38,5 +38,5 @@
 
 void fmuLogger(fmi2Component c, fmi2String instanceName, fmi2Status status,
                fmi2String category, fmi2String message, ...);
-int loadDll(const char *dllPath, FMU *fmu);
+int loadDll(const char *dllPath, FMU *fmu, char **errorMessage);
 int error(const char *message);

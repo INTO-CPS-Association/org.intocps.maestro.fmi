@@ -35,6 +35,10 @@ The API can be build using the following tools:
 Build using the `C:\msys64\ucrt64.exe` terminal. The resulting libraries use the
 Universal CRT, which is included with Windows 10 and Windows Server 2016 or newer.
 
+Native FMU load failures include the library path and operating-system diagnostic
+in the Java exception. On Windows this includes the numeric Windows error code and
+its system description; missing required FMI symbols are reported separately.
+
 ## Checkout
 
 ```bash
