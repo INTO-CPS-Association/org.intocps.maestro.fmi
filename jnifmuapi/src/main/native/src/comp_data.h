@@ -71,7 +71,7 @@ void *getCallbackEnvironment(FMU *fmu, const char *instanceName);
 jobject getCallbackReference(JNIEnv *env, void *componentEnvironment, jmethodID *method);
 void storeComponent(CompHashmapNode *comp);
 void freeComponentNode(JNIEnv *env, CompHashmapNode *comp);
-void freeComp(JNIEnv *env, fmi2Component comp);
+void freeComp(JNIEnv *env, FMU *fmu, fmi2Component comp);
 CompHashmapNode *beginFreeComponent(FMU *fmu, fmi2Component comp);
 int isComponentValid(FMU *fmu, fmi2Component comp);
 void storeFmu(FMU *fmu);

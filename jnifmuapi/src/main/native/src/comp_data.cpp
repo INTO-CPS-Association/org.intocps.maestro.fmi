@@ -37,11 +37,12 @@
 
 #include <map>
 #include <mutex>
+#include <utility>
 
 using namespace std;
 
 static map<void *, HashmapNode *> g_callbackMap;
-static map<fmi2Component, CompHashmapNode *> g_compMap;
+static map<pair<FMU *, fmi2Component>, CompHashmapNode *> g_compMap;
 static map<FMU *, size_t> g_fmus;
 static mutex g_mutex;
 
@@ -53,7 +54,7 @@ extern "C" void storeCallbackHandler(HashmapNode *callback) {
 extern "C" void storeComponent(CompHashmapNode *comp) {
   if (comp->comp == NULL) return;
   lock_guard<mutex> lock(g_mutex);
-  g_compMap[comp->comp] = comp;
+  g_compMap[make_pair(comp->fmu, comp->comp)] = comp;
 }
 
 extern "C" void freeCallbackHandler(JNIEnv *env, HashmapNode *callback) {
@@ -101,11 +102,11 @@ extern "C" void freeComponentNode(JNIEnv *env, CompHashmapNode *comp) {
   free(comp);
 }
 
-extern "C" void freeComp(JNIEnv *env, fmi2Component comp) {
+extern "C" void freeComp(JNIEnv *env, FMU *fmu, fmi2Component comp) {
   CompHashmapNode *node;
   {
     lock_guard<mutex> lock(g_mutex);
-    auto it = g_compMap.find(comp);
+    auto it = g_compMap.find(make_pair(fmu, comp));
     if (it == g_compMap.end()) return;
     node = it->second;
     g_compMap.erase(it);
@@ -115,14 +116,14 @@ extern "C" void freeComp(JNIEnv *env, fmi2Component comp) {
 
 extern "C" int isComponentValid(FMU *fmu, fmi2Component comp) {
   lock_guard<mutex> lock(g_mutex);
-  auto it = g_compMap.find(comp);
+  auto it = g_compMap.find(make_pair(fmu, comp));
   return g_fmus.count(fmu) != 0 && it != g_compMap.end() &&
          it->second->fmu == fmu && !it->second->freeing;
 }
 
 extern "C" CompHashmapNode *beginFreeComponent(FMU *fmu, fmi2Component comp) {
   lock_guard<mutex> lock(g_mutex);
-  auto it = g_compMap.find(comp);
+  auto it = g_compMap.find(make_pair(fmu, comp));
   if (g_fmus.count(fmu) == 0 || it == g_compMap.end() ||
       it->second->fmu != fmu || it->second->freeing) {
     return NULL;
