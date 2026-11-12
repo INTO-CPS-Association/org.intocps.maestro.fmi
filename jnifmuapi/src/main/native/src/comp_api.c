@@ -106,7 +106,7 @@ Java_org_intocps_fmi_jnifmuapi_NativeFmuComponent_nFreeInstance(
   }
   getFmuPtr(fmuPtr)->freeInstance(comp);
 
-  freeComp(env, comp);
+  freeComp(env, getFmuPtr(fmuPtr), comp);
 }
 
 JNIEXPORT jbyte JNICALL
